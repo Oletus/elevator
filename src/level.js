@@ -86,7 +86,7 @@ Elevator.prototype.render = function(ctx) {
     //this.tilemap.render(ctx, function(tile) { return tile === 'o'; }, 0.05, 0.05);
     ctx.save();
     ctx.translate(0, -2);
-    ctx.scale(0.17, 0.17);
+    ctx.scale(1 / 6, 1 / 6);
     Elevator.sprite.draw(ctx, 0, 0);
     ctx.restore();
     if (!this.doorOpen) {
@@ -149,7 +149,7 @@ Level.prototype.getFloorWidth = function() {
 Level.prototype.render = function(ctx) {
     ctx.save();
     ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
-    ctx.scale(15, 15);
+    ctx.scale(6, 6);
     ctx.translate(-this.floors[0].tilemap.width * 0.5, -this.numFloors * Floor.height * 0.5);
 
     for (var i = 0; i < this.floors.length; ++i) {
