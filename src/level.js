@@ -35,7 +35,9 @@ Elevator.doorSprite = new Sprite('door_closed.png');
 Elevator.doorOpenSprite = new Sprite('door_open1.png');
 
 Elevator.prototype.removeOccupant = function(toRemove) {
-    this.occupants.splice(this.occupants.indexOf(toRemove), 1);
+    if (this.occupants.indexOf(toRemove) >= 0) {
+        this.occupants.splice(this.occupants.indexOf(toRemove), 1);
+    }
 };
 
 Elevator.prototype.hasSpace = function(space) {
@@ -151,6 +153,7 @@ var Level = function() {
 Level.prototype.spawnCharacter = function() {
     var character = new Character({x: 1, floor: Math.floor(Math.random() * this.numFloors), level: this});
     this.characters.push(character);
+    this.floors[character.floor].occupants.push(character);
 };
 
 Level.prototype.getFloorTopY = function(floor) {

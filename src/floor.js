@@ -23,6 +23,13 @@ var Floor = function(options) {
     };
     objectUtil.initWithDefaults(this, defaults, options);
     this.tilemap = new TileMap({initTile: TileMap.initFromData(FloorTiles), height: FloorTiles.length, width: FloorTiles[0].length });
+    this.occupants = [];
+};
+
+Floor.prototype.removeOccupant = function(toRemove) {
+    if (this.occupants.indexOf(toRemove) >= 0) {
+        this.occupants.splice(this.occupants.indexOf(toRemove), 1);
+    }
 };
 
 Floor.height = FloorTiles.length - 1;

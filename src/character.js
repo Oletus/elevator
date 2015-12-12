@@ -78,6 +78,7 @@ Character.prototype.update = function(deltaTime) {
         this.x = wallXLeft + this.width * 0.5;
     }
     if (this.x > doorThresholdX && this.elevator === null) {
+        this.level.floors[this.floor].removeOccupant(this);
         this.elevator = this.level.elevator;
         this.elevator.occupants.push(this);
     }
