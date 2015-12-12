@@ -13,6 +13,7 @@ var FloorTiles = [
 
 var Floor = function(options) {
     var defaults = {
+        id: '',
         floor: 0, // Floor number rises upwards
         name: 'Products',
         elevator: null,

@@ -123,16 +123,13 @@ var Level = function() {
     var randomIndex = Math.floor(Math.random() * this.numFloors);
     
     for (var i = 0; i < this.numFloors; ++i) {
-        
-        if ( i == randomIndex )
-        {
-            floor = new Floor({floor: i, elevator: this.elevator, level: this, name: "Security", canSpawn: false});
+        var floorOptions = {floor: i, elevator: this.elevator, level: this};
+        for (var key in shuffledFloors[i]) {
+            if (shuffledFloors[i].hasOwnProperty(key)) {
+                floorOptions[key] = shuffledFloors[i][key];
+            }
         }
-        else
-        {
-            floor = new Floor({floor: i, elevator: this.elevator, level: this, name: shuffledFloors[i].name});
-        }    
-        
+        floor = new Floor(floorOptions);
         this.floors.push(floor);
     }
     this.characters = [];
