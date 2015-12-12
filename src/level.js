@@ -31,6 +31,7 @@ var Level = function() {
     this.characterMoveSpeed = 10;
     this.elevatorMoveSpeed = 4;
     this.elevatorDoorOpenTime = 0.3;
+    this.elevatorSnapTreshold = 0.3;
     
     this.score = 0;
 };

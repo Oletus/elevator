@@ -73,7 +73,7 @@ Elevator.prototype.update = function(deltaTime) {
     this.currentMovementSpeed = this.currentMovementSpeed * 0.9 + (appliedIntent * this.level.elevatorMoveSpeed) * 0.1;
     var snappiness = Math.abs(this.floorNumber - Math.round(this.floorNumber));
     if (moveIntent === 0) {
-        if (snappiness < 0.15) {
+        if (snappiness < this.level.elevatorSnapTreshold) {
             this.floorNumber = this.floorNumber * 0.85 + Math.round(this.floorNumber) * 0.15;
         }
         if (snappiness < 0.01) {
