@@ -98,6 +98,7 @@ Level.prototype.update = function(deltaTime) {
 };
 
 Level.prototype.resetCombo = function() {
+    this.elevator.comboText = null;
     this.comboCount = 0;
 }
 
