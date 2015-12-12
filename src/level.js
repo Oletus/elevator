@@ -37,7 +37,7 @@ Floor.prototype.render = function(ctx) {
     ctx.save();
     var drawY = this.level.getFloorTopY(this.floor);
     ctx.translate(0, drawY);
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = '#222';
     this.tilemap.render(ctx, function(tile) { return tile === 'x'; }, 0.05, 0.05);
     ctx.fillStyle = '#888';
     this.tilemap.render(ctx, function(tile) { return tile === 'h'; }, 0.05, 0.05);
@@ -147,6 +147,13 @@ var Level = function() {
     for (var i = 0; i < this.numFloors; ++i) {
         this.floors.push(new Floor({floor: i, elevator: this.elevator, level: this}));
     }
+    this.characters = [];
+    this.spawnCharacter();
+};
+
+Level.prototype.spawnCharacter = function() {
+    var character = new Character({x: 1, floor: Math.floor(Math.random() * this.numFloors), level: this});
+    this.characters.push(character);
 };
 
 Level.prototype.getFloorTopY = function(floor) {
@@ -154,7 +161,7 @@ Level.prototype.getFloorTopY = function(floor) {
 };
 
 Level.prototype.getFloorFloorY = function(floor) {
-    return (this.numFloors - floor - 1) * Floor.height + Floor.height - 2;
+    return (this.numFloors - floor - 1) * Floor.height + Floor.height - 1;
 };
 
 Level.prototype.render = function(ctx) {
@@ -167,6 +174,9 @@ Level.prototype.render = function(ctx) {
         this.floors[i].render(ctx);
     }
     this.elevator.render(ctx);
+    for (var i = 0; i < this.characters.length; ++i) {
+        this.characters[i].render(ctx);
+    }
     ctx.restore();
 };
 
@@ -175,6 +185,9 @@ Level.prototype.update = function(deltaTime) {
         this.floors[i].update(deltaTime);
     }
     this.elevator.update(deltaTime);
+    for (var i = 0; i < this.characters.length; ++i) {
+        this.characters[i].update(deltaTime);
+    }
 };
 
 Level.prototype.upPress = function(playerNumber) {

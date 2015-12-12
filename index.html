@@ -55,7 +55,7 @@ Game.prototype.render = function(ctx) {
     if (ctx === undefined) {
         ctx = this.realCtx;
     }
-    ctx.fillStyle = 'black'
+    ctx.fillStyle = '#aaa'
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     this.level.render(ctx);
     return ctx;
