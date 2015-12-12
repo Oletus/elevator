@@ -28,6 +28,8 @@ var Elevator = function(options) {
     this.doorOpen = false;
 };
 
+Elevator.sprite = new Sprite('lift.png');
+
 Elevator.prototype.getUniqueOccupants = function() {
     var occupants = [];
     for (var i = 0; i < this.slots.length; ++i) {
@@ -81,7 +83,12 @@ Elevator.prototype.render = function(ctx) {
     var drawY = this.level.getFloorTopY(this.floor);
     ctx.translate(this.x, drawY);
     ctx.fillStyle = 'red';
-    this.tilemap.render(ctx, function(tile) { return tile === 'o'; }, 0.05, 0.05);
+    //this.tilemap.render(ctx, function(tile) { return tile === 'o'; }, 0.05, 0.05);
+    ctx.save();
+    ctx.translate(0, -2);
+    ctx.scale(0.17, 0.17);
+    Elevator.sprite.draw(ctx, 0, 0);
+    ctx.restore();
     if (!this.doorOpen) {
         this.doorVisual = 1.0;
     } else {
