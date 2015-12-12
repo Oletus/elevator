@@ -104,11 +104,13 @@ Elevator.prototype.render = function(ctx) {
     var drawY = this.level.getFloorTopY(this.floorNumber);
     ctx.translate(0, drawY);
     ctx.fillStyle = 'red';
-    //this.tilemap.render(ctx, function(tile) { return tile === 'o'; }, 0.05, 0.05);
     ctx.save();
     ctx.translate(0, -2);
     ctx.scale(1 / 6, 1 / 6);
     Elevator.sprite.draw(ctx, 0, 0);
+    
+    ctx.textAlign = 'center';
+    whiteBitmapFont.drawText(ctx, 'SCORE: ' + this.level.score, 4 * 6, 0);
     if (!this.doorOpen) {
         this.doorVisual = 1.0;
     } else {
@@ -117,8 +119,6 @@ Elevator.prototype.render = function(ctx) {
     Elevator.doorOpenSprite.draw(ctx, 1, 21);
     ctx.globalAlpha = this.doorVisual;
     Elevator.doorSprite.draw(ctx, 1, 21);
-    /*ctx.fillStyle = '#da4';
-    this.tilemap.render(ctx, function(tile) { return tile === 'd'; }, 0.05, 0.05);*/
     ctx.restore();
     ctx.restore();
 };

@@ -31,6 +31,8 @@ var Level = function() {
     this.characterMoveSpeed = 10;
     this.elevatorMoveSpeed = 4;
     this.elevatorDoorOpenTime = 0.3;
+    
+    this.score = 0;
 };
 
 Level.prototype.spawnCharacter = function() {
@@ -92,6 +94,11 @@ Level.prototype.update = function(deltaTime) {
         this.timeUntilSpawn = minTimeUntilSpawn + Math.random() * (maxTimeUntilSpawn - minTimeUntilSpawn);
     }
         
+};
+
+Level.prototype.reachedGoal = function(character) {
+    console.log(character.queueTime);
+    this.score += character.spawnTip();
 };
 
 Level.prototype.upPress = function(playerNumber) {

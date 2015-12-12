@@ -30,6 +30,7 @@ var Character = function(options) {
             }
         }
     }
+    this.queueTime = 0;
 };
 
 Character.bodySprites = {
@@ -60,6 +61,14 @@ Character.prototype.render = function(ctx) {
         whiteBitmapFont.drawText(ctx, '' + (this.goalFloor + 1), 0, 0);
     }
     ctx.restore();
+};
+
+Character.prototype.spawnTip = function() {
+    var tip = 0;
+    if (this.queueTime < 10) {
+        tip = Math.ceil(10 - this.queueTime);
+    }
+    return tip;
 };
 
 Character.prototype.update = function(deltaTime) {
@@ -109,11 +118,16 @@ Character.prototype.update = function(deltaTime) {
         this.elevator = null;
         this.floorNumber = Math.round(this.floorNumber);
         this.elevatorTargetX = undefined;
+        if (this.floorNumber === this.goalFloor) {
+            this.level.reachedGoal(this);
+        }
     }
-    if (this.x != oldX) {
+    if (this.x !== oldX) {
         this.legsSprite.update(deltaTime);
         this.bobbleTime += deltaTime;
         this.facingRight = this.x - oldX > 0;
+    } else if (!this.elevator) {
+        this.queueTime += deltaTime;
     }
     if (this.x + this.width < -1 && this.floorNumber === this.goalFloor) {
         this.dead = true;
