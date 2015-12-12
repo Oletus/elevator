@@ -108,13 +108,11 @@ Level.prototype.reachedGoal = function(character) {
         // Repeat previous tippers in combo
         for ( var i = 0; i < this.comboCharacters.length; i++ ) {
             this.score += this.comboCharacters[i].getTip();
-            console.log(this.comboCharacters[i].getTip());
         }
         
         // Apply your own tip TIMES current combo count
         this.comboCount++;
         this.score += character.getTip() * this.comboCount;
-        console.log(character.getTip() + " * " + this.comboCount + " = " + (character.getTip() * this.comboCount));
         
         character.spawnTip();
         
@@ -124,7 +122,6 @@ Level.prototype.reachedGoal = function(character) {
         this.comboCharacters = [character];
         this.comboCount = 1;
         this.score += character.getTip();
-        console.log(character.getTip());
         character.spawnTip();
     }
     
