@@ -29,6 +29,9 @@ var Elevator = function(options) {
 };
 
 Elevator.sprite = new Sprite('lift.png');
+Elevator.shaftSprite = new Sprite('shaft.png');
+Elevator.doorSprite = new Sprite('door_closed.png');
+Elevator.doorOpenSprite = new Sprite('door_open1.png');
 
 Elevator.prototype.getUniqueOccupants = function() {
     var occupants = [];
@@ -80,23 +83,30 @@ Elevator.prototype.update = function(deltaTime) {
 
 Elevator.prototype.render = function(ctx) {
     ctx.save();
+    ctx.translate(this.x, 0);
+    ctx.save();
+    ctx.scale(1 / 6, 1 / 6);
+    Elevator.shaftSprite.draw(ctx, 0, 0);
+    ctx.restore();
     var drawY = this.level.getFloorTopY(this.floor);
-    ctx.translate(this.x, drawY);
+    ctx.translate(0, drawY);
     ctx.fillStyle = 'red';
     //this.tilemap.render(ctx, function(tile) { return tile === 'o'; }, 0.05, 0.05);
     ctx.save();
     ctx.translate(0, -2);
     ctx.scale(1 / 6, 1 / 6);
     Elevator.sprite.draw(ctx, 0, 0);
-    ctx.restore();
     if (!this.doorOpen) {
         this.doorVisual = 1.0;
     } else {
         this.doorVisual = 1.0 - (this.doorOpenTimer - 0.25) * 4.0;
     }
+    Elevator.doorOpenSprite.draw(ctx, 1, 21);
     ctx.globalAlpha = this.doorVisual;
-    ctx.fillStyle = '#da4';
-    this.tilemap.render(ctx, function(tile) { return tile === 'd'; }, 0.05, 0.05);
+    Elevator.doorSprite.draw(ctx, 1, 21);
+    /*ctx.fillStyle = '#da4';
+    this.tilemap.render(ctx, function(tile) { return tile === 'd'; }, 0.05, 0.05);*/
+    ctx.restore();
     ctx.restore();
 };
 
@@ -152,10 +162,10 @@ Level.prototype.render = function(ctx) {
     ctx.scale(6, 6);
     ctx.translate(-this.floors[0].tilemap.width * 0.5, -this.numFloors * Floor.height * 0.5);
 
+    this.elevator.render(ctx);
     for (var i = 0; i < this.floors.length; ++i) {
         this.floors[i].render(ctx);
     }
-    this.elevator.render(ctx);
     for (var i = 0; i < this.characters.length; ++i) {
         this.characters[i].render(ctx);
     }

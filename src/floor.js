@@ -42,9 +42,13 @@ Floor.prototype.render = function(ctx) {
     Floor.sprite.draw(ctx, 0, 0);
     ctx.restore();
     
+    ctx.save();
+    ctx.translate(22, -2);
+    ctx.scale(1 / 6, 1 / 6);
+    Elevator.doorOpenSprite.draw(ctx, -1, 21);
     ctx.globalAlpha = this.doorVisual;
-    ctx.fillStyle = '#da4';
-    this.tilemap.render(ctx, function(tile) { return tile === 'd'; }, 0.05, 0.05);
+    Elevator.doorSprite.draw(ctx, -1, 21);
+    ctx.restore();
     
     ctx.globalAlpha = 1;
     ctx.translate(21.5, 1.5);
