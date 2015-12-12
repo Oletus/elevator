@@ -43,7 +43,7 @@ Character.prototype.render = function(ctx) {
 Character.prototype.update = function(deltaTime) {
     var doorThresholdX = this.level.getFloorWidth();
     var wallXRight = doorThresholdX - 1;
-    var wallXLeft = 0;
+    var wallXLeft = -5;
     if (this.elevator) {
         this.floor = this.elevator.floor;
         if (!this.elevator.doorOpen) {
@@ -78,5 +78,8 @@ Character.prototype.update = function(deltaTime) {
     if (this.x != oldX) {
         this.legsSprite.update(deltaTime);
         this.bobbleTime += deltaTime;
+    }
+    if (this.x + this.width < -1 && this.floor === this.goalFloor) {
+        this.dead = true;
     }
 };

@@ -167,8 +167,13 @@ Level.prototype.update = function(deltaTime) {
         this.floors[i].update(deltaTime);
     }
     this.elevator.update(deltaTime);
-    for (var i = 0; i < this.characters.length; ++i) {
+    for (var i = 0; i < this.characters.length;) {
         this.characters[i].update(deltaTime);
+        if (this.characters[i].dead) {
+            this.characters.splice(i, 1);
+        } else {
+            ++i;
+        }
     }
 };
 
