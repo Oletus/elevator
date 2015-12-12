@@ -47,14 +47,11 @@ Floor.prototype.render = function(ctx) {
     this.tilemap.render(ctx, function(tile) { return tile === 'd'; }, 0.05, 0.05);
     
     ctx.globalAlpha = 1;
-    ctx.translate(21, 3);
-    ctx.scale(0.1, 0.1);
+    ctx.translate(21.5, 1.5);
+    ctx.scale(1 / 6, 1 / 6);
     ctx.fillStyle = 'black';
-    var originalFont = ctx.font;
     ctx.textAlign = "right";
-    ctx.font = "12px sans-serif";
-    ctx.fillText((this.floor + 1) + ' ' + this.name, 0, 0);
-    ctx.font = originalFont;
+    bitmapFont.drawText(ctx, ((this.floor + 1) + ' ' + this.name).toUpperCase(), 0, 0);
 
     ctx.restore();
 };

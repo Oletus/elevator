@@ -23,6 +23,7 @@
 <script src="src/util2d.js"></script>
 <script src="src/utiljs.js"></script>
 <script src="src/tilemap.js"></script>
+<script src="src/bitmapfont.js"></script>
 
 <script src="src/level.js"></script>
 <script src="src/character.js"></script>
@@ -84,6 +85,8 @@ Game.prototype.update = function(deltaTime) {
 };
 
 var DEV_MODE = (window.location.href.indexOf("?devMode") != -1);
+
+var bitmapFont = new BitmapFont();
 
 window['start'] = function() {
     var DEBUG_MAIN_LOOP = DEV_MODE && true; // Set to true to allow fast-forwarding main loop with 'f'

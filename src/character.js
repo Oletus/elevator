@@ -38,12 +38,10 @@ Character.prototype.render = function(ctx) {
     this.legsSprite.drawRotatedNonUniform(ctx, 0, -1, 0, scale * flip, scale);
     this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.sin(this.bobbleTime * 15) * 0.1, 0, scale * flip, scale);
     if (this.floor !== this.goalFloor || this.elevator) {
-        ctx.translate(0, -3);
-        ctx.scale(0.1, 0.1);
-        ctx.fillStyle = '#f00';
+        ctx.translate(0, -4);
+        ctx.scale(1 / 6, 1 / 6);
         ctx.textAlign = 'center';
-        ctx.font = "12px sans-serif";
-        ctx.fillText(this.goalFloor + 1, 0, 0);
+        bitmapFont.drawText(ctx, '' + this.goalFloor, 0, 0);
     }
     ctx.restore();
 };
