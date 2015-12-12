@@ -71,11 +71,11 @@ Elevator.prototype.downRelease = function() {
 Elevator.prototype.update = function(deltaTime) {
     var moveIntent = this.moveUp + this.moveDown;    
     var appliedIntent = this.doorOpen ? 0 : moveIntent;
-    this.currentMovementSpeed = this.currentMovementSpeed * 0.9 + (appliedIntent * 2) * 0.1;
+    this.currentMovementSpeed = this.currentMovementSpeed * 0.9 + (appliedIntent * this.level.elevatorMoveSpeed) * 0.1;
     var snappiness = Math.abs(this.floorNumber - Math.round(this.floorNumber));
     if (moveIntent === 0) {
         if (snappiness < 0.15) {
-            this.floorNumber = this.floorNumber * 0.9 + Math.round(this.floorNumber) * 0.1;
+            this.floorNumber = this.floorNumber * 0.85 + Math.round(this.floorNumber) * 0.15;
         }
         if (snappiness < 0.01) {
             this.doorOpenTimer += deltaTime;
@@ -84,8 +84,8 @@ Elevator.prototype.update = function(deltaTime) {
     if (snappiness > 0.01 || moveIntent != 0) {
         this.doorOpenTimer -= deltaTime;
     }
-    this.doorOpenTimer = mathUtil.clamp(0, 0.5, this.doorOpenTimer);
-    this.doorOpen = this.doorOpenTimer > 0.25;
+    this.doorOpenTimer = mathUtil.clamp(0, this.level.elevatorDoorOpenTime, this.doorOpenTimer);
+    this.doorOpen = this.doorOpenTimer > this.level.elevatorDoorOpenTime * 0.5;
     this.floorNumber += this.currentMovementSpeed * deltaTime;
     this.floorNumber = mathUtil.clamp(0, this.level.numFloors - 1, this.floorNumber);
     var fromRight = this.maxTotalOccupantWidth - this.getTotalUsedSpace();
@@ -113,7 +113,7 @@ Elevator.prototype.render = function(ctx) {
     if (!this.doorOpen) {
         this.doorVisual = 1.0;
     } else {
-        this.doorVisual = 1.0 - (this.doorOpenTimer - 0.25) * 4.0;
+        this.doorVisual = 1.0 - (this.doorOpenTimer - this.level.elevatorDoorOpenTime * 0.5) / (this.level.elevatorDoorOpenTime * 0.5);
     }
     Elevator.doorOpenSprite.draw(ctx, 1, 21);
     ctx.globalAlpha = this.doorVisual;
@@ -152,6 +152,10 @@ var Level = function() {
     }
     this.characters = [];
     this.spawnCharacter();
+    
+    this.characterMoveSpeed = 10;
+    this.elevatorMoveSpeed = 4;
+    this.elevatorDoorOpenTime = 0.3;
 };
 
 Level.prototype.spawnCharacter = function() {

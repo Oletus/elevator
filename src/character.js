@@ -17,8 +17,6 @@ var Character = function(options) {
     this.bobbleTime = 0;
 };
 
-Character.moveSpeed = 10;
-
 Character.bodySprites = {
     'customer': new Sprite('body-customer.png')
 };
@@ -73,11 +71,11 @@ Character.prototype.update = function(deltaTime) {
     }
     var oldX = this.x;
     if (this.elevatorTargetX !== undefined) {
-        propertyToValue(this, 'x', this.elevatorTargetX, Character.moveSpeed * deltaTime);
+        propertyToValue(this, 'x', this.elevatorTargetX, this.level.characterMoveSpeed * deltaTime);
     } else if (this.floorTargetX !== undefined) {
-        propertyToValue(this, 'x', this.floorTargetX, Character.moveSpeed * deltaTime);
+        propertyToValue(this, 'x', this.floorTargetX, this.level.characterMoveSpeed * deltaTime);
     } else {
-        this.x += this.moveX * Character.moveSpeed * deltaTime;
+        this.x += this.moveX * this.level.characterMoveSpeed * deltaTime;
     }
     if (this.x > wallXRight - this.width * 0.5) {
         this.x = wallXRight - this.width * 0.5;
