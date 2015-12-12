@@ -40,12 +40,16 @@ Elevator.prototype.removeOccupant = function(toRemove) {
     }
 };
 
-Elevator.prototype.hasSpace = function(space) {
+Elevator.prototype.getTotalUsedSpace = function() {
     var usedSpace = 0;
     for (var i = 0; i < this.occupants.length; ++i) {
         usedSpace += this.occupants[i].width;
     }
-    return usedSpace + space <= this.maxTotalOccupantWidth;
+    return usedSpace;
+};
+
+Elevator.prototype.hasSpace = function(space) {
+    return this.getTotalUsedSpace() + space <= this.maxTotalOccupantWidth;
 };
 
 Elevator.prototype.upPress = function() {
@@ -84,10 +88,10 @@ Elevator.prototype.update = function(deltaTime) {
     this.doorOpen = this.doorOpenTimer > 0.25;
     this.floorNumber += this.currentMovementSpeed * deltaTime;
     this.floorNumber = mathUtil.clamp(0, this.level.numFloors - 1, this.floorNumber);
-    var usedSpace = 0;
+    var fromRight = this.maxTotalOccupantWidth - this.getTotalUsedSpace();
     for (var i = 0; i < this.occupants.length; ++i) {
-        this.occupants[i].elevatorTargetX = this.x + this.maxTotalOccupantWidth + 1 - usedSpace - this.occupants[i].width * 0.5;
-        usedSpace += this.occupants[i].width;
+        this.occupants[i].elevatorTargetX = this.x + this.maxTotalOccupantWidth + 1 - fromRight - this.occupants[i].width * 0.5;
+        fromRight += this.occupants[i].width;
     }
 };
 
