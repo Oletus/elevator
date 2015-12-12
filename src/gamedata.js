@@ -74,7 +74,7 @@ GameData.floors =
     },
     {
         id: "positivesign",
-        name: "Exit signs and demotivators"
+        name: "Exit signs & demotivators"
     },
     {
         id: "dynamite",
@@ -118,7 +118,7 @@ function getAllButExcluded() {
     var group = [];
     
     for ( var i = 0; i < GameData.floors.length; i++ ) {
-        if ( !GameData.floors[i].hasOwnProperty("excludeAsDestination") ) {
+        if ( GameData.floors[i].hasOwnProperty("excludeAsDestination") ) {
             group.push(GameData.floors[i]);
         }
     }
@@ -132,8 +132,9 @@ GameData.destinationGroups =
 ];
 
 GameData.characters =
-{
-    'customer' : {
+[
+    {
+        id : "customer",
         destinations : getAllButExcluded() 
     }
-};
+];
