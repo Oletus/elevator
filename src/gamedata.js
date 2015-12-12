@@ -21,7 +21,7 @@ GameData.floors =
         name: "Surgery Spa"
     },
     {
-        id: "dog",
+        id: "dogfood",
         name: "Dog restaurant"
     },
     {
@@ -33,11 +33,11 @@ GameData.floors =
         name: "Acme"
     },
     {
-        id: "anvil",
+        id: "heavystuff",
         name: "Anvils, Pianos and heavy stuff shop"
     },
     {
-        id: "porcupine",
+        id: "balloonpop",
         name: "Porcupines and balloons"
     },
     {
@@ -45,19 +45,19 @@ GameData.floors =
         name: "Car wash and cocktail bar"
     },
     {
-        id: "cake",
+        id: "cakepoison",
         name: "Chocolate cakes and cyanide pills"
     },
     {
-        id: "baby",
+        id: "babyblender",
         name: "Baby blenders"
     },
     {
-        id: "pedicure",
+        id: "dogpedicure",
         name: "Dog pedicures"
     },
     {
-        id: "bicycles",
+        id: "fishbicycle",
         name: "Fish bicycles and frog umbrellas"
     },
     {
@@ -65,15 +65,15 @@ GameData.floors =
         name: "Cat travel agency"
     },
     {
-        id: "burners",
+        id: "burnerfabric",
         name: "Bunsen Burners and flammable fabrics"
     },
     {
-        id: "slippers",
+        id: "elephantslippers",
         name: "Elephant slippers"
     },
     {
-        id: "sign",
+        id: "positivesign",
         name: "Exit signs and positive affirmations"
     },
     {
@@ -85,7 +85,7 @@ GameData.floors =
         name: "Giant magnets"
     },
     {
-        id: "coffee",
+        id: "coffeemeditation",
         name: "Coffee and meditation beads"
     },
     {
@@ -93,23 +93,23 @@ GameData.floors =
         name: "Sea-monkey farm"
     },
     {
-        id: "tapdancing",
+        id: "tapdanceearplugs",
         name: "Tap dancing shoes and earplugs"
     },
     {
-        id: "underwear",
+        id: "underwearsnowshoe",
         name: "Underwear and snowshoes"
     },
     {
-        id: "clown",
+        id: "clowncamp",
         name: "Clown bootcamp"
     },
     {
-        id: "cheese",
+        id: "cheeseandraincoats",
         name: "Cheese kits and raincoats"
     },
     {
-        id: "bee",
+        id: "beetherapy",
         name: "Bee therapy"
     }
 ];
