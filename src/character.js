@@ -43,32 +43,37 @@ Character.prototype.render = function(ctx) {
 Character.prototype.update = function(deltaTime) {
     var doorThresholdX = this.level.getFloorWidth();
     var wallXRight = doorThresholdX - 1;
+    var wallXLeft = 0;
     if (this.elevator) {
         this.floor = this.elevator.floor;
-        if (this.elevator.doorOpen && Math.round(this.floor) == this.goalFloor) {
-            this.moveX = -1;
+        if (!this.elevator.doorOpen) {
+            wallXLeft = doorThresholdX + 1;
         }
         wallXRight = doorThresholdX + 7;
     } else {
-        if (this.floor === this.goalFloor) {
-            this.moveX = -1;
-        } else {
-            this.moveX = 1;
-        }
         if (this.level.floors[this.floor].doorOpen) {
             wallXRight = doorThresholdX + 7;
         }
     }
-    if (this.x > doorThresholdX && Math.round(this.level.elevator.floor) === this.floor) {
-        this.elevator = this.level.elevator;
-    }
-    if (this.x < doorThresholdX && Math.round(this.level.elevator.floor) === this.floor) {
-        this.elevator = null;
+    if (Math.round(this.floor) == this.goalFloor) {
+        this.moveX = -1;
+    } else {
+        this.moveX = 1;
     }
     var oldX = this.x;
     this.x += this.moveX * 4 * deltaTime;
     if (this.x > wallXRight - this.width * 0.5) {
         this.x = wallXRight - this.width * 0.5;
+    }
+    if (this.x < wallXLeft + this.width * 0.5) {
+        this.x = wallXLeft + this.width * 0.5;
+    }
+    if (this.x > doorThresholdX) {
+        this.elevator = this.level.elevator;
+    }
+    if (this.x < doorThresholdX) {
+        this.elevator = null;
+        this.floor = Math.round(this.floor);
     }
     if (this.x != oldX) {
         this.legsSprite.update(deltaTime);
