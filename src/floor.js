@@ -16,7 +16,7 @@ var Floor = function(options) {
         floor: 0, // Floor number rises upwards
         name: 'Products',
         elevator: null,
-        level: null
+        level: null,
         canSpawn : true
     };
     objectUtil.initWithDefaults(this, defaults, options);
