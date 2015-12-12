@@ -60,7 +60,7 @@ Character.prototype.update = function(deltaTime) {
             wallXRight = this.elevatorWallX;
         }
     } else {
-        if (this.level.floors[this.floor].doorOpen) {
+        if (this.level.floors[this.floor].doorOpen && this.level.elevator.hasSpace(this.width)) {
             wallXRight = doorThresholdX + 7;
         }
     }
