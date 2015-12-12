@@ -17,7 +17,7 @@ var Floor = function(options) {
         name: 'Products',
         elevator: null,
         level: null,
-        canSpawn : true
+        spawnIds : ["customer"]
     };
     objectUtil.initWithDefaults(this, defaults, options);
     this.tilemap = new TileMap({initTile: TileMap.initFromData(FloorTiles), height: FloorTiles.length, width: FloorTiles[0].length });

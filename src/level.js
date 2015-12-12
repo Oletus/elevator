@@ -106,7 +106,7 @@ var Level = function() {
     this.elevator = new Elevator({x: this.getFloorWidth(), level: this});
     this.floors = [];
     
-    var shuffledFloorNames = arrayUtil.shuffle(floorNames);
+    var shuffledFloors = arrayUtil.shuffle(GameData.floors);
     
     // Fixed, functional floors
     var floor;
@@ -120,7 +120,7 @@ var Level = function() {
         }
         else
         {
-            floor = new Floor({floor: i, elevator: this.elevator, level: this, name: shuffledFloorNames[i]});
+            floor = new Floor({floor: i, elevator: this.elevator, level: this, name: shuffledFloors[i].name});
         }    
         
         this.floors.push(floor);
