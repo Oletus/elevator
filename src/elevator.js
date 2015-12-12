@@ -87,6 +87,7 @@ Elevator.prototype.update = function(deltaTime) {
             this.doorOpenTimer += deltaTime;
         }
     } else {
+        this.level.resetCombo();
         this.targetFloor = undefined;
         this.currentMovementSpeed = this.currentMovementSpeed * 0.9 + (appliedIntent * this.level.elevatorMoveSpeed) * 0.1;
     }
