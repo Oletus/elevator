@@ -103,7 +103,6 @@ Level.prototype.resetCombo = function() {
 }
 
 Level.prototype.reachedGoal = function(character) {
-    console.log(character.queueTime);
     if ( this.lastScoreFloor === character.floorNumber ) {
         this.comboCount++;
     }
