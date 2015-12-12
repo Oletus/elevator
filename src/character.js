@@ -15,6 +15,21 @@ var Character = function(options) {
     this.legsSprite = new AnimatedSpriteInstance(Character.legsAnimation);
     this.bodySprite = Character.bodySprites[this.id];
     this.bobbleTime = 0;
+
+    var possibleDestinations = GameData.characters[this.id].destinations;
+    var shuffledFloors = arrayUtil.shuffle(this.level.floors);
+    
+    for ( var i = 0; i < shuffledFloors.length; i++ ) {
+        if ( shuffledFloors[i].floorNumber === this.floorNumber ) {
+            continue;
+        }
+            
+        for ( var b = 0; b < possibleDestinations.length; b++ ) {
+            if ( possibleDestinations[b].id === shuffledFloors[i].id ) {
+                this.goalFloor = shuffledFloors[i].floorNumber;
+            }
+        }
+    }
 };
 
 Character.bodySprites = {
