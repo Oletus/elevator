@@ -69,7 +69,9 @@ Floor.prototype.render = function(ctx) {
 };
 
 Floor.prototype.spawnCharacter = function() {
-    var character = BaseCharacter.create({x: 1, floorNumber: this.floorNumber, level: this.level, id: 'horse'});
+    var characterId = arrayUtil.randomItem(this.spawnIds);
+    var character = BaseCharacter.create({x: 1, floorNumber: this.floorNumber, level: this.level, id: characterId});
+    
     this.occupants.push(character);
     return character;
 }
