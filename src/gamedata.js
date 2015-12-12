@@ -134,6 +134,11 @@ GameData.destinationGroups =
 GameData.characters =
 {
     'customer' : {
-        destinations : getAllButExcluded() 
+        destinations : getAllButExcluded(),
+        characterConstructor: Character
+    },
+    'horse': {
+        destinations : getAllButExcluded(),
+        characterConstructor: Horse
     }
 };

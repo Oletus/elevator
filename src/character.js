@@ -2,6 +2,10 @@
 var BaseCharacter = function() {
 };
 
+BaseCharacter.create = function(options) {
+    return new GameData.characters[options.id].characterConstructor(options);
+};
+
 BaseCharacter.legsAnimation = new AnimatedSprite({
         'idle': [{src: 'legs-idle.png', duration: 0}],
 },
@@ -154,3 +158,28 @@ Character.prototype.renderBody = function(ctx) {
     this.legsSprite.drawRotatedNonUniform(ctx, 0, -1, 0, scale * flip, scale);
     this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.sin(this.bobbleTime * 15) * 0.1, 0, scale * flip, scale);
 };
+
+
+var Horse = function(options) {
+    options.width = 4;
+    this.initBase(options);
+    this.bodySprite = Horse.bodySprites[this.id];
+};
+
+Horse.prototype = new BaseCharacter();
+
+Horse.bodySprites = {
+    'horse': new Sprite('body-horse.png')
+};
+
+/**
+ * ctx has its current transform set centered on the floor at the x center of the character.
+ */
+Horse.prototype.renderBody = function(ctx) {
+    var scale = 1 / 6;
+    var flip = this.facingRight ? 1 : -1;
+    this.legsSprite.drawRotatedNonUniform(ctx, 1, -1, 0, scale * flip, scale);
+    this.legsSprite.drawRotatedNonUniform(ctx, -1, -1, 0, scale * flip, scale);
+    this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.sin(this.bobbleTime * 15) * 0.1, 0, scale * flip, scale);
+};
+

@@ -18,7 +18,7 @@ var Floor = function(options) {
         name: 'Products',
         elevator: null,
         level: null,
-        spawnIds : ["customer"],
+        spawnIds : ["customer", "horse"],
         excludeAsDestination : false
     };
     objectUtil.initWithDefaults(this, defaults, options);
@@ -69,7 +69,7 @@ Floor.prototype.render = function(ctx) {
 };
 
 Floor.prototype.spawnCharacter = function() {
-    var character = new Character({x: 1, floorNumber: this.floorNumber, level: this.level});
+    var character = BaseCharacter.create({x: 1, floorNumber: this.floorNumber, level: this.level, id: 'horse'});
     this.occupants.push(character);
     return character;
 }
