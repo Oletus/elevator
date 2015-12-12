@@ -25,6 +25,8 @@ var Floor = function(options) {
 
 Floor.height = FloorTiles.length - 1;
 
+Floor.sprite = new Sprite('floor_gfx.png');
+
 Floor.prototype.render = function(ctx) {
     ctx.save();
     var drawY = this.level.getFloorTopY(this.floor);
@@ -33,6 +35,12 @@ Floor.prototype.render = function(ctx) {
     this.tilemap.render(ctx, function(tile) { return tile === 'x'; }, 0.05, 0.05);
     ctx.fillStyle = '#888';
     this.tilemap.render(ctx, function(tile) { return tile === 'h'; }, 0.05, 0.05);
+    ctx.save();
+    ctx.translate(0, -0.5);
+    ctx.scale(0.1695, 0.1695);
+    Floor.sprite.draw(ctx, 0, 0);
+    ctx.restore();
+    
     ctx.globalAlpha = this.doorVisual;
     ctx.fillStyle = '#da4';
     this.tilemap.render(ctx, function(tile) { return tile === 'd'; }, 0.05, 0.05);
