@@ -57,7 +57,7 @@ Character.prototype.render = function(ctx) {
         ctx.translate(0, -4);
         ctx.scale(1 / 6, 1 / 6);
         ctx.textAlign = 'center';
-        bitmapFont.drawText(ctx, '' + (this.goalFloor + 1), 0, 0);
+        whiteBitmapFont.drawText(ctx, '' + (this.goalFloor + 1), 0, 0);
     }
     ctx.restore();
 };

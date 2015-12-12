@@ -1,7 +1,11 @@
 
 
-var BitmapFont = function() {
-    this.sprite = new Sprite('bitmapfont.png');
+var BitmapFont = function(color) {
+    if (color !== undefined) {
+        this.sprite = new Sprite('bitmapfont.png', Sprite.turnSolidColored(color));
+    } else {
+        this.sprite = new Sprite('bitmapfont.png');
+    }
     this.charactersPerRow = 32;
     this.characterHeight = 6;
     this.characterWidth = 4;

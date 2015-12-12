@@ -63,7 +63,7 @@ Floor.prototype.render = function(ctx) {
     ctx.scale(1 / 6, 1 / 6);
     ctx.fillStyle = 'black';
     ctx.textAlign = "right";
-    bitmapFont.drawText(ctx, ((this.floorNumber + 1) + ' ' + this.name).toUpperCase(), 0, 0);
+    blackBitmapFont.drawText(ctx, ((this.floorNumber + 1) + ' ' + this.name).toUpperCase(), 0, 0);
 
     ctx.restore();
 };
