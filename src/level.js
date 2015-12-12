@@ -96,7 +96,7 @@ Elevator.prototype.render = function(ctx) {
 var Level = function() {
     this.numFloors = 6;
 
-    this.elevator = new Elevator({x: 23, level: this});
+    this.elevator = new Elevator({x: this.getFloorWidth(), level: this});
     this.floors = [];
     
     var shuffledFloorNames = arrayUtil.shuffle(floorNames);
@@ -120,6 +120,10 @@ Level.prototype.getFloorTopY = function(floor) {
 
 Level.prototype.getFloorFloorY = function(floor) {
     return (this.numFloors - floor - 1) * Floor.height + Floor.height - 1;
+};
+
+Level.prototype.getFloorWidth = function() {
+    return 23;
 };
 
 Level.prototype.render = function(ctx) {
