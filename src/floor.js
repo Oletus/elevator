@@ -79,4 +79,9 @@ Floor.prototype.update = function(deltaTime) {
         this.doorOpen = this.elevator.doorOpen;
         this.doorVisual = this.elevator.doorVisual;
     }
+    var usedSpace = 0;
+    for (var i = 0; i < this.occupants.length; ++i) {
+        this.occupants[i].floorTargetX = this.level.getFloorWidth() - 1 - usedSpace - this.occupants[i].width * 0.5;
+        usedSpace += this.occupants[i].width;
+    }
 };

@@ -86,7 +86,7 @@ Elevator.prototype.update = function(deltaTime) {
     this.floor = mathUtil.clamp(0, this.level.numFloors - 1, this.floor);
     var usedSpace = 0;
     for (var i = 0; i < this.occupants.length; ++i) {
-        this.occupants[i].elevatorWallX = this.x + this.maxTotalOccupantWidth + 1 - usedSpace;
+        this.occupants[i].elevatorTargetX = this.x + this.maxTotalOccupantWidth + 1 - usedSpace - this.occupants[i].width * 0.5;
         usedSpace += this.occupants[i].width;
     }
 };

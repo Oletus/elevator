@@ -56,21 +56,27 @@ Character.prototype.update = function(deltaTime) {
         if (!this.elevator.doorOpen) {
             wallXLeft = doorThresholdX + 1;
         }
-        if (this.elevatorWallX !== undefined) {
-            wallXRight = this.elevatorWallX;
-        }
+        wallXRight = doorThresholdX + 7;
     } else {
         if (this.level.floors[this.floor].doorOpen && this.level.elevator.hasSpace(this.width)) {
             wallXRight = doorThresholdX + 7;
+            this.floorTargetX = undefined;
         }
     }
     if (Math.round(this.floor) == this.goalFloor && (!this.elevator || this.elevator.doorOpen)) {
         this.moveX = -1;
+        this.elevatorTargetX = undefined;
     } else {
         this.moveX = 1;
     }
     var oldX = this.x;
-    this.x += this.moveX * 4 * deltaTime;
+    if (this.elevatorTargetX !== undefined) {
+        propertyToValue(this, 'x', this.elevatorTargetX, 4 * deltaTime);
+    } else if (this.floorTargetX !== undefined) {
+        propertyToValue(this, 'x', this.floorTargetX, 4 * deltaTime);
+    } else {
+        this.x += this.moveX * 4 * deltaTime;
+    }
     if (this.x > wallXRight - this.width * 0.5) {
         this.x = wallXRight - this.width * 0.5;
     }
@@ -81,11 +87,13 @@ Character.prototype.update = function(deltaTime) {
         this.level.floors[this.floor].removeOccupant(this);
         this.elevator = this.level.elevator;
         this.elevator.occupants.push(this);
+        this.floorTargetX = undefined;
     }
     if (this.x < doorThresholdX && this.elevator !== null) {
         this.elevator.removeOccupant(this);
         this.elevator = null;
         this.floor = Math.round(this.floor);
+        this.elevatorTargetX = undefined;
     }
     if (this.x != oldX) {
         this.legsSprite.update(deltaTime);
