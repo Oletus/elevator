@@ -56,7 +56,9 @@ Character.prototype.update = function(deltaTime) {
         if (!this.elevator.doorOpen) {
             wallXLeft = doorThresholdX + 1;
         }
-        wallXRight = doorThresholdX + 7;
+        if (this.elevatorWallX !== undefined) {
+            wallXRight = this.elevatorWallX;
+        }
     } else {
         if (this.level.floors[this.floor].doorOpen) {
             wallXRight = doorThresholdX + 7;
@@ -75,10 +77,12 @@ Character.prototype.update = function(deltaTime) {
     if (this.x < wallXLeft + this.width * 0.5) {
         this.x = wallXLeft + this.width * 0.5;
     }
-    if (this.x > doorThresholdX) {
+    if (this.x > doorThresholdX && this.elevator === null) {
         this.elevator = this.level.elevator;
+        this.elevator.occupants.push(this);
     }
-    if (this.x < doorThresholdX) {
+    if (this.x < doorThresholdX && this.elevator !== null) {
+        this.elevator.removeOccupant(this);
         this.elevator = null;
         this.floor = Math.round(this.floor);
     }

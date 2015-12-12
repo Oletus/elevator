@@ -22,7 +22,8 @@ var Elevator = function(options) {
     this.currentMovementSpeed = 0;
 
     objectUtil.initWithDefaults(this, defaults, options);
-    this.slots = [null, null, null];
+    this.occupants = [];
+    this.maxTotalOccupantWidth = 6;
     this.tilemap = new TileMap({initTile: TileMap.initFromData(ElevatorTiles), height: ElevatorTiles.length, width: ElevatorTiles[0].length });
     this.doorOpenTimer = 0;
     this.doorOpen = false;
@@ -33,14 +34,16 @@ Elevator.shaftSprite = new Sprite('shaft.png');
 Elevator.doorSprite = new Sprite('door_closed.png');
 Elevator.doorOpenSprite = new Sprite('door_open1.png');
 
-Elevator.prototype.getUniqueOccupants = function() {
-    var occupants = [];
-    for (var i = 0; i < this.slots.length; ++i) {
-        if (this.slots[i] !== null && occupants.indexOf(this.slots[i]) < 0) {
-            occupants.push(this.slots[i]);
-        }
+Elevator.prototype.removeOccupant = function(toRemove) {
+    this.occupants.splice(this.occupants.indexOf(toRemove), 1);
+};
+
+Elevator.prototype.hasSpace = function(space) {
+    var usedSpace = 0;
+    for (var i = 0; i < this.occupants.length; ++i) {
+        usedSpace += this.occupants[i].width;
     }
-    return occupants;
+    return usedSpace + space <= this.maxTotalOccupantWidth;
 };
 
 Elevator.prototype.upPress = function() {
@@ -79,6 +82,11 @@ Elevator.prototype.update = function(deltaTime) {
     this.doorOpen = this.doorOpenTimer > 0.25;
     this.floor += this.currentMovementSpeed * deltaTime;
     this.floor = mathUtil.clamp(0, this.level.numFloors - 1, this.floor);
+    var usedSpace = 0;
+    for (var i = 0; i < this.occupants.length; ++i) {
+        this.occupants[i].elevatorWallX = this.x + this.maxTotalOccupantWidth + 1 - usedSpace;
+        usedSpace += this.occupants[i].width;
+    }
 };
 
 Elevator.prototype.render = function(ctx) {
