@@ -65,7 +65,7 @@ BaseCharacter.prototype.spawnTip = function() {
 };
 
 BaseCharacter.prototype.getTip = function() {
-    var tip = 0;
+    var tip = 1;
     if (this.queueTime < 10) {
         tip = Math.ceil(10 - this.queueTime);
     }
