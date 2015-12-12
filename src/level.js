@@ -110,7 +110,11 @@ Elevator.prototype.render = function(ctx) {
     ctx.restore();
 };
 
+var minTimeUntilSpawn = 3;
+var maxTimeUntilSpawn = 9;
+
 var Level = function() {
+    this.timeUntilSpawn = maxTimeUntilSpawn;
     this.numFloors = 6;
 
     this.elevator = new Elevator({x: this.getFloorWidth(), level: this});
@@ -182,6 +186,12 @@ Level.prototype.update = function(deltaTime) {
             ++i;
         }
     }
+    this.timeUntilSpawn -= deltaTime;
+    if ( this.timeUntilSpawn <= 0 ) {
+        this.spawnCharacter();
+        this.timeUntilSpawn = minTimeUntilSpawn + Math.random() * (maxTimeUntilSpawn - minTimeUntilSpawn);
+    }
+        
 };
 
 Level.prototype.upPress = function(playerNumber) {
