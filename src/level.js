@@ -34,6 +34,7 @@ var Level = function() {
     this.elevatorSnapTreshold = 0.3;
     
     this.score = 0;
+    this.comboCount = 0;
 };
 
 Level.prototype.spawnCharacter = function() {
@@ -97,8 +98,24 @@ Level.prototype.update = function(deltaTime) {
         
 };
 
+Level.prototype.resetCombo = function() {
+    this.comboCount = 0;
+}
+
 Level.prototype.reachedGoal = function(character) {
     console.log(character.queueTime);
+    if ( this.lastScoreFloor === character.floorNumber ) {
+        this.comboCount++;
+    }
+    else {
+        this.comboCount = 1;
+    }
+    
+    if ( this.comboCount > 1 ) {
+        this.elevator.comboText = "COMBO X" + this.comboCount;
+    }
+
+    this.lastScoreFloor = character.floorNumber;
     this.score += character.spawnTip();
 };
 

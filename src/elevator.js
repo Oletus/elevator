@@ -26,6 +26,7 @@ var Elevator = function(options) {
     this.tilemap = new TileMap({initTile: TileMap.initFromData(ElevatorTiles), height: ElevatorTiles.length, width: ElevatorTiles[0].length });
     this.doorOpenTimer = 0;
     this.doorOpen = false;
+    this.comboText = null;
 };
 
 Elevator.sprite = new Sprite('lift.png');
@@ -111,6 +112,11 @@ Elevator.prototype.render = function(ctx) {
     
     ctx.textAlign = 'center';
     whiteBitmapFont.drawText(ctx, 'SCORE: ' + this.level.score, 4 * 6, 0);
+    
+    if ( this.comboText !== null ) {
+        whiteBitmapFont.drawText(ctx, this.comboText, 4 * 6, -1 * 6);   
+    }
+    
     if (!this.doorOpen) {
         this.doorVisual = 1.0;
     } else {
