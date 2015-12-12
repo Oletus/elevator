@@ -34,9 +34,10 @@ Character.prototype.render = function(ctx) {
     var drawY = this.level.getFloorFloorY(this.floor);
     ctx.translate(this.x, drawY);
     var scale = 1 / 20;
-    var flip = 1;
+    var flip = this.facingRight ? 1 : -1;
     this.legsSprite.drawRotatedNonUniform(ctx, 0, -1, 0, scale * flip, scale);
     this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.sin(this.bobbleTime * 15) * 0.1, 0, scale * flip, scale);
+    this.facingRight = true;
     if (this.floor !== this.goalFloor || this.elevator) {
         ctx.translate(0, -4);
         ctx.scale(1 / 6, 1 / 6);
@@ -84,6 +85,7 @@ Character.prototype.update = function(deltaTime) {
     if (this.x != oldX) {
         this.legsSprite.update(deltaTime);
         this.bobbleTime += deltaTime;
+        this.facingRight = this.x - oldX > 0;
     }
     if (this.x + this.width < -1 && this.floor === this.goalFloor) {
         this.dead = true;
