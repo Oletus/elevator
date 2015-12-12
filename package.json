@@ -1,0 +1,10 @@
+{
+  "name": "Elevator",
+  "version": "0.1.0",
+  "description": "Ludum Dare 34 Game",
+  "repository": "https://github.com/Oletus/elevator.git",
+  "license": "?",
+  "dependencies": {
+    "howler": "^1.1.28"
+  }
+}

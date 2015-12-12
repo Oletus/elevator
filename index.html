@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- This template provides a starting point for implementing a game that takes full advantage of gameutils.js -->
+<title>Gameutils.js game</title>
+<meta charset="UTF-8">
+<!-- output -->
+<script src="src/lib/hsl.js"></script>
+<script src="src/sprite.js"></script>
+<script src="src/animatedsprite.js"></script>
+<script src="src/audio.js"></script>
+<script src="src/canvasresizer.js"></script>
+<script src="src/loadingbar.js"></script>
+<script src="src/particle.js"></script>
+<script src="src/canvasui.js"></script>
+<!-- input -->
+<script src="src/lib/mousetrap.js"></script>
+<script src="src/lib/mousetrap-global-bind.js"></script>
+<script src="src/gamepad.js"></script>
+<script src="src/inputmapper.js"></script>
+
+<script src="src/mainloop.js"></script>
+<script src="src/util2d.js"></script>
+<script src="src/utiljs.js"></script>
+<script src="src/tilemap.js"></script>
+<script>
+'use strict';
+
+var Game = function(resizer) {
+    this.canvas = resizer.getCanvas();
+    this.realCtx = this.canvas.getContext('2d');
+    this.canvasUI = new CanvasUI({
+        element: this.canvas,
+        getCanvasPositionFromEvent: function(event) {
+            return resizer.getCanvasPosition(event);
+        }
+    });
+    this.time = 0;
+};
+
+Game.prototype.render = function(ctx) {
+    // CanvasResizer passes a wrapped 2D context to use here when run in FIXED_COORDINATE_SYSTEM mode,
+    // where ctx.canvas.width/height are set to the coordinate system width/height.
+    // Otherwise the context initialized here is used.
+    if (ctx === undefined) {
+        ctx = this.realCtx;
+    }
+    ctx.fillStyle = cssUtil.rgbString([0, 0, (Math.sin(this.time) * 0.5 + 0.5) * 255]);
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    return ctx;
+};
+
+Game.prototype.update = function(deltaTime) {
+    this.time += deltaTime;
+};
+
+var DEV_MODE = (window.location.href.indexOf("?devMode") != -1);
+
+window['start'] = function() {
+    var DEBUG_MAIN_LOOP = DEV_MODE && true; // Set to true to allow fast-forwarding main loop with 'f'
+    Audio.muteAll(DEV_MODE && false); // Set to true if sounds annoy developers
+
+    var resizer = new CanvasResizer({mode: CanvasResizer.Mode.DYNAMIC});
+    var game = new Game(resizer);
+    startMainLoop([resizer, game, new LoadingBar()], {debugMode: DEBUG_MAIN_LOOP});
+};
+</script>
+</head>
+
+<body onload="start()" style="background: black;">
+</body>
+
+</html>
