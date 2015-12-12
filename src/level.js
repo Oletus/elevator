@@ -33,9 +33,9 @@ var Floor = function(options) {
     this.tilemap = new TileMap({initTile: TileMap.initFromData(FloorTiles), height: FloorTiles.length, width: FloorTiles[0].length });
 };
 
-Floor.prototype.render = function(ctx, numFloors) {
+Floor.prototype.render = function(ctx) {
     ctx.save();
-    var drawY = (numFloors - this.floor - 1) * Floor.height;
+    var drawY = this.level.getFloorTopY(this.floor);
     ctx.translate(0, drawY);
     ctx.fillStyle = 'white';
     this.tilemap.render(ctx, function(tile) { return tile === 'x'; }, 0.05, 0.05);
@@ -122,9 +122,9 @@ Elevator.prototype.update = function(deltaTime) {
     this.floor = mathUtil.clamp(0, this.level.numFloors - 1, this.floor);
 };
 
-Elevator.prototype.render = function(ctx, numFloors) {
+Elevator.prototype.render = function(ctx) {
     ctx.save();
-    var drawY = (numFloors - this.floor - 1) * Floor.height;
+    var drawY = this.level.getFloorTopY(this.floor);
     ctx.translate(this.x, drawY);
     ctx.fillStyle = 'red';
     this.tilemap.render(ctx, function(tile) { return tile === 'o'; }, 0.05, 0.05);
@@ -149,6 +149,14 @@ var Level = function() {
     }
 };
 
+Level.prototype.getFloorTopY = function(floor) {
+    return (this.numFloors - floor - 1) * Floor.height;
+};
+
+Level.prototype.getFloorFloorY = function(floor) {
+    return (this.numFloors - floor - 1) * Floor.height + Floor.height - 2;
+};
+
 Level.prototype.render = function(ctx) {
     ctx.save();
     ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
@@ -156,9 +164,9 @@ Level.prototype.render = function(ctx) {
     ctx.translate(-this.floors[0].tilemap.width * 0.5, -this.numFloors * Floor.height * 0.5);
 
     for (var i = 0; i < this.floors.length; ++i) {
-        this.floors[i].render(ctx, this.numFloors);
+        this.floors[i].render(ctx);
     }
-    this.elevator.render(ctx, this.numFloors);
+    this.elevator.render(ctx);
     ctx.restore();
 };
 
