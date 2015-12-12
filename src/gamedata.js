@@ -132,9 +132,8 @@ GameData.destinationGroups =
 ];
 
 GameData.characters =
-[
-    {
-        id : "customer",
+{
+    'customer' : {
         destinations : getAllButExcluded() 
     }
-];
+};
