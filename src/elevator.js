@@ -27,6 +27,7 @@ var Elevator = function(options) {
     this.doorOpenTimer = 0;
     this.doorOpen = false;
     this.comboText = null;
+    this.targetFloor = this.floorNumber;
 };
 
 Elevator.sprite = new Sprite('lift.png');
@@ -71,17 +72,25 @@ Elevator.prototype.downRelease = function() {
 Elevator.prototype.update = function(deltaTime) {
     var moveIntent = this.moveUp + this.moveDown;    
     var appliedIntent = this.doorOpen ? 0 : moveIntent;
-    this.currentMovementSpeed = this.currentMovementSpeed * 0.9 + (appliedIntent * this.level.elevatorMoveSpeed) * 0.1;
     var snappiness = Math.abs(this.floorNumber - Math.round(this.floorNumber));
     if (moveIntent === 0) {
-        if (snappiness < this.level.elevatorSnapTreshold) {
-            this.floorNumber = this.floorNumber * 0.85 + Math.round(this.floorNumber) * 0.15;
+        if (this.targetFloor === undefined) {
+            this.targetFloor = Math.round(this.floorNumber + this.currentMovementSpeed * 0.15);
+        }
+        var distanceFromTarget = Math.abs(this.floorNumber - this.targetFloor);
+        this.currentMovementSpeed *= mathUtil.clamp(0, 0.99, 0.8 + distanceFromTarget * 0.3);
+        if (distanceFromTarget < 0.2) {
+            var c = mathUtil.clamp(0, 0.1, 0.2 - distanceFromTarget);
+            this.floorNumber = this.floorNumber * (1.0 - c) + this.targetFloor * c;
         }
         if (snappiness < 0.01) {
             this.doorOpenTimer += deltaTime;
         }
+    } else {
+        this.targetFloor = undefined;
+        this.currentMovementSpeed = this.currentMovementSpeed * 0.9 + (appliedIntent * this.level.elevatorMoveSpeed) * 0.1;
     }
-    if (snappiness > 0.01 || moveIntent != 0) {
+    if (snappiness > 0.01 || moveIntent !== 0) {
         this.doorOpenTimer -= deltaTime;
     }
     this.doorOpenTimer = mathUtil.clamp(0, this.level.elevatorDoorOpenTime, this.doorOpenTimer);
