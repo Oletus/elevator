@@ -156,7 +156,7 @@ Character.prototype.renderBody = function(ctx) {
     var scale = 1 / 6;
     var flip = this.facingRight ? 1 : -1;
     this.legsSprite.drawRotatedNonUniform(ctx, 0, -1, 0, scale * flip, scale);
-    this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.sin(this.bobbleTime * 15) * 0.1, 0, scale * flip, scale);
+    this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 15) * 1) / 6, 0, scale * flip, scale);
 };
 
 
@@ -180,6 +180,6 @@ Horse.prototype.renderBody = function(ctx) {
     var flip = this.facingRight ? 1 : -1;
     this.legsSprite.drawRotatedNonUniform(ctx, 1, -1, 0, scale * flip, scale);
     this.legsSprite.drawRotatedNonUniform(ctx, -1, -1, 0, scale * flip, scale);
-    this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.sin(this.bobbleTime * 15) * 0.1, 0, scale * flip, scale);
+    this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 15) * 1) / 6, 0, scale * flip, scale);
 };
 
