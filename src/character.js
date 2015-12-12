@@ -1,7 +1,16 @@
 
+var BaseCharacter = function() {
+};
 
+BaseCharacter.legsAnimation = new AnimatedSprite({
+        'idle': [{src: 'legs-idle.png', duration: 0}],
+},
+{
+    durationMultiplier: 1000 / 60,
+    defaultDuration: 5
+});
 
-var Character = function(options) {
+BaseCharacter.prototype.initBase = function(options) {
     var defaults = {
         floorNumber: 0, // Floor number rises upwards
         x: 0,
@@ -12,8 +21,7 @@ var Character = function(options) {
         width: 2
     };
     objectUtil.initWithDefaults(this, defaults, options);
-    this.legsSprite = new AnimatedSpriteInstance(Character.legsAnimation);
-    this.bodySprite = Character.bodySprites[this.id];
+    this.legsSprite = new AnimatedSpriteInstance(BaseCharacter.legsAnimation);
     this.bobbleTime = 0;
 
     var possibleDestinations = GameData.characters[this.id].destinations;
@@ -33,19 +41,19 @@ var Character = function(options) {
     this.queueTime = 0;
 };
 
+
+var Character = function(options) {
+    this.initBase(options);
+    this.bodySprite = Character.bodySprites[this.id];
+};
+
+Character.prototype = new BaseCharacter();
+
 Character.bodySprites = {
     'customer': new Sprite('body-customer.png')
 };
 
-Character.legsAnimation = new AnimatedSprite({
-        'idle': [{src: 'legs-idle.png', duration: 0}],
-},
-{
-    durationMultiplier: 1000 / 60,
-    defaultDuration: 5
-});
-
-Character.prototype.render = function(ctx) {
+BaseCharacter.prototype.render = function(ctx) {
     ctx.save();
     var drawY = this.level.getFloorFloorY(this.floorNumber);
     ctx.translate(this.x, drawY);
@@ -63,7 +71,7 @@ Character.prototype.render = function(ctx) {
     ctx.restore();
 };
 
-Character.prototype.spawnTip = function() {
+BaseCharacter.prototype.spawnTip = function() {
     var tip = 0;
     if (this.queueTime < 10) {
         tip = Math.ceil(10 - this.queueTime);
@@ -71,7 +79,7 @@ Character.prototype.spawnTip = function() {
     return tip;
 };
 
-Character.prototype.update = function(deltaTime) {
+BaseCharacter.prototype.update = function(deltaTime) {
     var doorThresholdX = this.level.getFloorWidth();
     var wallXRight = doorThresholdX - 1;
     var wallXLeft = -5;
