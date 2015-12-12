@@ -108,8 +108,21 @@ var Level = function() {
     
     var shuffledFloorNames = arrayUtil.shuffle(floorNames);
     
+    // Fixed, functional floors
+    var floor;
+    var randomIndex = Math.floor(Math.random() * this.numFloors);
+    
     for (var i = 0; i < this.numFloors; ++i) {
-        var floor = new Floor({floor: i, elevator: this.elevator, level: this, name: shuffledFloorNames[i]});
+        
+        if ( i == randomIndex )
+        {
+            floor = new Floor({floor: i, elevator: this.elevator, level: this, name: "Security", canSpawn: false});
+        }
+        else
+        {
+            floor = new Floor({floor: i, elevator: this.elevator, level: this, name: shuffledFloorNames[i]});
+        }    
+        
         this.floors.push(floor);
     }
     this.characters = [];
