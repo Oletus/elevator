@@ -70,18 +70,20 @@ BaseCharacter.prototype.getTip = function() {
 
 BaseCharacter.prototype.update = function(deltaTime) {
     var doorThresholdX = this.level.getFloorWidth();
-    var wallXRight = doorThresholdX - 1;
+    var wallXRight = 0;
     var wallXLeft = -5;
     if (this.elevator) {
         this.floorNumber = this.elevator.floorNumber;
-        if (!this.elevator.doorOpen) {
-            wallXLeft = doorThresholdX + 1;
+        if (this.elevator.doorVisual > 0) {
+            wallXLeft = doorThresholdX + this.elevator.doorVisual;
         }
         wallXRight = doorThresholdX + 7;
     } else {
-        if (this.level.floors[this.floorNumber].doorOpen && this.level.elevator.hasSpace(this.width)) {
+        if (this.level.floors[this.floorNumber].doorVisual === 0 && this.level.elevator.hasSpace(this.width)) {
             wallXRight = doorThresholdX + 7;
             this.floorTargetX = undefined;
+        } else {
+            wallXRight = doorThresholdX - this.level.floors[this.floorNumber].doorVisual;
         }
     }
     if (Math.round(this.floorNumber) == this.goalFloor && (!this.elevator || this.elevator.doorOpen)) {
