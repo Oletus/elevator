@@ -1,48 +1,12 @@
 
-var LevelTiles = [
+var FloorTiles = [
     'xxxxxxxxxxxxxxxxxh     h',
     '                 d     h',
     '                 d     h',
     '                 d     h',
     '                 d     h',
     '                 d     h',
-    'xxxxxxxxxxxxxxxxxh     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    'xxxxxxxxxxxxxxxxxh     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    'xxxxxxxxxxxxxxxxxh     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    'xxxxxxxxxxxxxxxxxh     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    'xxxxxxxxxxxxxxxxxh     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    'xxxxxxxxxxxxxxxxxh     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    'xxxxxxxxxxxxxxxxxh     h',
+    'xxxxxxxxxxxxxxxxxh     h'
 ];
 
 var ElevatorTiles = [
@@ -58,9 +22,33 @@ var ElevatorTiles = [
 var Floor = function(options) {
     var defaults = {
         floor: 0, // Floor number rises upwards
-        name: 'Products'
+        name: 'Products',
+        elevator: null,
+        level: null
     };
     objectUtil.initWithDefaults(this, defaults, options);
+    this.tilemap = new TileMap({initTile: TileMap.initFromData(FloorTiles), height: FloorTiles.length, width: FloorTiles[0].length });
+};
+
+Floor.prototype.render = function(ctx, numFloors) {
+    ctx.save();
+    var drawY = (numFloors - this.floor - 1) * Floor.height;
+    ctx.translate(0, drawY);
+    ctx.fillStyle = 'white';
+    this.tilemap.render(ctx, function(tile) { return tile === 'x'; }, 0.05, 0.05);
+    ctx.fillStyle = '#888';
+    this.tilemap.render(ctx, function(tile) { return tile === 'h'; }, 0.05, 0.05);
+    ctx.globalAlpha = this.doorVisual;
+    ctx.fillStyle = '#da4';
+    this.tilemap.render(ctx, function(tile) { return tile === 'd'; }, 0.05, 0.05);
+    ctx.restore();
+};
+
+Floor.prototype.update = function(deltaTime) {
+    if (Math.round(this.elevator.floor) == this.floor) {
+        this.doorOpen = this.elevator.doorOpen;
+        this.doorVisual = this.elevator.doorVisual;
+    }
 };
 
 Floor.height = 6;
@@ -149,28 +137,32 @@ Elevator.prototype.render = function(ctx, numFloors) {
 };
 
 var Level = function() {
-    this.tilemap = new TileMap({initTile: TileMap.initFromData(LevelTiles), height: LevelTiles.length, width: LevelTiles[0].length });
-    this.numFloors = Math.floor(this.tilemap.height / Floor.height);
+    this.numFloors = 6;
+
     this.elevator = new Elevator({x: 18, level: this});
+    this.floors = [];
+    for (var i = 0; i < this.numFloors; ++i) {
+        this.floors.push(new Floor({floor: i, elevator: this.elevator, level: this}));
+    }
 };
 
 Level.prototype.render = function(ctx) {
     ctx.save();
     ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
     ctx.scale(15, 15);
-    ctx.translate(-this.tilemap.width * 0.5, -this.tilemap.height * 0.5);
-    ctx.fillStyle = 'white';
-    this.tilemap.render(ctx, function(tile) { return tile === 'x'; }, 0.05, 0.05);
-    ctx.fillStyle = '#888';
-    this.tilemap.render(ctx, function(tile) { return tile === 'h'; }, 0.05, 0.05);
-    ctx.fillStyle = '#da4';
-    this.tilemap.render(ctx, function(tile) { return tile === 'd'; }, 0.05, 0.05);
+    ctx.translate(-this.floors[0].tilemap.width * 0.5, -this.numFloors * Floor.height * 0.5);
 
+    for (var i = 0; i < this.floors.length; ++i) {
+        this.floors[i].render(ctx, this.numFloors);
+    }
     this.elevator.render(ctx, this.numFloors);
     ctx.restore();
 };
 
 Level.prototype.update = function(deltaTime) {
+    for (var i = 0; i < this.floors.length; ++i) {
+        this.floors[i].update(deltaTime);
+    }
     this.elevator.update(deltaTime);
 };
 
