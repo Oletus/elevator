@@ -8,12 +8,12 @@ var Character = function(options) {
         level: null,
         elevator: null,
         goalFloor: 0,
-        characterType: 'customer',
+        id: 'customer',
         width: 2
     };
     objectUtil.initWithDefaults(this, defaults, options);
     this.legsSprite = new AnimatedSpriteInstance(Character.legsAnimation);
-    this.bodySprite = Character.bodySprites[this.characterType];
+    this.bodySprite = Character.bodySprites[this.id];
     this.bobbleTime = 0;
 };
 
@@ -37,6 +37,14 @@ Character.prototype.render = function(ctx) {
     var flip = 1;
     this.legsSprite.drawRotatedNonUniform(ctx, 0, -1, 0, scale * flip, scale);
     this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.sin(this.bobbleTime * 15) * 0.1, 0, scale * flip, scale);
+    if (this.floor !== this.goalFloor || this.elevator) {
+        ctx.translate(0, -3);
+        ctx.scale(0.1, 0.1);
+        ctx.fillStyle = '#f00';
+        ctx.textAlign = 'center';
+        ctx.font = "12px sans-serif";
+        ctx.fillText(this.goalFloor + 1, 0, 0);
+    }
     ctx.restore();
 };
 

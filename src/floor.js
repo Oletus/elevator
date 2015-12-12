@@ -53,9 +53,9 @@ Floor.prototype.render = function(ctx) {
     var originalFont = ctx.font;
     ctx.textAlign = "right";
     ctx.font = "12px sans-serif";
-    ctx.fillText(this.name, 0, 0);
+    ctx.fillText((this.floor + 1) + ' ' + this.name, 0, 0);
     ctx.font = originalFont;
-    
+
     ctx.restore();
 };
 
