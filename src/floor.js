@@ -68,6 +68,12 @@ Floor.prototype.render = function(ctx) {
     ctx.restore();
 };
 
+Floor.prototype.spawnCharacter = function() {
+    var character = new Character({x: 1, floor: this, level: this.level});
+    occupants.push(character);
+    return character;
+}
+
 Floor.prototype.update = function(deltaTime) {
     if (Math.round(this.elevator.floor) == this.floor) {
         this.doorOpen = this.elevator.doorOpen;
