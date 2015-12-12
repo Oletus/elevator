@@ -34,6 +34,7 @@ var Level = function() {
     
     this.score = 0;
     this.comboCount = 0;
+    this.comboCharacters = [];
 };
 
 Level.prototype.spawnCharacter = function() {
@@ -104,10 +105,27 @@ Level.prototype.resetCombo = function() {
 
 Level.prototype.reachedGoal = function(character) {
     if ( this.lastScoreFloor === character.floorNumber ) {
+        // Repeat previous tippers in combo
+        for ( var i = 0; i < this.comboCharacters.length; i++ ) {
+            this.score += this.comboCharacters[i].getTip();
+            console.log(this.comboCharacters[i].getTip());
+        }
+        
+        // Apply your own tip TIMES current combo count
         this.comboCount++;
+        this.score += character.getTip() * this.comboCount;
+        console.log(character.getTip() + " * " + this.comboCount + " = " + (character.getTip() * this.comboCount));
+        
+        character.spawnTip();
+        
+        this.comboCharacters.push(character);
     }
     else {
+        this.comboCharacters = [character];
         this.comboCount = 1;
+        this.score += character.getTip();
+        console.log(character.getTip());
+        character.spawnTip();
     }
     
     if ( this.comboCount > 1 ) {
@@ -115,7 +133,6 @@ Level.prototype.reachedGoal = function(character) {
     }
 
     this.lastScoreFloor = character.floorNumber;
-    this.score += character.spawnTip();
 };
 
 Level.prototype.upPress = function(playerNumber) {
