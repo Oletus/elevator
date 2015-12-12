@@ -39,6 +39,10 @@ var Game = function(resizer) {
     });
     this.time = 0;
     this.level = new Level();
+    
+    this.input = new InputMapper(this, 1);
+    this.input.addListener(Gamepad.BUTTONS.UP_OR_ANALOG_UP, ['up', 'w'], this.upPress, this.upRelease);
+    this.input.addListener(Gamepad.BUTTONS.DOWN_OR_ANALOG_DOWN, ['down', 's'], this.downPress, this.downRelease);
 };
 
 Game.prototype.render = function(ctx) {
@@ -54,8 +58,25 @@ Game.prototype.render = function(ctx) {
     return ctx;
 };
 
+Game.prototype.downPress = function(playerNumber) {
+    this.level.downPress(playerNumber);
+};
+
+Game.prototype.upPress = function(playerNumber) {
+    this.level.upPress(playerNumber);
+};
+
+Game.prototype.downRelease = function(playerNumber) {
+    this.level.downRelease(playerNumber);
+};
+
+Game.prototype.upRelease = function(playerNumber) {
+    this.level.upRelease(playerNumber);
+};
+
 Game.prototype.update = function(deltaTime) {
     this.time += deltaTime;
+    this.level.update(deltaTime);
 };
 
 var DEV_MODE = (window.location.href.indexOf("?devMode") != -1);
