@@ -144,8 +144,12 @@ var Level = function() {
 
     this.elevator = new Elevator({x: 23, level: this});
     this.floors = [];
+    
+    arrayUtil.shuffle(floorNames);
+    
     for (var i = 0; i < this.numFloors; ++i) {
-        this.floors.push(new Floor({floor: i, elevator: this.elevator, level: this}));
+        var floor = new Floor({floor: i, elevator: this.elevator, level: this, name: floorNames.pop()});
+        this.floors.push(floor);
     }
     this.characters = [];
     this.spawnCharacter();
