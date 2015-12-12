@@ -1,57 +1,57 @@
 
 var LevelTiles = [
     'xxxxxxxxxxxxxxxxxh     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
     'xxxxxxxxxxxxxxxxxh     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
     'xxxxxxxxxxxxxxxxxh     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
     'xxxxxxxxxxxxxxxxxh     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
     'xxxxxxxxxxxxxxxxxh     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
     'xxxxxxxxxxxxxxxxxh     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
     'xxxxxxxxxxxxxxxxxh     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
-    '                 h     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
+    '                 d     h',
     'xxxxxxxxxxxxxxxxxh     h',
 ];
 
 var ElevatorTiles = [
     'ooooo',
-    'o   o',
-    'o   o',
-    'o   o',
-    'o   o',
-    'o   o',
+    'd   o',
+    'd   o',
+    'd   o',
+    'd   o',
+    'd   o',
     'ooooo'
 ];
 
@@ -79,6 +79,8 @@ var Elevator = function(options) {
     objectUtil.initWithDefaults(this, defaults, options);
     this.slots = [null, null, null];
     this.tilemap = new TileMap({initTile: TileMap.initFromData(ElevatorTiles), height: ElevatorTiles.length, width: ElevatorTiles[0].length });
+    this.doorOpenTimer = 0;
+    this.doorOpen = false;
 };
 
 Elevator.prototype.getUniqueOccupants = function() {
@@ -108,11 +110,23 @@ Elevator.prototype.downRelease = function() {
 };
 
 Elevator.prototype.update = function(deltaTime) {
-    var moveIntent = this.moveUp + this.moveDown;
-    this.currentMovementSpeed = this.currentMovementSpeed * 0.9 + (moveIntent * 2) * 0.1;
-    if (moveIntent === 0 && Math.abs(this.floor - Math.round(this.floor)) < 0.15) {
-        this.floor = this.floor * 0.9 + Math.round(this.floor) * 0.1;
+    var moveIntent = this.moveUp + this.moveDown;    
+    var appliedIntent = this.doorOpen ? 0 : moveIntent;
+    this.currentMovementSpeed = this.currentMovementSpeed * 0.9 + (appliedIntent * 2) * 0.1;
+    var snappiness = Math.abs(this.floor - Math.round(this.floor));
+    if (moveIntent === 0) {
+        if (snappiness < 0.15) {
+            this.floor = this.floor * 0.9 + Math.round(this.floor) * 0.1;
+        }
+        if (snappiness < 0.01) {
+            this.doorOpenTimer += deltaTime;
+        }
     }
+    if (snappiness > 0.01 || moveIntent != 0) {
+        this.doorOpenTimer -= deltaTime;
+    }
+    this.doorOpenTimer = mathUtil.clamp(0, 0.5, this.doorOpenTimer);
+    this.doorOpen = this.doorOpenTimer > 0.25;
     this.floor += this.currentMovementSpeed * deltaTime;
     this.floor = mathUtil.clamp(0, this.level.numFloors - 1, this.floor);
 };
@@ -123,6 +137,14 @@ Elevator.prototype.render = function(ctx, numFloors) {
     ctx.translate(this.x, drawY);
     ctx.fillStyle = 'red';
     this.tilemap.render(ctx, function(tile) { return tile === 'o'; }, 0.05, 0.05);
+    if (!this.doorOpen) {
+        this.doorVisual = 1.0;
+    } else {
+        this.doorVisual = 1.0 - (this.doorOpenTimer - 0.25) * 4.0;
+    }
+    ctx.globalAlpha = this.doorVisual;
+    ctx.fillStyle = '#da4';
+    this.tilemap.render(ctx, function(tile) { return tile === 'd'; }, 0.05, 0.05);
     ctx.restore();
 };
 
@@ -141,6 +163,8 @@ Level.prototype.render = function(ctx) {
     this.tilemap.render(ctx, function(tile) { return tile === 'x'; }, 0.05, 0.05);
     ctx.fillStyle = '#888';
     this.tilemap.render(ctx, function(tile) { return tile === 'h'; }, 0.05, 0.05);
+    ctx.fillStyle = '#da4';
+    this.tilemap.render(ctx, function(tile) { return tile === 'd'; }, 0.05, 0.05);
 
     this.elevator.render(ctx, this.numFloors);
     ctx.restore();
