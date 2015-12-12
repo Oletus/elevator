@@ -1,22 +1,25 @@
 
 var FloorTiles = [
-    'xxxxxxxxxxxxxxxxxh     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    '                 d     h',
-    'xxxxxxxxxxxxxxxxxh     h'
+    'xxxxxxxxxxxxxxxxxxxxxxh        h',
+    '                      h        h',
+    '                      d        h',
+    '                      d        h',
+    '                      d        h',
+    '                      d        h',
+    '                      d        h',
+    'xxxxxxxxxxxxxxxxxxxxxxh        h',
+    'xxxxxxxxxxxxxxxxxxxxxxh        h'
 ];
 
 var ElevatorTiles = [
-    'ooooo',
-    'd   o',
-    'd   o',
-    'd   o',
-    'd   o',
-    'd   o',
-    'ooooo'
+    'oooooooo',
+    'o      o',
+    'd      o',
+    'd      o',
+    'd      o',
+    'd      o',
+    'd      o',
+    'oooooooo'
 ];
 
 var Floor = function(options) {
@@ -51,7 +54,7 @@ Floor.prototype.update = function(deltaTime) {
     }
 };
 
-Floor.height = 6;
+Floor.height = FloorTiles.length - 1;
 
 var Elevator = function(options) {
     var defaults = {
@@ -139,7 +142,7 @@ Elevator.prototype.render = function(ctx, numFloors) {
 var Level = function() {
     this.numFloors = 6;
 
-    this.elevator = new Elevator({x: 18, level: this});
+    this.elevator = new Elevator({x: 23, level: this});
     this.floors = [];
     for (var i = 0; i < this.numFloors; ++i) {
         this.floors.push(new Floor({floor: i, elevator: this.elevator, level: this}));
