@@ -12,7 +12,7 @@ var ElevatorTiles = [
 
 var Elevator = function(options) {
     var defaults = {
-        floor: 0, // Floor number rises upwards
+        floorNumber: 0, // Floor number rises upwards
         x: 0,
         level: null
     };
@@ -68,10 +68,10 @@ Elevator.prototype.update = function(deltaTime) {
     var moveIntent = this.moveUp + this.moveDown;    
     var appliedIntent = this.doorOpen ? 0 : moveIntent;
     this.currentMovementSpeed = this.currentMovementSpeed * 0.9 + (appliedIntent * 2) * 0.1;
-    var snappiness = Math.abs(this.floor - Math.round(this.floor));
+    var snappiness = Math.abs(this.floorNumber - Math.round(this.floorNumber));
     if (moveIntent === 0) {
         if (snappiness < 0.15) {
-            this.floor = this.floor * 0.9 + Math.round(this.floor) * 0.1;
+            this.floorNumber = this.floorNumber * 0.9 + Math.round(this.floorNumber) * 0.1;
         }
         if (snappiness < 0.01) {
             this.doorOpenTimer += deltaTime;
@@ -82,8 +82,8 @@ Elevator.prototype.update = function(deltaTime) {
     }
     this.doorOpenTimer = mathUtil.clamp(0, 0.5, this.doorOpenTimer);
     this.doorOpen = this.doorOpenTimer > 0.25;
-    this.floor += this.currentMovementSpeed * deltaTime;
-    this.floor = mathUtil.clamp(0, this.level.numFloors - 1, this.floor);
+    this.floorNumber += this.currentMovementSpeed * deltaTime;
+    this.floorNumber = mathUtil.clamp(0, this.level.numFloors - 1, this.floorNumber);
     var usedSpace = 0;
     for (var i = 0; i < this.occupants.length; ++i) {
         this.occupants[i].elevatorTargetX = this.x + this.maxTotalOccupantWidth + 1 - usedSpace - this.occupants[i].width * 0.5;
@@ -98,7 +98,7 @@ Elevator.prototype.render = function(ctx) {
     ctx.scale(1 / 6, 1 / 6);
     Elevator.shaftSprite.draw(ctx, 0, 0);
     ctx.restore();
-    var drawY = this.level.getFloorTopY(this.floor);
+    var drawY = this.level.getFloorTopY(this.floorNumber);
     ctx.translate(0, drawY);
     ctx.fillStyle = 'red';
     //this.tilemap.render(ctx, function(tile) { return tile === 'o'; }, 0.05, 0.05);
@@ -137,7 +137,7 @@ var Level = function() {
     var randomIndex = Math.floor(Math.random() * this.numFloors);
     
     for (var i = 0; i < this.numFloors; ++i) {
-        var floorOptions = {floor: i, elevator: this.elevator, level: this};
+        var floorOptions = {floorNumber: i, elevator: this.elevator, level: this};
         for (var key in shuffledFloors[i]) {
             if (shuffledFloors[i].hasOwnProperty(key)) {
                 floorOptions[key] = shuffledFloors[i][key];

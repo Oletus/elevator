@@ -14,7 +14,7 @@ var FloorTiles = [
 var Floor = function(options) {
     var defaults = {
         id: '',
-        floor: 0, // Floor number rises upwards
+        floorNumber: 0, // Floor number rises upwards
         name: 'Products',
         elevator: null,
         level: null,
@@ -38,7 +38,7 @@ Floor.sprite = new Sprite('floor_gfx.png');
 
 Floor.prototype.render = function(ctx) {
     ctx.save();
-    var drawY = this.level.getFloorTopY(this.floor);
+    var drawY = this.level.getFloorTopY(this.floorNumber);
     ctx.translate(0, drawY);
     ctx.fillStyle = '#222';
     this.tilemap.render(ctx, function(tile) { return tile === 'x'; }, 0.05, 0.05);
@@ -63,19 +63,19 @@ Floor.prototype.render = function(ctx) {
     ctx.scale(1 / 6, 1 / 6);
     ctx.fillStyle = 'black';
     ctx.textAlign = "right";
-    bitmapFont.drawText(ctx, ((this.floor + 1) + ' ' + this.name).toUpperCase(), 0, 0);
+    bitmapFont.drawText(ctx, ((this.floorNumber + 1) + ' ' + this.name).toUpperCase(), 0, 0);
 
     ctx.restore();
 };
 
 Floor.prototype.spawnCharacter = function() {
-    var character = new Character({x: 1, floor: this.floor, level: this.level});
+    var character = new Character({x: 1, floorNumber: this.floorNumber, level: this.level});
     this.occupants.push(character);
     return character;
 }
 
 Floor.prototype.update = function(deltaTime) {
-    if (Math.round(this.elevator.floor) == this.floor) {
+    if (Math.round(this.elevator.floorNumber) == this.floorNumber) {
         this.doorOpen = this.elevator.doorOpen;
         this.doorVisual = this.elevator.doorVisual;
     }
