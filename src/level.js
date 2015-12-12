@@ -153,14 +153,13 @@ var Level = function() {
 Level.prototype.spawnCharacter = function() {
     var shuffledFloors = arrayUtil.shuffle(this.floors);
     
-    for ( int i = 0; i < shuffledFloors.length; i++ ) {
-        if ( shuffledFloors[i].spawnIds.length === 0 ) {
+    for ( var i = 0; i < shuffledFloors.length; i++ ) {
+        if ( shuffledFloors[i].spawnIds.length !== 0 ) {
             var character = shuffledFloors[i].spawnCharacter();
             this.characters.push(character);
+            return;
         }
     }
-
-    this.characters.push(character);
 };
 
 Level.prototype.getFloorTopY = function(floor) {

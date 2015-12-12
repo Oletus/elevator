@@ -69,8 +69,8 @@ Floor.prototype.render = function(ctx) {
 };
 
 Floor.prototype.spawnCharacter = function() {
-    var character = new Character({x: 1, floor: this, level: this.level});
-    occupants.push(character);
+    var character = new Character({x: 1, floor: this.floor, level: this.level});
+    this.occupants.push(character);
     return character;
 }
 
