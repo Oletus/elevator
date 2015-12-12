@@ -34,19 +34,19 @@ GameData.floors =
     },
     {
         id: "heavystuff",
-        name: "Anvils, Pianos and heavy stuff shop"
+        name: "Anvils & grand pianos"
     },
     {
         id: "balloonpop",
-        name: "Porcupines and balloons"
+        name: "Porcupines & balloons"
     },
     {
         id: "carwash",
-        name: "Car wash and cocktail bar"
+        name: "Car wash & cocktail bar"
     },
     {
         id: "cakepoison",
-        name: "Chocolate cakes and cyanide pills"
+        name: "Fruit cakes & cyanide pills"
     },
     {
         id: "babyblender",
@@ -58,7 +58,7 @@ GameData.floors =
     },
     {
         id: "fishbicycle",
-        name: "Fish bicycles and frog umbrellas"
+        name: "Fish bicycles"
     },
     {
         id: "travel",
@@ -66,7 +66,7 @@ GameData.floors =
     },
     {
         id: "burnerfabric",
-        name: "Bunsen Burners and flammable fabrics"
+        name: "Flamethrowers & envelopes"
     },
     {
         id: "elephantslippers",
@@ -74,11 +74,11 @@ GameData.floors =
     },
     {
         id: "positivesign",
-        name: "Exit signs and positive affirmations"
+        name: "Exit signs and demotivators"
     },
     {
         id: "dynamite",
-        name: "Dynamite and short fuses"
+        name: "Dynamite & short fuses"
     },
     {
         id: "magnets",
@@ -86,7 +86,7 @@ GameData.floors =
     },
     {
         id: "coffeemeditation",
-        name: "Coffee and meditation beads"
+        name: "Coffee & meditation beads"
     },
     {
         id: "seamonkey",
@@ -94,11 +94,11 @@ GameData.floors =
     },
     {
         id: "tapdanceearplugs",
-        name: "Tap dancing shoes and earplugs"
+        name: "Tuba repair shop & earplugs"
     },
     {
         id: "underwearsnowshoe",
-        name: "Underwear and snowshoes"
+        name: "Underwear & snowshoes"
     },
     {
         id: "clowncamp",
@@ -106,7 +106,7 @@ GameData.floors =
     },
     {
         id: "cheeseandraincoats",
-        name: "Cheese kits and raincoats"
+        name: "Cheese kits & raincoats"
     },
     {
         id: "beetherapy",
