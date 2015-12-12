@@ -44,6 +44,17 @@ Floor.prototype.render = function(ctx) {
     ctx.globalAlpha = this.doorVisual;
     ctx.fillStyle = '#da4';
     this.tilemap.render(ctx, function(tile) { return tile === 'd'; }, 0.05, 0.05);
+    
+    ctx.globalAlpha = 1;
+    ctx.translate(21, 3);
+    ctx.scale(0.1, 0.1);
+    ctx.fillStyle = 'black';
+    var originalFont = ctx.font;
+    ctx.textAlign = "right";
+    ctx.font = "12px sans-serif";
+    ctx.fillText(this.name, 0, 0);
+    ctx.font = originalFont;
+    
     ctx.restore();
 };
 
@@ -145,10 +156,10 @@ var Level = function() {
     this.elevator = new Elevator({x: 23, level: this});
     this.floors = [];
     
-    arrayUtil.shuffle(floorNames);
+    var shuffledFloorNames = arrayUtil.shuffle(floorNames);
     
     for (var i = 0; i < this.numFloors; ++i) {
-        var floor = new Floor({floor: i, elevator: this.elevator, level: this, name: floorNames.pop()});
+        var floor = new Floor({floor: i, elevator: this.elevator, level: this, name: shuffledFloorNames[i]});
         this.floors.push(floor);
     }
     this.characters = [];
