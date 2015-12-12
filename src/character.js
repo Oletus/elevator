@@ -64,7 +64,7 @@ Character.prototype.update = function(deltaTime) {
             wallXRight = doorThresholdX + 7;
         }
     }
-    if (Math.round(this.floor) == this.goalFloor) {
+    if (Math.round(this.floor) == this.goalFloor && (!this.elevator || this.elevator.doorOpen)) {
         this.moveX = -1;
     } else {
         this.moveX = 1;
