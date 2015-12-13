@@ -77,6 +77,7 @@ BaseCharacter.prototype.initBase = function(options) {
     }
     this.queueTime = 0;
     this.facingRight = true;
+    this.hurryTextTime = 0;
 };
 
 BaseCharacter.prototype.render = function(ctx) {
@@ -88,7 +89,13 @@ BaseCharacter.prototype.render = function(ctx) {
         ctx.translate(0, -4);
         ctx.scale(1 / 6, 1 / 6);
         ctx.textAlign = 'center';
-        whiteBitmapFont.drawText(ctx, '' + (this.goalFloor + 1), 0, 0);
+        
+        if ( !this.elevator && this.hurryTextTime >= 0.87 ) {
+            whiteBitmapFont.drawText(ctx, 'HURRY', 0, 0);
+        }
+        else {
+            whiteBitmapFont.drawText(ctx, '' + (this.goalFloor + 1), 0, 0);
+        }
     }
     ctx.restore();
 };
@@ -198,10 +205,18 @@ BaseCharacter.prototype.update = function(deltaTime) {
         this.bobbleTime += deltaTime;
         this.facingRight = (this.x > oldX);
     } else if (!this.elevator) {
-        this.queueTime += deltaTime;
-        
-        if ( this.queueTime > this.maxQueueTime ) {
-            this.queueTime = this.maxQueueTime;
+        if ( this.queueTime < this.maxQueueTime ) {
+            this.queueTime += deltaTime;
+            
+            if ( this.queueTime >= this.maxQueueTime ) {
+                this.queueTime = this.maxQueueTime;
+            }
+        }
+        else {
+            this.hurryTextTime += deltaTime * 0.25;
+            if ( this.hurryTextTime >= 1 ) {
+                this.hurryTextTime = 0;
+            }
         }
             
     }
