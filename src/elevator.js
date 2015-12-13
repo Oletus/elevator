@@ -32,6 +32,8 @@ var Elevator = function(options) {
 
 Elevator.sprite = new Sprite('lift.png');
 Elevator.shaftSprite = new Sprite('shaft.png');
+Elevator.counterweightSprite = new Sprite('counterweight.png');
+Elevator.wireSprite = new Sprite('wire.png');
 Elevator.doorSprite = new Sprite('door_closed.png');
 Elevator.doorOpenSprite = new Sprite('door_open1.png');
 Elevator.doorOpen2Sprite = new Sprite('door_open2.png');
@@ -146,8 +148,24 @@ Elevator.prototype.update = function(deltaTime) {
 Elevator.prototype.renderBg = function(ctx) {
     ctx.save();
     ctx.translate(this.x, 0);
+    
+    ctx.save();
     ctx.scale(1 / 6, 1 / 6);
     Elevator.shaftSprite.draw(ctx, 0, 0);
+    ctx.restore();
+
+    ctx.save();
+    var counterweightY = this.level.getFloorTopY(this.level.floors.length - this.floorNumber - 1.5);
+    ctx.translate(2, counterweightY);
+    
+    var buckleY = (this.getTotalWeight() > 3) ? 1 / 6 : 0;
+    ctx.translate(0, - buckleY);
+    ctx.scale(1 / 6, 1 / 6);
+    Elevator.counterweightSprite.draw(ctx, 0, 0);
+    Elevator.wireSprite.draw(ctx, 0, -312);
+    Elevator.wireSprite.draw(ctx, 19, -312);
+    ctx.restore();
+
     ctx.restore();
 };
 
@@ -160,7 +178,10 @@ Elevator.prototype.renderFg = function(ctx) {
     ctx.save();
     var buckleY = (this.getTotalWeight() > 3) ? 1 / 6 : 0;
     ctx.translate(0, -2 + buckleY);
+
     ctx.scale(1 / 6, 1 / 6);
+    Elevator.wireSprite.draw(ctx, 6, -320);
+    Elevator.wireSprite.draw(ctx, 36, -320);
     Elevator.sprite.draw(ctx, 0, 0);
     
     ctx.textAlign = 'center';
