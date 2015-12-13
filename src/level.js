@@ -1,9 +1,7 @@
 
-var minTimeUntilSpawn = 2;
-var maxTimeUntilSpawn = 7;
-
 var Level = function() {
     this.timeUntilSpawn = 0;
+    this.time = 0;
     this.numFloors = 6;
 
     this.elevator = new Elevator({x: this.getFloorWidth(), level: this});
@@ -126,6 +124,7 @@ Level.prototype.render = function(ctx) {
 
 Level.prototype.update = function(deltaTime) {
     this.stateTime += deltaTime;
+    this.time += deltaTime;
     for (var i = 0; i < this.floors.length; ++i) {
         this.floors[i].update(deltaTime);
     }
@@ -139,9 +138,11 @@ Level.prototype.update = function(deltaTime) {
         }
     }
     this.timeUntilSpawn -= deltaTime;
-    if ( this.timeUntilSpawn <= 0 ) {
+    if (this.timeUntilSpawn <= 0) {
         this.spawnCharacter();
-        this.timeUntilSpawn = minTimeUntilSpawn + Math.random() * (maxTimeUntilSpawn - minTimeUntilSpawn);
+        var randomMult = (1.0 + (Math.random() - 0.5) * Game.parameters['spawnIntervalRandomness']);
+        var spawnIntervalFunc = Math.pow(this.time + 10, -0.3) * 2;
+        this.timeUntilSpawn = Game.parameters['initialSpawnInterval'] * spawnIntervalFunc * randomMult;
     }
     
     this.particles.update(deltaTime);

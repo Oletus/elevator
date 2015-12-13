@@ -26,8 +26,8 @@ GameData.floors =
         name: "Graveyard",
         spawnIds: [
             {id: "customer", chance: 3},
-            {id: "horse", chance: 2},
-            {id: "ghost", chance: 2}
+            {id: "horse", chance: 1},
+            {id: "ghost", chance: 3}
         ]
     },
     {
