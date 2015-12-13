@@ -18,7 +18,7 @@ var Floor = function(options) {
         name: 'Products',
         elevator: null,
         level: null,
-        spawnIds : [{id: "customer", chance: 0.7}, {id: "horse", chance: 0.3}],
+        spawnIds : [{id: "customer", chance: 0.5}, {id: "horse", chance: 0.3}, {id: "heavy", chance: 0.2}],
         excludeAsDestination : false
     };
     objectUtil.initWithDefaults(this, defaults, options);
