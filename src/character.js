@@ -22,13 +22,16 @@ BaseCharacter.prototype.initBase = function(options) {
         elevator: null,
         goalFloor: 0,
         id: 'customer',
-        width: 2
+        width: 2,
+        weight: 1
     };
     objectUtil.initWithDefaults(this, defaults, options);
     this.legsSprite = new AnimatedSpriteInstance(BaseCharacter.legsAnimation);
     this.bobbleTime = 0;
 
-    var possibleDestinations = GameData.characters[this.id].destinations;
+    var charData = GameData.characters[this.id];
+    this.weight = charData.weight;
+    var possibleDestinations = charData.destinations;
     var shuffledFloors = arrayUtil.shuffle(this.level.floors);
     
     for ( var i = 0; i < shuffledFloors.length; i++ ) {

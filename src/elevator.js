@@ -45,6 +45,10 @@ Elevator.prototype.getTotalUsedSpace = function() {
     return Level.getTotalUsedSpace(this.occupants);
 };
 
+Elevator.prototype.getTotalWeight = function() {
+    return Level.getTotalWeight(this.occupants);
+};
+
 Elevator.prototype.hasSpace = function(space) {
     return this.getTotalUsedSpace() + space <= this.maxTotalOccupantWidth;
 };
@@ -112,7 +116,8 @@ Elevator.prototype.render = function(ctx) {
     ctx.translate(0, drawY);
     ctx.fillStyle = 'red';
     ctx.save();
-    ctx.translate(0, -2);
+    var buckleY = (this.getTotalWeight() > 3) ? 1 / 6 : 0;
+    ctx.translate(0, -2 + buckleY);
     ctx.scale(1 / 6, 1 / 6);
     Elevator.sprite.draw(ctx, 0, 0);
     

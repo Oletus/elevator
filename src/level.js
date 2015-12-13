@@ -190,3 +190,11 @@ Level.getTotalUsedSpace = function(occupants) {
     }
     return usedSpace;
 };
+
+Level.getTotalWeight = function(occupants) {
+    var w = 0;
+    for (var i = 0; i < occupants.length; ++i) {
+        w += occupants[i].weight;
+    }
+    return w;
+};
