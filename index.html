@@ -17,6 +17,7 @@ Audio.audioPath = 'assets/audio/';
 <script src="src/loadingbar.js"></script>
 <script src="src/particle.js"></script>
 <script src="src/canvasui.js"></script>
+<script src="src/lib/dat.gui.js"></script>
 <!-- input -->
 <script src="src/lib/mousetrap.js"></script>
 <script src="src/lib/mousetrap-global-bind.js"></script>
@@ -97,6 +98,7 @@ Game.prototype.upRelease = function(playerNumber) {
 Game.prototype.update = function(deltaTime) {
     this.time += deltaTime;
     this.level.update(deltaTime);
+    Audio.muteAll(Game.parameters['muteAudio']);
 };
 
 var DEV_MODE = (window.location.href.indexOf("?devMode") != -1);
@@ -107,9 +109,48 @@ var bigBitmapFont = new BitmapFont({spriteSrc: 'bitmapfont-big.png', characterWi
 
 Game.music = new Audio('elevator_music');
 
+/**
+ * @constructor
+ */
+var GameParameters = function() {
+    var params = GameParameters.parameters;
+    for (var key in params) {
+        if (params.hasOwnProperty(key)) {
+            this[key] = params[key].initial;
+        }
+    }
+};
+
+GameParameters.parameters = {
+    //'playerRunSpeed': {initial: 14, min: 10, max: 20},
+    'muteAudio': false
+};
+
+GameParameters.prototype.initGUI = function() {
+    var gui = new dat.GUI();
+    var params = GameParameters.parameters;
+    for (var key in params) {
+        if (params.hasOwnProperty(key)) {
+            var param = params[key];
+            if (param.min !== undefined) {
+                gui.add(this, key, param.min, param.max);
+            } else {
+                gui.add(this, key);
+            }
+        }
+    }
+};
+
+Game.parameters = new GameParameters();
+
 window['start'] = function() {
     var DEBUG_MAIN_LOOP = DEV_MODE && true; // Set to true to allow fast-forwarding main loop with 'f'
-    Audio.muteAll(DEV_MODE && true); // Set to true if sounds annoy developers
+
+    Game.parameters['muteAudio'] = (DEV_MODE && true); // Set to true if sounds annoy developers
+    
+    if (DEV_MODE) {
+        Game.parameters.initGUI();
+    }
 
     Game.music.playSingular(true);
     
