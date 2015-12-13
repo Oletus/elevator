@@ -23,6 +23,13 @@ BaseCharacter.State = {
 
 BaseCharacter.legsAnimation = new AnimatedSprite({
         'idle': [{src: 'legs-idle.png', duration: 0}],
+        'walking': [
+            {src: 'legs-walking1.png'},
+            {src: 'legs-walking2.png'},
+            {src: 'legs-walking3.png'},
+            {src: 'legs-walking4.png'},
+            {src: 'legs-walking5.png'}
+        ],
 },
 {
     durationMultiplier: 1000 / 60,
@@ -299,15 +306,21 @@ BaseCharacter.prototype.update = function(deltaTime) {
     this.movedX = this.x - oldX;
     var bobble = this.alwaysBobble;
     if (Math.abs(this.movedX) > this.level.characterMoveSpeed * this.moveSpeedMultiplier * deltaTime * 0.4 + 0.001) {
+        if (this.legsSprite.animationKey != 'walking') {
+            this.legsSprite.setAnimation('walking');
+        }
         this.legsSprite.update(deltaTime);
         bobble = true;
         this.facingRight = (this.x > oldX);
-    } else if (!this.elevator) {
-        if (this.queueTime < this.maxQueueTime) {
-            this.queueTime += deltaTime;
-            
-            if ( this.queueTime >= this.maxQueueTime ) {
-                this.queueTime = this.maxQueueTime;
+    } else {
+        this.legsSprite.setAnimation('idle');
+        if (!this.elevator) {
+            if (this.queueTime < this.maxQueueTime) {
+                this.queueTime += deltaTime;
+                
+                if ( this.queueTime >= this.maxQueueTime ) {
+                    this.queueTime = this.maxQueueTime;
+                }
             }
         }
     }
