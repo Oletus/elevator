@@ -22,7 +22,7 @@ var Floor = function(options) {
             {id: "customer", chance: 5},
             {id: "horse", chance: 3},
             {id: "heavy", chance: 2},
-            {id: "runner", chance: 100}
+            {id: "runner", chance: 1}
         ],
         excludeAsDestination : false
     };

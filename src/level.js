@@ -1,6 +1,6 @@
 
-var minTimeUntilSpawn = 3;
-var maxTimeUntilSpawn = 9;
+var minTimeUntilSpawn = 2;
+var maxTimeUntilSpawn = 7;
 
 var Level = function() {
     this.timeUntilSpawn = 0;
