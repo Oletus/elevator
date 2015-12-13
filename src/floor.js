@@ -29,6 +29,7 @@ var Floor = function(options) {
     objectUtil.initWithDefaults(this, defaults, options);
     this.tilemap = new TileMap({initTile: TileMap.initFromData(FloorTiles), height: FloorTiles.length, width: FloorTiles[0].length });
     this.occupants = [];
+    this.alarm = 0;
 };
 
 Floor.prototype.removeOccupant = function(toRemove) {
@@ -41,6 +42,7 @@ Floor.height = FloorTiles.length - 1;
 
 Floor.fgSprites = {};
 Floor.bgSprites = {};
+Floor.alarmSprite = new Sprite('floor-alarm.png');
 
 Floor.loadSprites = function() {
     for (var i = 0; i < GameData.floors.length; ++i) {
@@ -89,6 +91,11 @@ Floor.prototype.renderFg = function(ctx) {
     var drawY = this.level.getFloorTopY(this.floorNumber);
     ctx.translate(0, drawY + 6);
     Floor.fgSprites[this.id].draw(ctx, 0, 0);
+    var alarmAlpha = this.alarm * Math.max(Math.sin(this.level.time * 3.5) * 0.8 + 0.2, 0);
+    if (alarmAlpha > 0.01) {
+        ctx.globalAlpha = alarmAlpha;
+        Floor.alarmSprite.draw(ctx, 0, 0);
+    }
     ctx.restore();
 }
 
@@ -130,5 +137,11 @@ Floor.prototype.update = function(deltaTime) {
         if (usedSpace >= this.level.getFloorCapacity() && Math.abs(lastDude.x - lastDude.floorTargetX) < 1) {
             this.level.goToState(Level.State.FAIL);
         }
+    }
+    
+    if (usedSpace >= this.level.getFloorCapacity() - 6) {
+        propertyToValue(this, 'alarm', 1, deltaTime);
+    } else {
+        propertyToZero(this, 'alarm', deltaTime);
     }
 };
