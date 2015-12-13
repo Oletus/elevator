@@ -20,7 +20,7 @@ var Floor = function(options) {
         level: null,
         spawnIds : [
             {id: "customer", chance: 5},
-            {id: "horse", chance: 3},
+            {id: "horse", chance: 1},
             {id: "heavy", chance: 2},
             {id: "runner", chance: 1}
         ],
