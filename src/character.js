@@ -3,7 +3,20 @@ var BaseCharacter = function() {
 };
 
 BaseCharacter.create = function(options) {
-    return new GameData.characters[options.id].characterConstructor(options);
+    var charData = GameData.characters[options.id];
+    for (var key in charData) {
+        if (!options.hasOwnProperty(key) && charData.hasOwnProperty(key)) {
+            options[key] = charData[key];
+        }
+    }
+    return new charData.characterConstructor(options);
+};
+
+BaseCharacter.State = {
+    INITIALIZING: 0,
+    APPROACHING: 1,
+    RUSHING: 2,
+    NORMAL: 3
 };
 
 BaseCharacter.legsAnimation = new AnimatedSprite({
@@ -37,14 +50,14 @@ BaseCharacter.prototype.initBase = function(options) {
         weight: 1,
         maxQueueTime : 10,
         minTip : 1,
-        maxTip : 10
+        maxTip : 10,
+        moveSpeedMultiplier: 1
     };
     objectUtil.initWithDefaults(this, defaults, options);
     this.legsSprite = new AnimatedSpriteInstance(BaseCharacter.legsAnimation);
     this.bobbleTime = 0;
 
     var charData = GameData.characters[this.id];
-    this.weight = charData.weight;
     var shuffledFloors = arrayUtil.shuffle(this.level.floors);
     for (var i = 0; i < shuffledFloors.length;) {
         if (shuffledFloors[i].floorNumber === this.floorNumber) {
@@ -91,8 +104,9 @@ BaseCharacter.prototype.initBase = function(options) {
     this.queueTime = 0;
     this.facingRight = true;
     this.hurryTextTime = 0;
-    this.rushing = false;
     this.dy = 0;
+    this.state = BaseCharacter.State.NORMAL;
+    this.stateTime = 0;
 };
 
 BaseCharacter.prototype.render = function(ctx) {
@@ -171,18 +185,20 @@ BaseCharacter.prototype.getTip = function() {
 };
 
 BaseCharacter.prototype.update = function(deltaTime) {
+    this.stateTime += deltaTime;
+
     var doorThresholdX = this.level.getFloorWidth();
     var oldX = this.x;
     var wallXRight = 0;
     var wallXLeft = -5;
     if (this.elevator) {
         this.floorNumber = this.elevator.floorNumber;
-        if (this.elevator.doorVisual > 0 && !this.rushing) {
+        if (this.elevator.doorVisual > 0 && this.state !== BaseCharacter.State.RUSHING) {
             wallXLeft = doorThresholdX + this.elevator.doorVisual;
         }
         wallXRight = doorThresholdX + 7;
     } else {
-        if (this.rushing ||
+        if (this.state === BaseCharacter.State.RUSHING ||
             (this.level.floors[this.floorNumber].doorVisual === 0 &&
             this.level.elevator.hasSpace(this.width)))
         {
@@ -204,15 +220,15 @@ BaseCharacter.prototype.update = function(deltaTime) {
     } else {
         this.moveX = 1;
     }
-    if (this.rushing && !this.elevator) {
-        this.x += this.moveX * this.level.characterMoveSpeed * deltaTime;
+    if (this.state === BaseCharacter.State.RUSHING && !this.elevator) {
+        this.x += this.moveX * this.level.characterMoveSpeed * this.moveSpeedMultiplier * deltaTime;
     } else {
         if (this.elevatorTargetX !== undefined) {
-            propertyToValue(this, 'x', this.elevatorTargetX, this.level.characterMoveSpeed * deltaTime);
+            propertyToValue(this, 'x', this.elevatorTargetX, this.level.characterMoveSpeed * this.moveSpeedMultiplier * deltaTime);
         } else if (this.floorTargetX !== undefined) {
-            propertyToValue(this, 'x', this.floorTargetX, this.level.characterMoveSpeed * deltaTime);
+            propertyToValue(this, 'x', this.floorTargetX, this.level.characterMoveSpeed * this.moveSpeedMultiplier * deltaTime);
         } else {
-            this.x += this.moveX * this.level.characterMoveSpeed * deltaTime;
+            this.x += this.moveX * this.level.characterMoveSpeed * this.moveSpeedMultiplier * deltaTime;
         }
     }
     if (this.x > wallXRight - this.width * 0.5) {
@@ -304,8 +320,7 @@ Horse.prototype.renderBody = function(ctx) {
 var Runner = function(options) {
     this.initBase(options);
     this.bodySprite = Runner.bodySprites[this.id];
-    this.rushing = true;
-    this.removedFromFloor = false;
+    this.state = BaseCharacter.State.INITIALIZING;
 };
 
 Runner.prototype = new BaseCharacter();
@@ -318,12 +333,26 @@ Runner.runningSprite = new Sprite('body-runner-running.png');
 Runner.prototype.update = function(deltaTime) {
     BaseCharacter.prototype.update.call(this, deltaTime);
     var doorThresholdX = this.level.getFloorWidth();
-    if (!this.removedFromFloor) {
+    if (this.state === BaseCharacter.State.INITIALIZING) {
         this.level.floors[Math.round(this.floorNumber)].removeOccupant(this);
-        this.removedFromFloor = true;
-    }
-    if (this.elevator && this.x >= doorThresholdX + 2 || this.floorNumber === this.goalFloor) {
-        this.rushing = false;
+        changeState(this, BaseCharacter.State.APPROACHING);
+        this.moveSpeedMultiplier = 1.0;
+    } else if (this.state === BaseCharacter.State.APPROACHING) {
+        if (this.x > 3) {
+            changeState(this, BaseCharacter.State.WAITING);
+            this.moveSpeedMultiplier = 0.0;
+        }
+    } else if (this.state === BaseCharacter.State.WAITING) {
+        if (this.stateTime > 1) {
+            changeState(this, BaseCharacter.State.RUSHING);
+            this.moveSpeedMultiplier = 0.5;
+        }
+    } else if (this.state === BaseCharacter.State.RUSHING) {
+        this.moveSpeedMultiplier += deltaTime * 2.0;
+        if (this.elevator && this.x >= doorThresholdX + 2 || this.floorNumber === this.goalFloor) {
+            changeState(this, BaseCharacter.State.NORMAL);
+            this.moveSpeedMultiplier = 1.5;
+        }
     }
 };
 
@@ -331,7 +360,7 @@ Runner.prototype.update = function(deltaTime) {
  * ctx has its current transform set centered on the floor at the x center of the character.
  */
 Runner.prototype.renderBody = function(ctx) {
-    if (this.rushing) {    
+    if (this.state === BaseCharacter.State.RUSHING) {
         var scale = 1 / 6;
         var flip = this.facingRight ? 1 : -1;
         this.legsSprite.drawRotatedNonUniform(ctx, 0, -1, 0, scale * flip, scale);
