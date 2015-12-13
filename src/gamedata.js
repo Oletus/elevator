@@ -27,7 +27,7 @@ GameData.floors =
         spawnIds: [
             {id: "customer", chance: 3},
             {id: "horse", chance: 2},
-            {id: "ghost", chance: 100}
+            {id: "ghost", chance: 2}
         ]
     },
     {
@@ -43,7 +43,16 @@ GameData.floors =
         name: "Security",
         spawnIds: [],
         excludeAsDestination: true
-    } /*,
+    },
+    {
+        id: "clowncamp",
+        name: "Clown bootcamp",
+        spawnIds: [
+            {id: "clown", chance: 5},
+            {id: "horse", chance: 2},
+            {id: "customer", chance: 1}
+        ]
+    },  /*,
     {
         id: "bioweapon",
         name: "Bio weapons lab"
@@ -129,10 +138,6 @@ GameData.floors =
         name: "Underwear & snowshoes"
     },
     {
-        id: "clowncamp",
-        name: "Clown bootcamp"
-    },
-    {
         id: "cheeseandraincoats",
         name: "Cheese kits & raincoats"
     },
@@ -165,6 +170,11 @@ GameData.characters =
         destinations : getAllButExcluded(),
         characterConstructor: Character,
         weight: 1
+    },
+    'clown' : {
+        destinations : getAllButExcluded(),
+        characterConstructor: Character,
+        weight: -4
     },
     'heavy' : {
         destinations : getAllButExcluded(),

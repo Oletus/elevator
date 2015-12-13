@@ -87,6 +87,10 @@ Elevator.prototype.update = function(deltaTime) {
         var slowDown = Math.min((this.getTotalWeight() - 2) * 0.2, 0.8);
         moveIntent = Math.min(moveIntent, 1.0 - slowDown);
     }
+    if (this.getTotalWeight() < -3) {
+        var slowDown = Math.min((Math.abs(this.getTotalWeight()) - 2) * 0.2, 0.8);
+        moveIntent = Math.max(moveIntent, -(1.0 - slowDown));
+    }
     var appliedIntent = this.doorOpen ? 0 : moveIntent;
     var snappiness = Math.abs(this.floorNumber - Math.round(this.floorNumber));
     if (moveIntent === 0) {
