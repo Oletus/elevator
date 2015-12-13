@@ -373,7 +373,7 @@ var Runner = function(options) {
     this.initBase(options);
     this.bodySprite = Runner.bodySprites[this.id];
     this.state = BaseCharacter.State.INITIALIZING;
-    this.approachTargetX = 2 + Math.random() * 2;
+    this.approachTargetX = Math.floor(12 + Math.random() * 20);
 };
 
 Runner.prototype = new BaseCharacter();
