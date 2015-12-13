@@ -41,6 +41,7 @@ BaseCharacter.legsAnimation = new AnimatedSprite({
 
 BaseCharacter.iconAnimation = new AnimatedSprite({
         'escaping': [{src: 'icon-escaping.png', duration: 0}],
+        'renovating': [{src: 'icon-renovating.png', duration: 0}],
 },
 {
     durationMultiplier: 1000 / 60,
@@ -555,6 +556,7 @@ Car.prototype.update = function(deltaTime) {
 var Renovator = function(options) {
     this.initBase(options);
     this.startFloor = this.floorNumber;
+    this.iconSprite.setAnimation('renovating');
 };
 
 Renovator.prototype = new BaseCharacter();
@@ -567,4 +569,8 @@ Renovator.prototype.update = function(deltaTime) {
     if (this.dead && this.x < 0) {
         this.level.floors[Math.round(this.floorNumber)].renovate();
     }
+};
+
+Renovator.prototype.renderIcon = function(ctx) {
+    this.iconSprite.drawRotated(ctx, 0, 0, 0);
 };
