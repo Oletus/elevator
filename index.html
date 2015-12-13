@@ -9,6 +9,10 @@
 <script src="src/sprite.js"></script>
 <script src="src/animatedsprite.js"></script>
 <script src="src/audio.js"></script>
+<script>
+Audio.defaultExtensions = ['ogg'];
+Audio.audioPath = 'assets/audio/';
+</script>
 <script src="src/canvasresizer.js"></script>
 <script src="src/loadingbar.js"></script>
 <script src="src/particle.js"></script>
@@ -101,10 +105,14 @@ var blackBitmapFont = new BitmapFont({color: 'black'});
 var whiteBitmapFont = new BitmapFont({color: 'white'});
 var bigBitmapFont = new BitmapFont({spriteSrc: 'bitmapfont-big.png', characterWidth: 8, characterHeight: 12});
 
+Game.music = new Audio('elevator_music');
+
 window['start'] = function() {
     var DEBUG_MAIN_LOOP = DEV_MODE && true; // Set to true to allow fast-forwarding main loop with 'f'
-    Audio.muteAll(DEV_MODE && false); // Set to true if sounds annoy developers
+    Audio.muteAll(DEV_MODE && true); // Set to true if sounds annoy developers
 
+    Game.music.playSingular(true);
+    
     var resizer = new CanvasResizer({mode: CanvasResizer.Mode.FIXED_RESOLUTION, width: 192, height: 300});
     var game = new Game(resizer);
     startMainLoop([resizer, game, new LoadingBar()], {debugMode: DEBUG_MAIN_LOOP});
