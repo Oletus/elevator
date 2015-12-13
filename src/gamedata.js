@@ -40,7 +40,11 @@ GameData.floors =
     },
     {
         id: "garage",
-        name: "Garage"
+        name: "Garage",
+        spawnIds: [
+            {id: "customer", chance: 5},
+            {id: "car", chance: 2},
+        ]
     },
     {
         id: "security",
@@ -185,7 +189,7 @@ GameData.characters =
         characterConstructor: Character,
         weight: 4,
         minTip: 5,
-        maxTip: 20
+        maxTip: 10
     },
     'runner' : {
         destinations : getAllButExcluded(),
@@ -204,11 +208,18 @@ GameData.characters =
         destinations : getAllButExcluded(),
         characterConstructor: Ghost,
         weight: -1,
-        minTip: 20,
-        maxTip: 30,
+        minTip: 10,
+        maxTip: 10,
         scary: true,
         immuneToScary: true
-    }
+    },
+    'car': {
+        destinations : getAllButExcluded(),
+        characterConstructor: Car,
+        weight: 10,
+        width: 6,
+        minTip: 30
+    },
 };
 
 BaseCharacter.loadSprites();

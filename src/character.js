@@ -485,3 +485,42 @@ Ghost.prototype.update = function(deltaTime) {
         }
     }
 };
+
+var Car = function(options) {
+    this.initBase(options);
+    this.bodySprite = new AnimatedSpriteInstance(Car.animation);
+};
+
+Car.prototype = new BaseCharacter();
+
+Car.animation = new AnimatedSprite({
+        'idle': [{src: 'car1.png', duration: 0}],
+        'moving': [
+            {src: 'car1.png'},
+            {src: 'car2.png'}
+        ],
+},
+{
+    durationMultiplier: 1000 / 60,
+    defaultDuration: 5
+});
+
+Car.prototype.renderBody = function(ctx) {
+    var scale = 1 / 6;
+    var flip = this.facingRight ? 1 : -1;
+    this.bodySprite.drawRotatedNonUniform(ctx, 0, -9 / 6, 0, scale * flip, scale);
+};
+
+Car.prototype.update = function(deltaTime) {
+    BaseCharacter.prototype.update.call(this, deltaTime);
+    if (Math.abs(this.movedX) > 0.1 * deltaTime) {
+        if (this.bodySprite.animationKey !== 'moving') {
+            this.bodySprite.setAnimation('moving');
+        }
+        this.bodySprite.update(deltaTime);
+    } else {
+        if (this.bodySprite.animationKey !== 'idle') {
+            this.bodySprite.setAnimation('idle');
+        }
+    }
+};
