@@ -378,6 +378,8 @@ var Runner = function(options) {
     this.initBase(options);
     this.state = BaseCharacter.State.INITIALIZING;
     this.approachTargetX = Math.floor(12 + Math.random() * 20);
+    this.alerting = false;
+    this.alertTime = this.level.time - 1;
 };
 
 Runner.prototype = new BaseCharacter();
@@ -401,13 +403,20 @@ Runner.prototype.update = function(deltaTime) {
         }
     } else if (this.state === BaseCharacter.State.DOING_ACTION) {
         if (this.level.elevator.hasSpace(this.width)) {
+            if (!this.alerting) {
+                this.alerting = true;
+                if (this.level.time > this.alertTime + 1) {
+                    BaseCharacter.alertSound.play();
+                }
+                this.alertTime = this.level.time;
+            }
             if (this.stateTime > 1) {
                 changeState(this, BaseCharacter.State.RUSHING);
                 this.moveSpeedMultiplier = 0.5;
-                BaseCharacter.alertSound.play();
             }
         } else {
             this.stateTime = 0;
+            this.alerting = false;
         }
     } else if (this.state === BaseCharacter.State.RUSHING) {
         if (Math.abs(this.movedX) > 0.01) {
@@ -419,13 +428,14 @@ Runner.prototype.update = function(deltaTime) {
         if (this.elevator && this.x >= doorThresholdX + 2 || this.floorNumber === this.goalFloor) {
             changeState(this, BaseCharacter.State.NORMAL);
             this.moveSpeedMultiplier = 1.5;
+            this.alerting = false;
         }
     }
 };
 
 Runner.prototype.renderIcon = function(ctx) {
     var drewIcon = false;    
-    if (!drewIcon && this.state === BaseCharacter.State.RUSHING) {
+    if (!drewIcon && this.alerting) {
         whiteBitmapFont.drawText(ctx, '!', 0, 0);
         drewIcon = true;
     }
