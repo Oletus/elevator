@@ -394,7 +394,7 @@ Runner.prototype.update = function(deltaTime) {
         changeState(this, BaseCharacter.State.APPROACHING);
         this.moveSpeedMultiplier = 1.0;
     } else if (this.state === BaseCharacter.State.APPROACHING) {
-        if (Math.abs(this.x - 3) < 0.1) {
+        if (Math.abs(this.x - this.approachTargetX) < 0.1) {
             changeState(this, BaseCharacter.State.DOING_ACTION);
             this.moveSpeedMultiplier = 0.0;
         }
