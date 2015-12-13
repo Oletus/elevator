@@ -87,6 +87,10 @@ Level.prototype.getFloorWidth = function() {
     return 23 * 6;
 };
 
+Level.prototype.getFloorCapacity = function() {
+    return 23;
+};
+
 Level.prototype.render = function(ctx) {
     ctx.save();
     ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);

@@ -22,7 +22,7 @@ var Elevator = function(options) {
 
     objectUtil.initWithDefaults(this, defaults, options);
     this.occupants = [];
-    this.maxTotalOccupantWidth = 6;
+    this.maxWidthCapacity = 6;
     this.tilemap = new TileMap({initTile: TileMap.initFromData(ElevatorTiles), height: ElevatorTiles.length, width: ElevatorTiles[0].length });
     this.doorOpenTimer = 0;
     this.doorOpen = false;
@@ -53,7 +53,7 @@ Elevator.prototype.getTotalWeight = function() {
 };
 
 Elevator.prototype.hasSpace = function(space) {
-    return this.getTotalUsedSpace() + space <= this.maxTotalOccupantWidth;
+    return this.getTotalUsedSpace() + space <= this.maxWidthCapacity;
 };
 
 Elevator.prototype.hasOccupants = function(matchFunc) {
@@ -118,12 +118,12 @@ Elevator.prototype.update = function(deltaTime) {
     this.doorOpen = this.doorOpenTimer > this.level.elevatorDoorOpenTime * 0.5;
     this.floorNumber += this.currentMovementSpeed * deltaTime;
     this.floorNumber = mathUtil.clamp(0, this.level.numFloors - 1, this.floorNumber);
-    var fromRight = this.maxTotalOccupantWidth - this.getTotalUsedSpace();
+    var fromRight = this.maxWidthCapacity - this.getTotalUsedSpace();
     var usedSpace = 0;
     var scaryOccupants = false;
     for (var i = 0; i < this.occupants.length; ++i) {
         var occupant = this.occupants[i];
-        occupant.elevatorTargetX = this.x + (this.maxTotalOccupantWidth + 1 - fromRight - occupant.width * 0.5) * 6;
+        occupant.elevatorTargetX = this.x + (this.maxWidthCapacity + 1 - fromRight - occupant.width * 0.5) * 6;
         fromRight += occupant.width;
         usedSpace += occupant.width;
         if (occupant.scary) {
@@ -140,7 +140,7 @@ Elevator.prototype.update = function(deltaTime) {
     var floor = this.level.floors[Math.round(this.floorNumber)];
     for (var i = 0; i < floor.occupants.length; ++i) {
         var floorOccupant = floor.occupants[i];
-        if (this.doorOpen && usedSpace + floorOccupant.width <= this.maxTotalOccupantWidth && (!scaryOccupants || floorOccupant.immuneToScary)) {
+        if (this.doorOpen && usedSpace + floorOccupant.width <= this.maxWidthCapacity && (!scaryOccupants || floorOccupant.immuneToScary)) {
             usedSpace += floorOccupant.width;
             floorOccupant.elevatorTargetX = this.x + (1 +  floorOccupant.width * 0.5) * 6;
         } else {

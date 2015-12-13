@@ -125,9 +125,10 @@ Floor.prototype.update = function(deltaTime) {
         usedSpace += this.occupants[i].width;
     }
     
-    var lastDude = this.occupants[this.occupants.length - 1];
-    
-    if (usedSpace >= this.level.getFloorWidth() && Math.abs(lastDude.x - lastDude.width * 0.5 * TILE_WIDTH) < 1) {
-        this.level.goToState(Level.State.FAIL);
+    if (this.occupants.length > 0) {
+        var lastDude = this.occupants[this.occupants.length - 1];
+        if (usedSpace >= this.level.getFloorCapacity() && Math.abs(lastDude.x - lastDude.floorTargetX) < 1) {
+            this.level.goToState(Level.State.FAIL);
+        }
     }
 };
