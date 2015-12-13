@@ -95,7 +95,7 @@ Level.prototype.render = function(ctx) {
 
     this.elevator.renderBg(ctx);
     for (var i = 0; i < this.floors.length; ++i) {
-        this.floors[i].render(ctx);
+        this.floors[i].renderBg(ctx);
     }
     for (var i = 0; i < this.characters.length; ++i) {
         if (this.characters[i].falling) {
@@ -107,6 +107,9 @@ Level.prototype.render = function(ctx) {
         if (!this.characters[i].falling) {
             this.characters[i].render(ctx);
         }
+    }
+    for (var i = 0; i < this.floors.length; ++i) {
+        this.floors[i].renderFg(ctx);
     }
     
     this.particles.render(ctx);

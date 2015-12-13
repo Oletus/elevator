@@ -3,18 +3,34 @@ var GameData = {};
 GameData.floors =
 [
     {
-        id: "security",
-        name: "Security",
-        spawnIds: [],
-        excludeAsDestination: true
+        id: "acme",
+        name: "Acme"
     },
     {
-        id: "bioweapon",
-        name: "Bio weapons lab"
+        id: "stables",
+        name: "Stables"
+    },
+    {
+        id: "graveyard",
+        name: "Graveyard"
+    },
+    {
+        id: "lounge",
+        name: "Business lounge"
     },
     {
         id: "garage",
         name: "Garage"
+    },
+    {
+        id: "security",
+        name: "Security",
+        spawnIds: [],
+        excludeAsDestination: true
+    } /*,
+    {
+        id: "bioweapon",
+        name: "Bio weapons lab"
     },
     {
         id: "surgeryspa",
@@ -27,10 +43,6 @@ GameData.floors =
     {
         id: "gym",
         name: "Gym"
-    },
-    {
-        id: "acme",
-        name: "Acme"
     },
     {
         id: "heavystuff",
@@ -111,7 +123,7 @@ GameData.floors =
     {
         id: "beetherapy",
         name: "Bee therapy"
-    }
+    }*/
 ];
 
 function getAllButExcluded() {

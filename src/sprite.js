@@ -6,19 +6,31 @@
  * @param {string|HTMLImageElement|HTMLCanvasElement} filename File to load or a graphical element that's already
  * loaded.
  * @param {string=} filter Filter function to convert the sprite, for example Sprite.turnSolidColored('black')
+ * @param {string|HTMLImageElement|HTMLCanvasElement=} fallback Fallback file to load or a graphical element that's
+ * already loaded.
  */
-var Sprite = function(filename, /* Optional */ filter) {
+var Sprite = function(filename, /* Optional */ filter, fallback) {
     this.filename = filename;
     this.missing = false;
+    this.fallback = fallback;
+    this.filter = filter;
     Sprite.createdCount++;
+    this._reload();
+};
+
+/**
+ * Reload the Sprite.
+ * @protected
+ */
+Sprite.prototype._reload = function() {
     if (typeof this.filename != typeof '') {
         this.img = this.filename;
         this.loaded = true;
         Sprite.loadedCount++;
         this.width = this.filename.width;
         this.height = this.filename.height;
-        if (filter !== undefined) {
-            filter(this);
+        if (this.filter !== undefined) {
+            this.filter(this);
         }
     } else {
         this.img = document.createElement('img');
@@ -30,11 +42,17 @@ var Sprite = function(filename, /* Optional */ filter) {
             Sprite.loadedCount++;
             that.width = that.img.width;
             that.height = that.img.height;
-            if (filter !== undefined) {
-                filter(that);
+            if (that.filter !== undefined) {
+                that.filter(that);
             }
         };
         this.img.onerror = function() {
+            if (that.fallback) {
+                that.filename = that.fallback;
+                that.fallback = undefined;
+                that._reload();
+                return;
+            }
             that.loaded = true;
             that.missing = true;
             Sprite.loadedCount++;

@@ -39,20 +39,29 @@ Floor.prototype.removeOccupant = function(toRemove) {
 
 Floor.height = FloorTiles.length - 1;
 
-Floor.sprite = new Sprite('floor_gfx.png');
+Floor.fgSprites = {};
+Floor.bgSprites = {};
 
-Floor.prototype.render = function(ctx) {
+Floor.loadSprites = function() {
+    for (var i = 0; i < GameData.floors.length; ++i) {
+        var floor = GameData.floors[i];
+        Floor.bgSprites[floor.id] = new Sprite('floor-' + floor.id + '-bg.png', undefined, 'floor_gfx.png');
+        Floor.fgSprites[floor.id] = new Sprite('floor-' + floor.id + '-fg.png', undefined, 'floor-fg.png');
+    }
+};
+
+Floor.loadSprites();
+
+Floor.prototype.renderBg = function(ctx) {
     ctx.save();
     var drawY = this.level.getFloorTopY(this.floorNumber);
     ctx.translate(0, drawY);
-    /*ctx.fillStyle = '#222';
-    this.tilemap.render(ctx, function(tile) { return tile === 'x'; }, 0.05, 0.05);*/
     ctx.fillStyle = '#888';
     this.tilemap.render(ctx, function(tile) { return tile === 'h'; }, 0.05, 0.05);
     ctx.save();
     ctx.translate(0, 1);
     ctx.scale(1 / 6, 1 / 6);
-    Floor.sprite.draw(ctx, 0, 0);
+    Floor.bgSprites[this.id].draw(ctx, 0, 0);
     ctx.restore();
     
     ctx.save();
@@ -73,6 +82,16 @@ Floor.prototype.render = function(ctx) {
 
     ctx.restore();
 };
+
+Floor.prototype.renderFg = function(ctx) {
+    ctx.save();
+    var drawY = this.level.getFloorTopY(this.floorNumber);
+    ctx.translate(0, drawY);
+    ctx.translate(0, 1);
+    ctx.scale(1 / 6, 1 / 6);
+    Floor.fgSprites[this.id].draw(ctx, 0, 0);
+    ctx.restore();
+}
 
 Floor.prototype.spawnCharacter = function() {
     var totalChance = 0;
