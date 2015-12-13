@@ -23,7 +23,12 @@ GameData.floors =
     },
     {
         id: "graveyard",
-        name: "Graveyard"
+        name: "Graveyard",
+        spawnIds: [
+            {id: "customer", chance: 3},
+            {id: "horse", chance: 2},
+            {id: "ghost", chance: 100}
+        ]
     },
     {
         id: "lounge",
@@ -165,21 +170,28 @@ GameData.characters =
         destinations : getAllButExcluded(),
         characterConstructor: Character,
         weight: 4,
-        minTip : 5,
-        maxTip : 20
+        minTip: 5,
+        maxTip: 20
     },
     'runner' : {
         destinations : getAllButExcluded(),
         characterConstructor: Runner,
         weight: 1,
-        minTip : 20,
-        maxTip : 50
+        minTip: 20,
+        maxTip: 30
     },
     'horse': {
         destinations : getAllButExcluded(),
         characterConstructor: Horse,
         weight: 2,
-        minTip : 5
+        minTip: 5
+    },
+    'ghost': {
+        destinations : getAllButExcluded(),
+        characterConstructor: Ghost,
+        weight: -1,
+        minTip: 20,
+        maxTip: 30
     }
 };
 

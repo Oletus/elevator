@@ -16,7 +16,8 @@ BaseCharacter.State = {
     INITIALIZING: 0,
     APPROACHING: 1,
     RUSHING: 2,
-    NORMAL: 3
+    NORMAL: 3,
+    ESCAPING: 4
 };
 
 BaseCharacter.legsAnimation = new AnimatedSprite({
@@ -108,6 +109,7 @@ BaseCharacter.prototype.initBase = function(options) {
     this.movedX = 0; // delta of x on last frame
     this.state = BaseCharacter.State.NORMAL;
     this.stateTime = 0;
+    this.alwaysBobble = false;
 };
 
 BaseCharacter.prototype.render = function(ctx) {
@@ -193,7 +195,8 @@ BaseCharacter.prototype.update = function(deltaTime) {
     
     // Determine target x
     var targetX = undefined;
-    if (Math.round(this.floorNumber) === this.goalFloor && (!this.elevator || this.elevator.doorOpen)) {
+    var wantOut = (Math.round(this.floorNumber) === this.goalFloor) || this.state === BaseCharacter.State.ESCAPING;
+    if (wantOut && (!this.elevator || this.elevator.doorOpen)) {
         targetX = -10;
     } else if (this.elevatorTargetX !== undefined) {
         targetX = this.elevatorTargetX;
@@ -270,9 +273,10 @@ BaseCharacter.prototype.update = function(deltaTime) {
     
     // Update animation
     this.movedX = this.x - oldX;
+    var bobble = this.alwaysBobble;
     if (Math.abs(this.movedX) > this.level.characterMoveSpeed * this.moveSpeedMultiplier * deltaTime * 0.4 + 0.001) {
         this.legsSprite.update(deltaTime);
-        this.bobbleTime += deltaTime;
+        bobble = true;
         this.facingRight = (this.x > oldX);
     } else if (!this.elevator) {
         if ( this.queueTime < this.maxQueueTime ) {
@@ -288,7 +292,9 @@ BaseCharacter.prototype.update = function(deltaTime) {
                 this.hurryTextTime = 0;
             }
         }
-            
+    }
+    if (bobble) {
+        this.bobbleTime += deltaTime;
     }
     
     // Check if the character has left the level
@@ -384,4 +390,22 @@ Runner.prototype.renderBody = function(ctx) {
     } else {
         BaseCharacter.prototype.renderBody.call(this, ctx);
     }
+};
+
+
+var Ghost = function(options) {
+    this.initBase(options);
+    this.bodySprite = Ghost.bodySprites[this.id];
+    this.alwaysBobble = true;
+};
+
+Ghost.prototype = new BaseCharacter();
+
+/**
+ * ctx has its current transform set centered on the floor at the x center of the character.
+ */
+Ghost.prototype.renderBody = function(ctx) {
+    var scale = 1 / 6;
+    var flip = this.facingRight ? 1 : -1;
+    this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 2) * 2) / 6, 0, scale * flip, scale);
 };
