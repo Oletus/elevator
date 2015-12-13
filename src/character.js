@@ -227,6 +227,8 @@ BaseCharacter.prototype.update = function(deltaTime) {
     var wantOut = (Math.round(this.floorNumber) === this.goalFloor) || this.state === BaseCharacter.State.ESCAPING;
     if (this.state === BaseCharacter.State.DOING_ACTION) {
         targetX = this.x;
+    } else if (this.state === BaseCharacter.State.APPROACHING) {
+        targetX = this.approachTargetX;
     } else if (wantOut && (!this.elevator || this.elevator.doorOpen)) {
         targetX = -10;
     } else if (this.elevatorTargetX !== undefined) {
@@ -374,6 +376,7 @@ var Runner = function(options) {
     this.initBase(options);
     this.bodySprite = Runner.bodySprites[this.id];
     this.state = BaseCharacter.State.INITIALIZING;
+    this.approachTargetX = 2 + Math.random() * 2;
 };
 
 Runner.prototype = new BaseCharacter();
@@ -391,11 +394,11 @@ Runner.prototype.update = function(deltaTime) {
         changeState(this, BaseCharacter.State.APPROACHING);
         this.moveSpeedMultiplier = 1.0;
     } else if (this.state === BaseCharacter.State.APPROACHING) {
-        if (this.x > 3) {
-            changeState(this, BaseCharacter.State.WAITING);
+        if (Math.abs(this.x - 3) < 0.1) {
+            changeState(this, BaseCharacter.State.DOING_ACTION);
             this.moveSpeedMultiplier = 0.0;
         }
-    } else if (this.state === BaseCharacter.State.WAITING) {
+    } else if (this.state === BaseCharacter.State.DOING_ACTION) {
         if (this.level.elevator.hasSpace(this.width)) {
             if (this.stateTime > 1) {
                 changeState(this, BaseCharacter.State.RUSHING);
@@ -405,7 +408,12 @@ Runner.prototype.update = function(deltaTime) {
             this.stateTime = 0;
         }
     } else if (this.state === BaseCharacter.State.RUSHING) {
-        this.moveSpeedMultiplier += deltaTime * 2.0;
+        if (Math.abs(this.movedX) > 0.01) {
+            this.moveSpeedMultiplier += deltaTime * 2.0;
+        } else if (!this.falling) {
+            this.moveSpeedMultiplier = 0.5;
+            changeState(this, BaseCharacter.State.APPROACHING);
+        }
         if (this.elevator && this.x >= doorThresholdX + 2 || this.floorNumber === this.goalFloor) {
             changeState(this, BaseCharacter.State.NORMAL);
             this.moveSpeedMultiplier = 1.5;

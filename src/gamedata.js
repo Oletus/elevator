@@ -9,7 +9,7 @@ GameData.floors =
             {id: "customer", chance: 5},
             {id: "horse", chance: 1},
             {id: "heavy", chance: 5},
-            {id: "runner", chance: 1}
+            {id: "runner", chance: 2}
         ]
     },
     {
@@ -27,12 +27,16 @@ GameData.floors =
         spawnIds: [
             {id: "customer", chance: 3},
             {id: "horse", chance: 1},
-            {id: "ghost", chance: 3}
+            {id: "ghost", chance: 2}
         ]
     },
     {
         id: "lounge",
-        name: "Business lounge"
+        name: "Business lounge",
+        spawnIds: [
+            {id: "customer", chance: 3},
+            {id: "runner", chance: 3}
+        ]
     },
     {
         id: "garage",
