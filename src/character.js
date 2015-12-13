@@ -133,9 +133,6 @@ BaseCharacter.prototype.initBase = function(options) {
 };
 
 BaseCharacter.prototype.renderIcon = function(ctx) {
-    ctx.translate(0, -4 * 6);
-    ctx.textAlign = 'center';
-
     var drewIcon = false;
     
     if (!drewIcon && this.state === BaseCharacter.State.ESCAPING) {
@@ -154,7 +151,11 @@ BaseCharacter.prototype.render = function(ctx) {
     var drawY = this.level.getFloorFloorY(this.floorNumber);
     ctx.translate(this.x, drawY);
     this.renderBody(ctx);
+    ctx.save();
+    ctx.translate(0, -30);
+    ctx.textAlign = 'center';
     this.renderIcon(ctx);
+    ctx.restore();
     ctx.restore();
 };
 
@@ -415,23 +416,13 @@ Runner.prototype.update = function(deltaTime) {
 };
 
 Runner.prototype.renderIcon = function(ctx) {
-    ctx.translate(0, -4 * 6);
-    ctx.textAlign = 'center';
-
-    var drewIcon = false;
-    
-    if (!drewIcon && this.state === BaseCharacter.State.RUSHING ) {
+    var drewIcon = false;    
+    if (!drewIcon && this.state === BaseCharacter.State.RUSHING) {
         whiteBitmapFont.drawText(ctx, '!', 0, 0);
         drewIcon = true;
     }
-    if (!drewIcon && this.state === BaseCharacter.State.ESCAPING) {
-        if (mathUtil.fmod(this.toggleIconTime * 3, 1) > 0.5) {
-            this.iconSprite.drawRotated(ctx, 0, 0, 0);
-            drewIcon = true;
-        }
-    }
-    if (!drewIcon && (this.floorNumber !== this.goalFloor || this.elevator)) {
-        whiteBitmapFont.drawText(ctx, '' + (this.goalFloor + 1), 0, 0);
+    if (!drewIcon) {
+        BaseCharacter.prototype.renderIcon.call(this, ctx);
     }
 }
 
@@ -485,7 +476,6 @@ Ghost.prototype.renderIcon = function (ctx) {
     if ( this.state === BaseCharacter.State.DISAPPEARING ) {
         return;
     }
-    
     BaseCharacter.prototype.renderIcon.call(this, ctx);
 }
 
