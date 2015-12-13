@@ -105,6 +105,7 @@ BaseCharacter.prototype.initBase = function(options) {
     this.facingRight = true;
     this.hurryTextTime = 0;
     this.dy = 0;
+    this.movedX = 0; // delta of x on last frame
     this.state = BaseCharacter.State.NORMAL;
     this.stateTime = 0;
 };
@@ -189,54 +190,62 @@ BaseCharacter.prototype.update = function(deltaTime) {
 
     var doorThresholdX = this.level.getFloorWidth();
     var oldX = this.x;
+    
+    // Determine target x
+    var targetX = undefined;
+    if (Math.round(this.floorNumber) === this.goalFloor && (!this.elevator || this.elevator.doorOpen)) {
+        targetX = -10;
+    } else if (this.elevatorTargetX !== undefined) {
+        targetX = this.elevatorTargetX;
+    } else if (this.state === BaseCharacter.State.RUSHING && this.level.elevator.hasSpace(this.width)) {
+        targetX = doorThresholdX + 5;
+    } else if (this.floorTargetX !== undefined) {
+        targetX = this.floorTargetX;
+    } else {
+        targetX = doorThresholdX - 1 - this.width * 0.5;
+    }
+    
+    // Determine wall positions
     var wallXRight = 0;
     var wallXLeft = -5;
-    if (this.elevator) {
+    if (this.elevator) { // Character is in elevator
         this.floorNumber = this.elevator.floorNumber;
         if (this.elevator.doorVisual > 0 && this.state !== BaseCharacter.State.RUSHING) {
             wallXLeft = doorThresholdX + this.elevator.doorVisual;
         }
         wallXRight = doorThresholdX + 7;
     } else {
-        if (this.state === BaseCharacter.State.RUSHING ||
-            (this.level.floors[this.floorNumber].doorVisual === 0 &&
-            this.level.elevator.hasSpace(this.width)))
-        {
+        if (this.state === BaseCharacter.State.RUSHING) {
             wallXRight = doorThresholdX + 8;
-            this.floorTargetX = undefined;
+        } else if (this.level.floors[this.floorNumber].doorVisual === 0 &&
+            this.level.elevator.hasSpace(this.width))
+        {
+            wallXRight = doorThresholdX + 7;
         } else {
             wallXRight = doorThresholdX - this.level.floors[this.floorNumber].doorVisual;
         }
     }
+    
+    // Move the character
     if (this.falling) {
+        this.x += this.movedX *= 0.98 + 0.01 * deltaTime;
         if (this.x - this.width * 0.5 > doorThresholdX) {
             this.dy -= deltaTime * 4;
             this.floorNumber += this.dy * deltaTime;
         }
-        this.moveX *= 0.99;
-    } else if (Math.round(this.floorNumber) == this.goalFloor && (!this.elevator || this.elevator.doorOpen)) {
-        this.moveX = -1;
-        this.elevatorTargetX = undefined;
     } else {
-        this.moveX = 1;
+        propertyToValue(this, 'x', targetX, this.level.characterMoveSpeed * this.moveSpeedMultiplier * deltaTime);
     }
-    if (this.state === BaseCharacter.State.RUSHING && !this.elevator) {
-        this.x += this.moveX * this.level.characterMoveSpeed * this.moveSpeedMultiplier * deltaTime;
-    } else {
-        if (this.elevatorTargetX !== undefined) {
-            propertyToValue(this, 'x', this.elevatorTargetX, this.level.characterMoveSpeed * this.moveSpeedMultiplier * deltaTime);
-        } else if (this.floorTargetX !== undefined) {
-            propertyToValue(this, 'x', this.floorTargetX, this.level.characterMoveSpeed * this.moveSpeedMultiplier * deltaTime);
-        } else {
-            this.x += this.moveX * this.level.characterMoveSpeed * this.moveSpeedMultiplier * deltaTime;
-        }
-    }
+
+    // Collide with walls
     if (this.x > wallXRight - this.width * 0.5) {
         this.x = wallXRight - this.width * 0.5;
     }
     if (this.x < wallXLeft + this.width * 0.5) {
         this.x = wallXLeft + this.width * 0.5;
     }
+    
+    // Change status based on when crossing elevator threshold
     if (this.x > doorThresholdX) {
         if (!this.falling && this.elevator === null) {
             if (this.floorNumber > -0.1) {
@@ -248,19 +257,20 @@ BaseCharacter.prototype.update = function(deltaTime) {
             } else {
                 this.falling = true;
             }
-            this.floorTargetX = undefined;
         }
     }
     if (this.x < doorThresholdX && this.elevator !== null) {
         this.elevator.removeOccupant(this);
         this.elevator = null;
         this.floorNumber = Math.round(this.floorNumber);
-        this.elevatorTargetX = undefined;
         if (this.floorNumber === this.goalFloor) {
             this.level.reachedGoal(this);
         }
     }
-    if (Math.abs(this.x - oldX) > this.level.characterMoveSpeed * deltaTime * 0.5) {
+    
+    // Update animation
+    this.movedX = this.x - oldX;
+    if (Math.abs(this.movedX) > this.level.characterMoveSpeed * this.moveSpeedMultiplier * deltaTime * 0.4 + 0.001) {
         this.legsSprite.update(deltaTime);
         this.bobbleTime += deltaTime;
         this.facingRight = (this.x > oldX);
@@ -280,6 +290,8 @@ BaseCharacter.prototype.update = function(deltaTime) {
         }
             
     }
+    
+    // Check if the character has left the level
     if (this.x + this.width < -1 && this.floorNumber === this.goalFloor) {
         this.dead = true;
     }
@@ -343,9 +355,13 @@ Runner.prototype.update = function(deltaTime) {
             this.moveSpeedMultiplier = 0.0;
         }
     } else if (this.state === BaseCharacter.State.WAITING) {
-        if (this.stateTime > 1) {
-            changeState(this, BaseCharacter.State.RUSHING);
-            this.moveSpeedMultiplier = 0.5;
+        if (this.level.elevator.hasSpace(this.width)) {
+            if (this.stateTime > 1) {
+                changeState(this, BaseCharacter.State.RUSHING);
+                this.moveSpeedMultiplier = 0.5;
+            }
+        } else {
+            this.stateTime = 0;
         }
     } else if (this.state === BaseCharacter.State.RUSHING) {
         this.moveSpeedMultiplier += deltaTime * 2.0;

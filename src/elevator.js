@@ -103,9 +103,21 @@ Elevator.prototype.update = function(deltaTime) {
     this.floorNumber += this.currentMovementSpeed * deltaTime;
     this.floorNumber = mathUtil.clamp(0, this.level.numFloors - 1, this.floorNumber);
     var fromRight = this.maxTotalOccupantWidth - this.getTotalUsedSpace();
+    var usedSpace = 0;
     for (var i = 0; i < this.occupants.length; ++i) {
         this.occupants[i].elevatorTargetX = this.x + this.maxTotalOccupantWidth + 1 - fromRight - this.occupants[i].width * 0.5;
         fromRight += this.occupants[i].width;
+        usedSpace += this.occupants[i].width;
+    }
+    if (this.doorOpen) {
+        var floor = this.level.floors[Math.round(this.floorNumber)];
+        for (var i = 0; i < floor.occupants.length; ++i) {
+            var floorOccupant = floor.occupants[i];
+            if (usedSpace + floorOccupant.width <= this.maxTotalOccupantWidth) {
+                usedSpace += floorOccupant.width;
+                floorOccupant.elevatorTargetX = this.x + 1 +  floorOccupant.width * 0.5;
+            }
+        }
     }
 };
 
