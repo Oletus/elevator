@@ -35,7 +35,9 @@ BaseCharacter.prototype.initBase = function(options) {
         id: 'customer',
         width: 2,
         weight: 1,
-        maxQueueTime : 10
+        maxQueueTime : 10,
+        minTip : 1,
+        maxTip : 10
     };
     objectUtil.initWithDefaults(this, defaults, options);
     this.legsSprite = new AnimatedSpriteInstance(BaseCharacter.legsAnimation);
@@ -163,10 +165,8 @@ BaseCharacter.prototype.spawnTip = function() {
 };
 
 BaseCharacter.prototype.getTip = function() {
-    var tip = 1;
-    if (this.queueTime < this.maxQueueTime) {
-        tip = Math.ceil(this.maxQueueTime - this.queueTime);
-    }
+    var relativeTime = mathUtil.clamp(0, 1, 1 - this.queueTime / this.maxQueueTime);
+    var tip = this.minTip + Math.round(relativeTime * (this.maxTip - this.minTip));
     return tip;
 };
 

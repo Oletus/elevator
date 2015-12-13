@@ -136,17 +136,20 @@ GameData.characters =
     'customer' : {
         destinations : getAllButExcluded(),
         characterConstructor: Character,
-        weight: 1,
+        weight: 1
     },
     'heavy' : {
         destinations : getAllButExcluded(),
         characterConstructor: Character,
-        weight: 4
+        weight: 4,
+        maxTip : 15
     },
     'runner' : {
         destinations : getAllButExcluded(),
         characterConstructor: Runner,
-        weight: 1
+        weight: 1,
+        minTip : 20,
+        maxTip : 20
     },
     'horse': {
         destinations : getAllButExcluded(),
