@@ -27,7 +27,7 @@ var Level = function() {
     }
     this.characters = [];
     
-    this.state = Level.State.IN_PROGRESS;
+    this.goToState(Level.State.IN_PROGRESS);
     
     this.characterMoveSpeed = 10;
     this.elevatorMoveSpeed = 4;
@@ -36,6 +36,7 @@ var Level = function() {
     this.score = 0;
     this.comboCount = 0;
     this.comboCharacters = [];
+    this.stateTime = 0;
     
     this.particles = new ParticleEngine({
         gravityY: 40
@@ -46,6 +47,15 @@ Level.State = {
     IN_PROGRESS: 0,
     FAIL: 1
 };
+
+Level.prototype.goToState = function(state) {
+    if ( state === this.state ) {
+        return;
+    }
+    
+    this.state = state;
+    this.stateTime = 0;
+}
 
 Level.failSprite = new Sprite('level-fail.png');
 
@@ -64,7 +74,7 @@ Level.prototype.spawnCharacter = function() {
     var character = spawnFloor.spawnCharacter();
     this.characters.push(character);
     if (Level.getTotalUsedSpace(spawnFloor.occupants) > this.getFloorWidth() - 1) {
-        this.state = Level.State.FAIL;
+        this.goToState(Level.State.FAIL);
     }
 };
 
@@ -107,6 +117,7 @@ Level.prototype.render = function(ctx) {
 };
 
 Level.prototype.update = function(deltaTime) {
+    this.stateTime += deltaTime;
     for (var i = 0; i < this.floors.length; ++i) {
         this.floors[i].update(deltaTime);
     }
