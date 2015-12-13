@@ -63,15 +63,16 @@ Floor.prototype.render = function(ctx) {
     ctx.scale(1 / 6, 1 / 6);
     ctx.fillStyle = 'black';
     ctx.textAlign = "right";
-    blackBitmapFont.drawText(ctx, ((this.floorNumber + 1) + ' ' + this.name).toUpperCase(), 0, 0);
+    var floorTextNumber = (this.floorNumber >= 10 ) ? (this.floorNumber + 1).toString() : '0' + (this.floorNumber + 1);
+    blackBitmapFont.drawText(ctx, this.name.toUpperCase() + ' ' + floorTextNumber, 0, 0);
 
     ctx.restore();
 };
 
 Floor.prototype.spawnCharacter = function() {
     var characterId = arrayUtil.randomItem(this.spawnIds);
-    var character = BaseCharacter.create({x: -2, floorNumber: this.floorNumber, level: this.level, id: characterId});
-
+    var character = BaseCharacter.create({x: 1, floorNumber: this.floorNumber, level: this.level, id: characterId});
+    
     this.occupants.push(character);
     return character;
 }
