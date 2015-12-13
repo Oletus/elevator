@@ -21,6 +21,8 @@ BaseCharacter.State = {
     DOING_ACTION: 5
 };
 
+BaseCharacter.bodySprites = {};
+
 BaseCharacter.legsAnimation = new AnimatedSprite({
         'idle': [{src: 'legs-idle.png', duration: 0}],
         'walking': [
@@ -47,10 +49,7 @@ BaseCharacter.iconAnimation = new AnimatedSprite({
 BaseCharacter.loadSprites = function() {
     for (var key in GameData.characters) {
         if (GameData.characters.hasOwnProperty(key)) {
-            if (GameData.characters[key].characterConstructor.bodySprites === undefined) {
-                GameData.characters[key].characterConstructor.bodySprites = {};
-            }
-            GameData.characters[key].characterConstructor.bodySprites[key] = new Sprite('body-' + key + '.png');
+            BaseCharacter.bodySprites[key] = new Sprite('body-' + key + '.png');
         }
     }
 };
@@ -129,6 +128,7 @@ BaseCharacter.prototype.initBase = function(options) {
     this.stateTime = 0;
     this.alwaysBobble = false;
     this.iconSprite = new AnimatedSpriteInstance(BaseCharacter.iconAnimation);
+    this.bodySprite = BaseCharacter.bodySprites[this.id];
 };
 
 BaseCharacter.prototype.renderIcon = function(ctx) {
@@ -342,7 +342,6 @@ BaseCharacter.prototype.update = function(deltaTime) {
 
 var Character = function(options) {
     this.initBase(options);
-    this.bodySprite = Character.bodySprites[this.id];
 };
 
 Character.prototype = new BaseCharacter();
@@ -351,7 +350,6 @@ Character.prototype = new BaseCharacter();
 var Horse = function(options) {
     options.width = 4;
     this.initBase(options);
-    this.bodySprite = Horse.bodySprites[this.id];
 };
 
 Horse.prototype = new BaseCharacter();
@@ -369,7 +367,6 @@ Horse.prototype.renderBody = function(ctx) {
 
 var Runner = function(options) {
     this.initBase(options);
-    this.bodySprite = Runner.bodySprites[this.id];
     this.state = BaseCharacter.State.INITIALIZING;
     this.approachTargetX = Math.floor(12 + Math.random() * 20);
 };
@@ -453,7 +450,6 @@ Runner.prototype.renderBody = function(ctx) {
 
 var Ghost = function(options) {
     this.initBase(options);
-    this.bodySprite = Ghost.bodySprites[this.id];
     this.alwaysBobble = true;
     this.stateTime = 0;
     this.scary = false;
