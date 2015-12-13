@@ -19,7 +19,7 @@ BaseCharacter.State = {
     NORMAL: 3,
     ESCAPING: 4,
     DOING_ACTION: 5,
-	DISAPPEARING: 6
+    DISAPPEARING: 6
 };
 
 BaseCharacter.bodySprites = {};
@@ -133,11 +133,11 @@ BaseCharacter.prototype.initBase = function(options) {
 };
 
 BaseCharacter.prototype.renderIcon = function(ctx) {
-	ctx.translate(0, -4 * 6);
+    ctx.translate(0, -4 * 6);
     ctx.textAlign = 'center';
 
-	var drewIcon = false;
-	
+    var drewIcon = false;
+    
     if (!drewIcon && this.state === BaseCharacter.State.ESCAPING) {
         if (mathUtil.fmod(this.toggleIconTime * 3, 1) > 0.5) {
             this.iconSprite.drawRotated(ctx, 0, 0, 0);
@@ -154,7 +154,7 @@ BaseCharacter.prototype.render = function(ctx) {
     var drawY = this.level.getFloorFloorY(this.floorNumber);
     ctx.translate(this.x, drawY);
     this.renderBody(ctx);
-	this.renderIcon(ctx);
+    this.renderIcon(ctx);
     ctx.restore();
 };
 
@@ -415,15 +415,15 @@ Runner.prototype.update = function(deltaTime) {
 };
 
 Runner.prototype.renderIcon = function(ctx) {
-	ctx.translate(0, -4 * 6);
+    ctx.translate(0, -4 * 6);
     ctx.textAlign = 'center';
 
-	var drewIcon = false;
-	
-	if (!drewIcon && this.state === BaseCharacter.State.RUSHING ) {
-		whiteBitmapFont.drawText(ctx, '!', 0, 0);
-		drewIcon = true;
-	}
+    var drewIcon = false;
+    
+    if (!drewIcon && this.state === BaseCharacter.State.RUSHING ) {
+        whiteBitmapFont.drawText(ctx, '!', 0, 0);
+        drewIcon = true;
+    }
     if (!drewIcon && this.state === BaseCharacter.State.ESCAPING) {
         if (mathUtil.fmod(this.toggleIconTime * 3, 1) > 0.5) {
             this.iconSprite.drawRotated(ctx, 0, 0, 0);
@@ -454,6 +454,7 @@ var Ghost = function(options) {
     this.alwaysBobble = true;
     this.stateTime = 0;
     this.scary = false;
+    this.didScareCount = 0;
 };
 
 //Ghost.scarySound = new Audio('ghost-shriek');
@@ -467,12 +468,12 @@ Ghost.disappearTime = 2;
  */
 Ghost.prototype.renderBody = function(ctx) {
     var flip = this.facingRight ? 1 : -1;
-	
-	if ( this.state === BaseCharacter.State.DISAPPEARING ) {
-		var relativeAlpha = mathUtil.clamp(0, 1, 1 - this.stateTime / Ghost.disappearTime);
-		ctx.globalAlpha = relativeAlpha;
-	}
-	
+    
+    if ( this.state === BaseCharacter.State.DISAPPEARING ) {
+        var relativeAlpha = mathUtil.clamp(0, 1, 1 - this.stateTime / Ghost.disappearTime);
+        ctx.globalAlpha = relativeAlpha;
+    }
+    
     if (this.scary) {
         Ghost.scaringSprite.drawRotatedNonUniform(ctx, 0, -12 + Math.floor(Math.sin(this.bobbleTime * 2) * 2), 0, flip);
     } else {
@@ -481,49 +482,44 @@ Ghost.prototype.renderBody = function(ctx) {
 };
 
 Ghost.prototype.renderIcon = function (ctx) {
-	if ( this.state === BaseCharacter.State.DISAPPEARING ) {
-		return;
-	}
-	
-	BaseCharacter.prototype.renderIcon.call(this, ctx);
+    if ( this.state === BaseCharacter.State.DISAPPEARING ) {
+        return;
+    }
+    
+    BaseCharacter.prototype.renderIcon.call(this, ctx);
 }
 
 Ghost.prototype.update = function(deltaTime) {
-	if ( this.state === BaseCharacter.State.DISAPPEARING ) {
-		if( !this.dead && this.stateTime >= Ghost.disappearTime) {
-			this.dead = true;
-		}
-		
-		return;
-	}
     BaseCharacter.prototype.update.call(this, deltaTime);
-    if (this.elevator && this.elevator.doorOpen &&
-        Math.round(this.floorNumber) !== this.goalFloor &&
-        Math.abs(this.x - this.elevatorTargetX) < 0.05 &&
-        this.elevator.hasOccupants(function(occupant) { return !occupant.immuneToScary && Math.abs(occupant.x - occupant.elevatorTargetX) < 0.05; }))
-    {
-        if (this.state !== BaseCharacter.State.DOING_ACTION) {
-            changeState(this, BaseCharacter.State.DOING_ACTION);
-        }
-        var wasScary = this.scary;
-        this.scary = (Math.sin(this.stateTime * 1.5) > 0) && this.elevator;
-        if (!wasScary && this.scary) {
-            //Ghost.scarySound.play();
+    if (this.state === BaseCharacter.State.DISAPPEARING) {
+        if (this.stateTime >= Ghost.disappearTime) {
+            this.dead = true;
         }
     } else {
-        if (this.state === BaseCharacter.State.DOING_ACTION && this.stateTime > 1) {
-            changeState(this, BaseCharacter.State.NORMAL);
-            this.scary = false;
-			
-			if ( !this.hasOwnProperty('didScareCount') ) {
-				this.didScareCount = 0;
-			}
-			
-			this.didScareCount++;
-			
-			if ( this.didScareCount >= 3 ) {
-				changeState(this, BaseCharacter.State.DISAPPEARING);
-			}
+        if (this.elevator && this.elevator.doorOpen &&
+            Math.round(this.floorNumber) !== this.goalFloor &&
+            Math.abs(this.x - this.elevatorTargetX) < 0.05 &&
+            this.elevator.hasOccupants(function(occupant) { return !occupant.immuneToScary && Math.abs(occupant.x - occupant.elevatorTargetX) < 0.05; }))
+        {
+            if (this.state !== BaseCharacter.State.DOING_ACTION) {
+                changeState(this, BaseCharacter.State.DOING_ACTION);
+            }
+            var wasScary = this.scary;
+            this.scary = (Math.sin(this.stateTime * 1.5) > 0) && this.elevator;
+            if (!wasScary && this.scary) {
+                //Ghost.scarySound.play();
+            }
+        } else {
+            if (this.state === BaseCharacter.State.DOING_ACTION && this.stateTime > 1) {
+                changeState(this, BaseCharacter.State.NORMAL);
+                this.scary = false;
+                
+                this.didScareCount++;
+                
+                if ( this.didScareCount >= 3 ) {
+                    changeState(this, BaseCharacter.State.DISAPPEARING);
+                }
+            }
         }
     }
 };

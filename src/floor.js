@@ -150,7 +150,7 @@ Floor.prototype.update = function(deltaTime) {
     }
 
     var usedSpace = 0;
-    for (var i = 0; i < this.occupants.length; ++i) {
+    for (var i = 0; i < this.occupants.length;) {
         var occupant = this.occupants[i];
         occupant.floorTargetX = this.level.getFloorWidth() - (1 + usedSpace + occupant.width * 0.5) * TILE_WIDTH;
         usedSpace += occupant.width;
