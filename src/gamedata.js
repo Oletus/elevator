@@ -191,7 +191,9 @@ GameData.characters =
         characterConstructor: Ghost,
         weight: -1,
         minTip: 20,
-        maxTip: 30
+        maxTip: 30,
+        scary: true,
+        immuneToScary: true
     }
 };
 

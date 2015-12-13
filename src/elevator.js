@@ -105,15 +105,27 @@ Elevator.prototype.update = function(deltaTime) {
     this.floorNumber = mathUtil.clamp(0, this.level.numFloors - 1, this.floorNumber);
     var fromRight = this.maxTotalOccupantWidth - this.getTotalUsedSpace();
     var usedSpace = 0;
+    var scaryOccupants = false;
     for (var i = 0; i < this.occupants.length; ++i) {
-        this.occupants[i].elevatorTargetX = this.x + this.maxTotalOccupantWidth + 1 - fromRight - this.occupants[i].width * 0.5;
-        fromRight += this.occupants[i].width;
-        usedSpace += this.occupants[i].width;
+        var occupant = this.occupants[i];
+        occupant.elevatorTargetX = this.x + this.maxTotalOccupantWidth + 1 - fromRight - occupant.width * 0.5;
+        fromRight += occupant.width;
+        usedSpace += occupant.width;
+        if (occupant.scary) {
+            scaryOccupants = true;
+        }
+    }
+    if (scaryOccupants) {
+        for (var i = 0; i < this.occupants.length; ++i) {
+            if (!this.occupants[i].immuneToScary) {
+                changeState(this.occupants[i], BaseCharacter.State.ESCAPING);
+            }
+        }
     }
     var floor = this.level.floors[Math.round(this.floorNumber)];
     for (var i = 0; i < floor.occupants.length; ++i) {
         var floorOccupant = floor.occupants[i];
-        if (this.doorOpen && usedSpace + floorOccupant.width <= this.maxTotalOccupantWidth) {
+        if (this.doorOpen && usedSpace + floorOccupant.width <= this.maxTotalOccupantWidth && (!scaryOccupants || floorOccupant.immuneToScary)) {
             usedSpace += floorOccupant.width;
             floorOccupant.elevatorTargetX = this.x + 1 +  floorOccupant.width * 0.5;
         } else {

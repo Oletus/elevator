@@ -52,7 +52,9 @@ BaseCharacter.prototype.initBase = function(options) {
         maxQueueTime : 10,
         minTip : 1,
         maxTip : 10,
-        moveSpeedMultiplier: 1
+        moveSpeedMultiplier: 1,
+        immuneToScary: false,
+        scary: false,
     };
     objectUtil.initWithDefaults(this, defaults, options);
     this.legsSprite = new AnimatedSpriteInstance(BaseCharacter.legsAnimation);
@@ -397,9 +399,12 @@ var Ghost = function(options) {
     this.initBase(options);
     this.bodySprite = Ghost.bodySprites[this.id];
     this.alwaysBobble = true;
+    this.scaryTime = 0;
 };
 
 Ghost.prototype = new BaseCharacter();
+
+Ghost.scaringSprite = new Sprite('body-ghost-scaring.png');
 
 /**
  * ctx has its current transform set centered on the floor at the x center of the character.
@@ -407,5 +412,15 @@ Ghost.prototype = new BaseCharacter();
 Ghost.prototype.renderBody = function(ctx) {
     var scale = 1 / 6;
     var flip = this.facingRight ? 1 : -1;
-    this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 2) * 2) / 6, 0, scale * flip, scale);
+    if (this.scary) {
+        Ghost.scaringSprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 2) * 2) / 6, 0, scale * flip, scale);
+    } else {
+        this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 2) * 2) / 6, 0, scale * flip, scale);
+    }
+};
+
+Ghost.prototype.update = function(deltaTime) {
+    BaseCharacter.prototype.update.call(this, deltaTime);
+    this.scaryTime += deltaTime;
+    this.scary = (Math.sin(this.scaryTime * 1.5) > 0.5) && this.elevator;
 };
