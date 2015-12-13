@@ -147,7 +147,7 @@ BaseCharacter.prototype.render = function(ctx) {
             drewIcon = true;
         }
     }
-    if (!drewIcon && this.floorNumber !== this.goalFloor || this.elevator) {
+    if (!drewIcon && (this.floorNumber !== this.goalFloor || this.elevator)) {
         whiteBitmapFont.drawText(ctx, '' + (this.goalFloor + 1), 0, 0);
     }
     ctx.restore();
