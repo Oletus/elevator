@@ -32,19 +32,48 @@ BaseCharacter.prototype.initBase = function(options) {
 
     var charData = GameData.characters[this.id];
     this.weight = charData.weight;
-    var possibleDestinations = charData.destinations;
     var shuffledFloors = arrayUtil.shuffle(this.level.floors);
-    
-    for ( var i = 0; i < shuffledFloors.length; i++ ) {
-        if ( shuffledFloors[i].floorNumber === this.floorNumber ) {
+    for (var i = 0; i < shuffledFloors.length;) {
+        if (shuffledFloors[i].floorNumber === this.floorNumber) {
+            shuffledFloors.splice(i, 1);
             continue;
         }
-            
-        for ( var b = 0; b < possibleDestinations.length; b++ ) {
-            if ( possibleDestinations[b].id === shuffledFloors[i].id ) {
-                this.goalFloor = shuffledFloors[i].floorNumber;
+        var possible = false;
+        for (var b = 0; b < charData.destinations.length; b++) {
+            if (charData.destinations[b].id === shuffledFloors[i].id) {
+                possible = true;
             }
         }
+        if (!possible) {
+            shuffledFloors.splice(i, 1);
+            continue;
+        }
+        ++i;
+    }
+    var minPossibleFloorNumber = shuffledFloors[0].floorNumber;
+    var maxPossibleFloorNumber = shuffledFloors[0].floorNumber;
+    for (var i = 0; i < shuffledFloors.length; ++i) {
+        if (shuffledFloors[i].floorNumber < minPossibleFloorNumber) {
+            minPossibleFloorNumber = shuffledFloors[i].floorNumber;
+        }
+        if (shuffledFloors[i].floorNumber > maxPossibleFloorNumber) {
+            maxPossibleFloorNumber = shuffledFloors[i].floorNumber;
+        }
+    }
+    var preferGoingDown = (this.weight / this.width) > 1;
+    if (preferGoingDown) {
+        if (minPossibleFloorNumber > this.floorNumber) {
+            this.goalFloor = minPossibleFloorNumber;
+        } else {
+            for (var i = 0; i < shuffledFloors.length; ++i) {
+                if (shuffledFloors[i].floorNumber <= this.floorNumber + 1) {
+                    this.goalFloor = shuffledFloors[i].floorNumber;
+                    break;
+                }
+            }
+        }
+    } else {
+        this.goalFloor = shuffledFloors[0].floorNumber;
     }
     this.queueTime = 0;
     this.facingRight = true;
