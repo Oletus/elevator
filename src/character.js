@@ -18,7 +18,8 @@ BaseCharacter.State = {
     RUSHING: 2,
     NORMAL: 3,
     ESCAPING: 4,
-    DOING_ACTION: 5
+    DOING_ACTION: 5,
+	DISAPPEARING: 6
 };
 
 BaseCharacter.bodySprites = {};
@@ -460,12 +461,18 @@ var Ghost = function(options) {
 Ghost.prototype = new BaseCharacter();
 
 Ghost.scaringSprite = new Sprite('body-ghost-scaring.png');
-
+Ghost.disappearTime = 2;
 /**
  * ctx has its current transform set centered on the floor at the x center of the character.
  */
 Ghost.prototype.renderBody = function(ctx) {
     var flip = this.facingRight ? 1 : -1;
+	
+	if ( this.state === BaseCharacter.State.DISAPPEARING ) {
+		var relativeAlpha = mathUtil.clamp(0, 1, 1 - this.stateTime / Ghost.disappearTime);
+		ctx.globalAlpha = relativeAlpha;
+	}
+	
     if (this.scary) {
         Ghost.scaringSprite.drawRotatedNonUniform(ctx, 0, -12 + Math.floor(Math.sin(this.bobbleTime * 2) * 2), 0, flip);
     } else {
@@ -473,7 +480,22 @@ Ghost.prototype.renderBody = function(ctx) {
     }
 };
 
+Ghost.prototype.renderIcon = function (ctx) {
+	if ( this.state === BaseCharacter.State.DISAPPEARING ) {
+		return;
+	}
+	
+	BaseCharacter.prototype.renderIcon.call(this, ctx);
+}
+
 Ghost.prototype.update = function(deltaTime) {
+	if ( this.state === BaseCharacter.State.DISAPPEARING ) {
+		if( !this.dead && this.stateTime >= Ghost.disappearTime) {
+			this.dead = true;
+		}
+		
+		return;
+	}
     BaseCharacter.prototype.update.call(this, deltaTime);
     if (this.elevator && this.elevator.doorOpen &&
         Math.round(this.floorNumber) !== this.goalFloor &&
@@ -492,6 +514,16 @@ Ghost.prototype.update = function(deltaTime) {
         if (this.state === BaseCharacter.State.DOING_ACTION && this.stateTime > 1) {
             changeState(this, BaseCharacter.State.NORMAL);
             this.scary = false;
+			
+			if ( !this.hasOwnProperty('didScareCount') ) {
+				this.didScareCount = 0;
+			}
+			
+			this.didScareCount++;
+			
+			if ( this.didScareCount >= 3 ) {
+				changeState(this, BaseCharacter.State.DISAPPEARING);
+			}
         }
     }
 };
