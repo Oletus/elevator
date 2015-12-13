@@ -216,10 +216,10 @@ Sprite.prototype.drawRotatedNonUniform = function(ctx, centerX, centerY, angleRa
         angleRadians = 0.0;
     }
     if (scaleX === undefined) {
-        scale = 1.0;
+        scaleX = 1.0;
     }
     if (scaleY === undefined) {
-        scale = 1.0;
+        scaleY = 1.0;
     }
     if (this.loaded) {
         ctx.save();
