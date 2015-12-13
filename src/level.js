@@ -41,6 +41,8 @@ var Level = function() {
     this.particles = new ParticleEngine({
         gravityY: 240
     });
+    
+    this.levelOverFade = 0;
 };
 
 Level.State = {
@@ -88,7 +90,7 @@ Level.prototype.getFloorWidth = function() {
 };
 
 Level.prototype.getFloorCapacity = function() {
-    return 23;
+    return Game.parameters['floorCapacity'];
 };
 
 Level.prototype.render = function(ctx) {
@@ -120,6 +122,10 @@ Level.prototype.render = function(ctx) {
     ctx.restore();
     
     if (this.state === Level.State.FAIL) {
+        ctx.globalAlpha = this.levelOverFade * 0.5;
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.globalAlpha = this.levelOverFade;
         Level.failSprite.drawRotated(ctx, ctx.canvas.width * 0.5, ctx.canvas.height * 0.4, 0);
         
         ctx.textAlign = 'center';
@@ -127,6 +133,7 @@ Level.prototype.render = function(ctx) {
         
         var key = game.input.getKeyInstruction(game.startPress, 0);
         bigBitmapFont.drawText(ctx, 'PRESS ' + key + ' TO RESTART', ctx.canvas.width * 0.5, ctx.canvas.height * 0.7);
+        ctx.globalAlpha = 1.0;
     }
 };
 
@@ -154,7 +161,13 @@ Level.prototype.update = function(deltaTime) {
     }
     
     this.particles.update(deltaTime);
-    BaseCharacter.coinAnimation.update(deltaTime);
+    BaseCharacter.coinAnimation.update(deltaTime); // Shared between all particles
+    
+    if (this.state === Level.State.FAIL) {
+        propertyToValue(this, 'levelOverFade', 1, deltaTime);
+    } else {
+        propertyToValue(this, 'levelOverFade', 0, deltaTime);
+    }
 };
 
 Level.prototype.resetCombo = function() {

@@ -125,7 +125,8 @@ var GameParameters = function() {
 GameParameters.parameters = {
     'initialSpawnInterval': {initial: 4, min: 0.5, max: 10},
     'spawnIntervalRandomness': {initial: 1, min: 0, max: 2},
-    'muteAudio': false
+    'floorCapacity': {initial: 23, min: 3, max: 50},
+    'muteAudio': false,
 };
 
 GameParameters.prototype.initGUI = function() {
