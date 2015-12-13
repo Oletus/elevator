@@ -109,13 +109,17 @@ Elevator.prototype.update = function(deltaTime) {
     }
 };
 
-Elevator.prototype.render = function(ctx) {
+Elevator.prototype.renderBg = function(ctx) {
     ctx.save();
     ctx.translate(this.x, 0);
-    ctx.save();
     ctx.scale(1 / 6, 1 / 6);
     Elevator.shaftSprite.draw(ctx, 0, 0);
     ctx.restore();
+};
+
+Elevator.prototype.renderFg = function(ctx) {
+    ctx.save();
+    ctx.translate(this.x, 0);
     var drawY = this.level.getFloorTopY(this.floorNumber);
     ctx.translate(0, drawY);
     ctx.fillStyle = 'red';

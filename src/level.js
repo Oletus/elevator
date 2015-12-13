@@ -93,12 +93,20 @@ Level.prototype.render = function(ctx) {
     ctx.scale(6, 6);
     ctx.translate(-this.floors[0].tilemap.width * 0.5, -this.numFloors * Floor.height * 0.5);
 
-    this.elevator.render(ctx);
+    this.elevator.renderBg(ctx);
     for (var i = 0; i < this.floors.length; ++i) {
         this.floors[i].render(ctx);
     }
     for (var i = 0; i < this.characters.length; ++i) {
-        this.characters[i].render(ctx);
+        if (this.characters[i].falling) {
+            this.characters[i].render(ctx);
+        }
+    }
+    this.elevator.renderFg(ctx);
+    for (var i = 0; i < this.characters.length; ++i) {
+        if (!this.characters[i].falling) {
+            this.characters[i].render(ctx);
+        }
     }
     
     this.particles.render(ctx);
