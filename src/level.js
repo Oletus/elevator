@@ -143,16 +143,15 @@ Level.prototype.reachedGoal = function(character) {
         this.comboCount++;
         this.score += character.getTip() * this.comboCount;
         
-        character.spawnTip();
-        
         this.comboCharacters.push(character);
     }
     else {
         this.comboCharacters = [character];
         this.comboCount = 1;
         this.score += character.getTip();
-        character.spawnTip();
     }
+    
+    character.spawnTip();
     
     if ( this.comboCount > 1 ) {
         this.elevator.comboText = "COMBO X" + this.comboCount;

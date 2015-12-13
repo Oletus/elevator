@@ -90,7 +90,7 @@ BaseCharacter.tipParticleEmitter = new ParticleEmitter({
 });
 
 BaseCharacter.prototype.spawnTip = function() {
-    var tip = this.getTip();
+    var tip = this.getTip() * this.level.comboCount;
     for (var i = 0; i < tip; ++i) {
         this.level.particles.addParticle(BaseCharacter.tipParticleEmitter.emitParticle({
             x: this.x,
