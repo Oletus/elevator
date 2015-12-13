@@ -23,7 +23,8 @@ BaseCharacter.prototype.initBase = function(options) {
         goalFloor: 0,
         id: 'customer',
         width: 2,
-        weight: 1
+        weight: 1,
+        maxQueueTime : 10
     };
     objectUtil.initWithDefaults(this, defaults, options);
     this.legsSprite = new AnimatedSpriteInstance(BaseCharacter.legsAnimation);
@@ -104,8 +105,8 @@ BaseCharacter.prototype.spawnTip = function() {
 
 BaseCharacter.prototype.getTip = function() {
     var tip = 1;
-    if (this.queueTime < 10) {
-        tip = Math.ceil(10 - this.queueTime);
+    if (this.queueTime < this.maxQueueTime) {
+        tip = Math.ceil(this.maxQueueTime - this.queueTime);
     }
     return tip;
 };
@@ -169,6 +170,11 @@ BaseCharacter.prototype.update = function(deltaTime) {
         this.facingRight = (this.x > oldX);
     } else if (!this.elevator) {
         this.queueTime += deltaTime;
+        
+        if ( this.queueTime > this.maxQueueTime ) {
+            this.queueTime = this.maxQueueTime;
+        }
+            
     }
     if (this.x + this.width < -1 && this.floorNumber === this.goalFloor) {
         this.dead = true;
@@ -202,7 +208,6 @@ Character.prototype.renderBody = function(ctx) {
     this.legsSprite.drawRotatedNonUniform(ctx, 0, -1, 0, scale * flip, scale);
     this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 15) * 1) / 6, 0, scale * flip, scale);
 };
-
 
 var Horse = function(options) {
     options.width = 4;
