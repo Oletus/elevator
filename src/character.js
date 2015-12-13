@@ -48,6 +48,11 @@ BaseCharacter.iconAnimation = new AnimatedSprite({
     defaultDuration: 5
 });
 
+BaseCharacter.alertSound = new Audio('customer-alert');
+BaseCharacter.fallSound = new Audio('customer-fall');
+BaseCharacter.fanfareSound = new Audio('band-fanfare');
+BaseCharacter.ghostShriekSound = new Audio('ghost-shriek');
+
 BaseCharacter.loadSprites = function() {
     for (var key in GameData.characters) {
         if (GameData.characters.hasOwnProperty(key)) {
@@ -291,6 +296,7 @@ BaseCharacter.prototype.update = function(deltaTime) {
                 this.elevator.occupants.push(this);
             } else {
                 this.falling = true;
+                BaseCharacter.fallSound.play();
             }
         }
     }
@@ -398,6 +404,7 @@ Runner.prototype.update = function(deltaTime) {
             if (this.stateTime > 1) {
                 changeState(this, BaseCharacter.State.RUSHING);
                 this.moveSpeedMultiplier = 0.5;
+                BaseCharacter.alertSound.play();
             }
         } else {
             this.stateTime = 0;
@@ -494,6 +501,7 @@ Ghost.prototype.update = function(deltaTime) {
         {
             if (this.state !== BaseCharacter.State.DOING_ACTION) {
                 changeState(this, BaseCharacter.State.DOING_ACTION);
+                BaseCharacter.ghostShriekSound.play();
             }
             var wasScary = this.scary;
             this.scary = (Math.sin(this.stateTime * 1.5) > 0) && this.elevator;

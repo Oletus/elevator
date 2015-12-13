@@ -56,6 +56,8 @@ Level.State = {
     FAIL: 1
 };
 
+Level.moneySound = new Audio('money-chime');
+
 Level.prototype.goToState = function(state) {
     if ( state === this.state ) {
         return;
@@ -217,6 +219,7 @@ Level.prototype.reachedGoal = function(character) {
     }
     
     character.spawnTip();
+    Level.moneySound.play();
     
     if ( this.comboCount > 1 ) {
         this.elevator.comboText = "COMBO X" + this.comboCount;

@@ -38,6 +38,9 @@ Elevator.doorSprite = new Sprite('door_closed.png');
 Elevator.doorOpenSprite = new Sprite('door_open1.png');
 Elevator.doorOpen2Sprite = new Sprite('door_open2.png');
 
+Elevator.whirrSound = new Audio('elevator-whirring');
+Elevator.dingSound = new Audio('elevator-ding');
+
 Elevator.prototype.removeOccupant = function(toRemove) {
     if (this.occupants.indexOf(toRemove) >= 0) {
         this.occupants.splice(this.occupants.indexOf(toRemove), 1);
@@ -105,6 +108,10 @@ Elevator.prototype.update = function(deltaTime) {
         }
         if (snappiness < 0.01 && this.level.floors[Math.round(this.floorNumber)].canOpenDoor()) {
             this.doorOpenTimer += deltaTime;
+        }
+        if (this.doorOpenTimer > 0.25 && Math.round(this.floorNumber) != this.lastFloorOpenSound) {
+            this.lastFloorOpenSound = Math.round(this.floorNumber);
+            Elevator.dingSound.play();
         }
     } else {
         this.level.resetCombo();
@@ -220,3 +227,4 @@ Elevator.prototype.renderFg = function(ctx) {
     ctx.restore();
     ctx.restore();
 };
+
