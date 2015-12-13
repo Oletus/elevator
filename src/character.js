@@ -29,6 +29,14 @@ BaseCharacter.legsAnimation = new AnimatedSprite({
     defaultDuration: 5
 });
 
+BaseCharacter.iconAnimation = new AnimatedSprite({
+        'escaping': [{src: 'icon-escaping.png', duration: 0}],
+},
+{
+    durationMultiplier: 1000 / 60,
+    defaultDuration: 5
+});
+
 BaseCharacter.loadSprites = function() {
     for (var key in GameData.characters) {
         if (GameData.characters.hasOwnProperty(key)) {
@@ -107,12 +115,13 @@ BaseCharacter.prototype.initBase = function(options) {
     }
     this.queueTime = 0;
     this.facingRight = true;
-    this.hurryTextTime = 0;
+    this.toggleIconTime = 0;
     this.dy = 0;
     this.movedX = 0; // delta of x on last frame
     this.state = BaseCharacter.State.NORMAL;
     this.stateTime = 0;
     this.alwaysBobble = false;
+    this.iconSprite = new AnimatedSpriteInstance(BaseCharacter.iconAnimation);
 };
 
 BaseCharacter.prototype.render = function(ctx) {
@@ -120,17 +129,26 @@ BaseCharacter.prototype.render = function(ctx) {
     var drawY = this.level.getFloorFloorY(this.floorNumber);
     ctx.translate(this.x, drawY);
     this.renderBody(ctx);
-    if (this.floorNumber !== this.goalFloor || this.elevator) {
-        ctx.translate(0, -4);
-        ctx.scale(1 / 6, 1 / 6);
-        ctx.textAlign = 'center';
-        
-        if ( !this.elevator && this.hurryTextTime >= 0.87 ) {
+
+    ctx.translate(0, -4);
+    ctx.scale(1 / 6, 1 / 6);
+    ctx.textAlign = 'center';
+
+    var drewIcon = false;
+    if (!drewIcon && this.state === BaseCharacter.State.ESCAPING) {
+        if (mathUtil.fmod(this.toggleIconTime * 3, 1) > 0.5) {
+            this.iconSprite.drawRotated(ctx, 0, 0, 0);
+            drewIcon = true;
+        }
+    }
+    if (!drewIcon && this.queueTime >= this.maxQueueTime && !this.elevator && this.floorNumber !== this.goalFloor) {
+        if (this.toggleIconTime >= 0.87) {
             whiteBitmapFont.drawText(ctx, 'HURRY', 0, 0);
+            drewIcon = true;
         }
-        else {
-            whiteBitmapFont.drawText(ctx, '' + (this.goalFloor + 1), 0, 0);
-        }
+    }
+    if (!drewIcon && this.floorNumber !== this.goalFloor || this.elevator) {
+        whiteBitmapFont.drawText(ctx, '' + (this.goalFloor + 1), 0, 0);
     }
     ctx.restore();
 };
@@ -192,6 +210,7 @@ BaseCharacter.prototype.getTip = function() {
 
 BaseCharacter.prototype.update = function(deltaTime) {
     this.stateTime += deltaTime;
+    this.iconSprite.update(deltaTime);
 
     var doorThresholdX = this.level.getFloorWidth();
     var oldX = this.x;
@@ -284,19 +303,17 @@ BaseCharacter.prototype.update = function(deltaTime) {
         bobble = true;
         this.facingRight = (this.x > oldX);
     } else if (!this.elevator) {
-        if ( this.queueTime < this.maxQueueTime ) {
+        if (this.queueTime < this.maxQueueTime) {
             this.queueTime += deltaTime;
             
             if ( this.queueTime >= this.maxQueueTime ) {
                 this.queueTime = this.maxQueueTime;
             }
         }
-        else {
-            this.hurryTextTime += deltaTime * 0.25;
-            if ( this.hurryTextTime >= 1 ) {
-                this.hurryTextTime = 0;
-            }
-        }
+    }
+    this.toggleIconTime += deltaTime * 0.25;
+    if ( this.toggleIconTime >= 1 ) {
+        this.toggleIconTime = 0;
     }
     if (bobble) {
         this.bobbleTime += deltaTime;
