@@ -186,7 +186,7 @@ BaseCharacter.prototype.update = function(deltaTime) {
             (this.level.floors[this.floorNumber].doorVisual === 0 &&
             this.level.elevator.hasSpace(this.width)))
         {
-            wallXRight = doorThresholdX + 7;
+            wallXRight = doorThresholdX + 8;
             this.floorTargetX = undefined;
         } else {
             wallXRight = doorThresholdX - this.level.floors[this.floorNumber].doorVisual;
@@ -310,14 +310,33 @@ var Runner = function(options) {
 
 Runner.prototype = new BaseCharacter();
 
+Runner.runningSprite = new Sprite('body-runner-running.png');
+
 /**
  * ctx has its current transform set centered on the floor at the x center of the character.
  */
 Runner.prototype.update = function(deltaTime) {
     BaseCharacter.prototype.update.call(this, deltaTime);
+    var doorThresholdX = this.level.getFloorWidth();
     if (!this.removedFromFloor) {
         this.level.floors[Math.round(this.floorNumber)].removeOccupant(this);
         this.removedFromFloor = true;
     }
+    if (this.elevator && this.x >= doorThresholdX + 2 || this.floorNumber === this.goalFloor) {
+        this.rushing = false;
+    }
 };
 
+/**
+ * ctx has its current transform set centered on the floor at the x center of the character.
+ */
+Runner.prototype.renderBody = function(ctx) {
+    if (this.rushing) {    
+        var scale = 1 / 6;
+        var flip = this.facingRight ? 1 : -1;
+        this.legsSprite.drawRotatedNonUniform(ctx, 0, -1, 0, scale * flip, scale);
+        Runner.runningSprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 15) * 1) / 6, 0, scale * flip, scale);
+    } else {
+        BaseCharacter.prototype.renderBody.call(this, ctx);
+    }
+};
