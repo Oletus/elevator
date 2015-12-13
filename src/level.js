@@ -3,7 +3,7 @@ var minTimeUntilSpawn = 3;
 var maxTimeUntilSpawn = 9;
 
 var Level = function() {
-    this.timeUntilSpawn = maxTimeUntilSpawn;
+    this.timeUntilSpawn = 0;
     this.numFloors = 6;
 
     this.elevator = new Elevator({x: this.getFloorWidth(), level: this});
@@ -26,7 +26,6 @@ var Level = function() {
         this.floors.push(floor);
     }
     this.characters = [];
-    this.spawnCharacter();
     
     this.state = Level.State.IN_PROGRESS;
     
