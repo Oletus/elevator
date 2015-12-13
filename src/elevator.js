@@ -54,6 +54,15 @@ Elevator.prototype.hasSpace = function(space) {
     return this.getTotalUsedSpace() + space <= this.maxTotalOccupantWidth;
 };
 
+Elevator.prototype.hasOccupants = function(matchFunc) {
+    for (var i = 0; i < this.occupants.length; ++i) {
+        if (matchFunc(this.occupants[i])) {
+            return true;
+        }
+    }
+    return false;
+};
+
 Elevator.prototype.upPress = function() {
     this.moveUp = 1;
 };

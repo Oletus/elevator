@@ -17,7 +17,8 @@ BaseCharacter.State = {
     APPROACHING: 1,
     RUSHING: 2,
     NORMAL: 3,
-    ESCAPING: 4
+    ESCAPING: 4,
+    DOING_ACTION: 5
 };
 
 BaseCharacter.legsAnimation = new AnimatedSprite({
@@ -198,7 +199,9 @@ BaseCharacter.prototype.update = function(deltaTime) {
     // Determine target x
     var targetX = undefined;
     var wantOut = (Math.round(this.floorNumber) === this.goalFloor) || this.state === BaseCharacter.State.ESCAPING;
-    if (wantOut && (!this.elevator || this.elevator.doorOpen)) {
+    if (this.state === BaseCharacter.State.DOING_ACTION) {
+        targetX = this.x;
+    } else if (wantOut && (!this.elevator || this.elevator.doorOpen)) {
         targetX = -10;
     } else if (this.elevatorTargetX !== undefined) {
         targetX = this.elevatorTargetX;
@@ -399,8 +402,11 @@ var Ghost = function(options) {
     this.initBase(options);
     this.bodySprite = Ghost.bodySprites[this.id];
     this.alwaysBobble = true;
-    this.scaryTime = 0;
+    this.stateTime = 0;
+    this.scary = false;
 };
+
+//Ghost.scarySound = new Audio('ghost-shriek');
 
 Ghost.prototype = new BaseCharacter();
 
@@ -421,6 +427,23 @@ Ghost.prototype.renderBody = function(ctx) {
 
 Ghost.prototype.update = function(deltaTime) {
     BaseCharacter.prototype.update.call(this, deltaTime);
-    this.scaryTime += deltaTime;
-    this.scary = (Math.sin(this.scaryTime * 1.5) > 0.5) && this.elevator;
+    if (this.elevator && this.elevator.doorOpen &&
+        Math.round(this.floorNumber) !== this.goalFloor &&
+        Math.abs(this.x - this.elevatorTargetX) < 0.05 &&
+        this.elevator.hasOccupants(function(occupant) { return !occupant.immuneToScary && Math.abs(occupant.x - occupant.elevatorTargetX) < 0.05; }))
+    {
+        if (this.state !== BaseCharacter.State.DOING_ACTION) {
+            changeState(this, BaseCharacter.State.DOING_ACTION);
+        }
+        var wasScary = this.scary;
+        this.scary = (Math.sin(this.stateTime * 1.5) > 0) && this.elevator;
+        if (!wasScary && this.scary) {
+            //Ghost.scarySound.play();
+        }
+    } else {
+        if (this.state === BaseCharacter.State.DOING_ACTION && this.stateTime > 1) {
+            changeState(this, BaseCharacter.State.NORMAL);
+            this.scary = false;
+        }
+    }
 };
