@@ -121,13 +121,18 @@ Elevator.prototype.update = function(deltaTime) {
     var fromRight = this.maxWidthCapacity - this.getTotalUsedSpace();
     var usedSpace = 0;
     var scaryOccupants = false;
-    for (var i = 0; i < this.occupants.length; ++i) {
+    for (var i = 0; i < this.occupants.length;) {
         var occupant = this.occupants[i];
         occupant.elevatorTargetX = this.x + (this.maxWidthCapacity + 1 - fromRight - occupant.width * 0.5) * 6;
         fromRight += occupant.width;
         usedSpace += occupant.width;
         if (occupant.scary) {
             scaryOccupants = true;
+        }
+        if (occupant.dead) {
+            this.occupants.splice(i, 1);
+        } else {
+            ++i;
         }
     }
     if (scaryOccupants) {

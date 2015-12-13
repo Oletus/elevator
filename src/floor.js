@@ -151,8 +151,14 @@ Floor.prototype.update = function(deltaTime) {
 
     var usedSpace = 0;
     for (var i = 0; i < this.occupants.length; ++i) {
-        this.occupants[i].floorTargetX = this.level.getFloorWidth() - (1 + usedSpace + this.occupants[i].width * 0.5) * TILE_WIDTH;
-        usedSpace += this.occupants[i].width;
+        var occupant = this.occupants[i];
+        occupant.floorTargetX = this.level.getFloorWidth() - (1 + usedSpace + occupant.width * 0.5) * TILE_WIDTH;
+        usedSpace += occupant.width;
+        if (occupant.dead) {
+            this.occupants.splice(i, 1);
+        } else {
+            ++i;
+        }
     }
     if (this.occupants.length > 0) {
         var lastDude = this.occupants[this.occupants.length - 1];
