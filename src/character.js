@@ -74,6 +74,7 @@ BaseCharacter.prototype.getTip = function() {
 
 BaseCharacter.prototype.update = function(deltaTime) {
     var doorThresholdX = this.level.getFloorWidth();
+    var oldX = this.x;
     var wallXRight = 0;
     var wallXLeft = -5;
     if (this.elevator) {
@@ -96,7 +97,6 @@ BaseCharacter.prototype.update = function(deltaTime) {
     } else {
         this.moveX = 1;
     }
-    var oldX = this.x;
     if (this.elevatorTargetX !== undefined) {
         propertyToValue(this, 'x', this.elevatorTargetX, this.level.characterMoveSpeed * deltaTime);
     } else if (this.floorTargetX !== undefined) {
@@ -125,10 +125,10 @@ BaseCharacter.prototype.update = function(deltaTime) {
             this.level.reachedGoal(this);
         }
     }
-    if (this.x !== oldX) {
+    if (Math.abs(this.x - oldX) > this.level.characterMoveSpeed * deltaTime * 0.5) {
         this.legsSprite.update(deltaTime);
         this.bobbleTime += deltaTime;
-        this.facingRight = this.x - oldX > 0;
+        this.facingRight = (this.x > oldX);
     } else if (!this.elevator) {
         this.queueTime += deltaTime;
     }
