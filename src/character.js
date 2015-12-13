@@ -533,3 +533,20 @@ Car.prototype.update = function(deltaTime) {
         }
     }
 };
+
+var Renovator = function(options) {
+    this.initBase(options);
+    this.startFloor = this.floorNumber;
+};
+
+Renovator.prototype = new BaseCharacter();
+
+Renovator.prototype.update = function(deltaTime) {
+    BaseCharacter.prototype.update.call(this, deltaTime);
+    if (Math.round(this.floorNumber) !== this.startFloor) {
+        this.goalFloor = Math.round(this.floorNumber);
+    }
+    if (this.dead && this.x < 0) {
+        this.level.floors[Math.round(this.floorNumber)].renovate();
+    }
+};

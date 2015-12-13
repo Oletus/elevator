@@ -1,15 +1,4 @@
-
-var FloorTiles = [
-    'xxxxxxxxxxxxxxxxxxxxxxh        h',
-    '                      h        h',
-    '                      d        h',
-    '                      d        h',
-    '                      d        h',
-    '                      d        h',
-    '                      d        h',
-    'xxxxxxxxxxxxxxxxxxxxxxh        h',
-    'xxxxxxxxxxxxxxxxxxxxxxh        h'
-];
+"use strict";
 
 var Floor = function(options) {
     var defaults = {
@@ -18,6 +7,7 @@ var Floor = function(options) {
         name: 'Products',
         elevator: null,
         level: null,
+        occupants: [],
         spawnIds : [
             {id: "customer", chance: 5},
             {id: "horse", chance: 1},
@@ -27,9 +17,9 @@ var Floor = function(options) {
         excludeAsDestination : false
     };
     objectUtil.initWithDefaults(this, defaults, options);
-    this.tilemap = new TileMap({initTile: TileMap.initFromData(FloorTiles), height: FloorTiles.length, width: FloorTiles[0].length });
-    this.occupants = [];
     this.alarm = 0;
+    this.stateTime = 0;
+    this.state = Floor.State.IDLE;
 };
 
 Floor.prototype.removeOccupant = function(toRemove) {
@@ -38,11 +28,18 @@ Floor.prototype.removeOccupant = function(toRemove) {
     }
 };
 
-Floor.height = FloorTiles.length - 1;
+Floor.State = {
+    IDLE: 0,
+    RENOVATING: 1,
+    RENOVATED: 2
+};
+
+Floor.height = 8;
 
 Floor.fgSprites = {};
 Floor.bgSprites = {};
 Floor.alarmSprite = new Sprite('floor-alarm.png');
+Floor.renovationSprite = new Sprite('floor-renovation.png');
 
 Floor.loadSprites = function() {
     for (var i = 0; i < GameData.floors.length; ++i) {
@@ -58,8 +55,6 @@ Floor.prototype.renderBg = function(ctx) {
     ctx.save();
     var drawY = this.level.getFloorTopY(this.floorNumber);
     ctx.translate(0, drawY);
-    ctx.fillStyle = '#888';
-    //this.tilemap.render(ctx, function(tile) { return tile === 'h'; }, 0.05, 0.05);
     ctx.save();
     ctx.translate(0, 6);
     Floor.bgSprites[this.id].draw(ctx, 0, 0);
@@ -96,6 +91,10 @@ Floor.prototype.renderFg = function(ctx) {
         ctx.globalAlpha = alarmAlpha;
         Floor.alarmSprite.draw(ctx, 0, 0);
     }
+    if (this.state === Floor.State.RENOVATING) {
+        ctx.globalAlpha = mathUtil.clamp(0, 1, this.stateTime);
+        Floor.renovationSprite.draw(ctx, 0, 0);
+    }
     ctx.restore();
 }
 
@@ -121,27 +120,50 @@ Floor.prototype.spawnCharacter = function() {
     return character;
 }
 
+Floor.prototype.canOpenDoor = function() {
+    return (this.state === Floor.State.IDLE);
+};
+
 Floor.prototype.update = function(deltaTime) {
-    if (Math.round(this.elevator.floorNumber) == this.floorNumber) {
-        this.doorOpen = this.elevator.doorOpen;
-        this.doorVisual = this.elevator.doorVisual;
+    this.stateTime += deltaTime;
+
+    if (this.state === Floor.State.RENOVATING) {
+        if (this.stateTime > 1) {
+            this.state = Floor.State.RENOVATED;
+        }
     }
+
+    if (this.canOpenDoor()) {
+        if (Math.round(this.elevator.floorNumber) == this.floorNumber) {
+            this.doorOpen = this.elevator.doorOpen;
+            this.doorVisual = this.elevator.doorVisual;
+        }
+    } else {
+        this.doorOpen = false;
+        propertyToValue(this, 'doorVisual', 1, deltaTime * 2);
+    }
+
     var usedSpace = 0;
     for (var i = 0; i < this.occupants.length; ++i) {
         this.occupants[i].floorTargetX = this.level.getFloorWidth() - (1 + usedSpace + this.occupants[i].width * 0.5) * TILE_WIDTH;
         usedSpace += this.occupants[i].width;
     }
-    
     if (this.occupants.length > 0) {
         var lastDude = this.occupants[this.occupants.length - 1];
         if (usedSpace >= this.level.getFloorCapacity() && Math.abs(lastDude.x - lastDude.floorTargetX) < 1) {
             this.level.goToState(Level.State.FAIL);
         }
     }
-    
+
     if (usedSpace >= this.level.getFloorCapacity() - 6) {
         propertyToValue(this, 'alarm', 1, deltaTime);
     } else {
         propertyToZero(this, 'alarm', deltaTime);
+    }
+};
+
+Floor.prototype.renovate = function() {
+    if (this.state !== Floor.State.RENOVATING) {
+        changeState(this, Floor.State.RENOVATING);
     }
 };

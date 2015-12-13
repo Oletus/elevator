@@ -16,14 +16,7 @@ var Level = function() {
     var randomIndex = Math.floor(Math.random() * this.numFloors);
     
     for (var i = 0; i < this.numFloors; ++i) {
-        var floorOptions = {floorNumber: i, elevator: this.elevator, level: this};
-        for (var key in shuffledFloors[i]) {
-            if (shuffledFloors[i].hasOwnProperty(key)) {
-                floorOptions[key] = shuffledFloors[i][key];
-            }
-        }
-        floor = new Floor(floorOptions);
-        this.floors.push(floor);
+        this.floors.push(this.createFloor(shuffledFloors[i], i));
     }
     this.characters = [];
     
@@ -43,6 +36,19 @@ var Level = function() {
     });
     
     this.levelOverFade = 0;
+};
+
+Level.prototype.createFloor = function(floorParameters, i) {
+    var floorOptions = {floorNumber: i, elevator: this.elevator, level: this};
+    for (var key in floorParameters) {
+        if (floorParameters.hasOwnProperty(key)) {
+            floorOptions[key] = floorParameters[key];
+        }
+    }
+    if (this.floors.length > i) {
+        floorOptions.occupants = this.floors[i].occupants;
+    }
+    return new Floor(floorOptions);
 };
 
 Level.State = {
@@ -95,8 +101,7 @@ Level.prototype.getFloorCapacity = function() {
 
 Level.prototype.render = function(ctx) {
     ctx.save();
-    ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
-    ctx.translate(-this.floors[0].tilemap.width * 0.5 * 6, -this.numFloors * Floor.height * 0.5 * 6);
+    ctx.translate(0, 6);
 
     this.elevator.renderBg(ctx);
     for (var i = 0; i < this.floors.length; ++i) {
@@ -137,11 +142,28 @@ Level.prototype.render = function(ctx) {
     }
 };
 
+Level.prototype.hasFloorId = function(id) {
+    for (var i = 0; i < this.floors.length; ++i) {
+        if (this.floors[i].id === id) {
+            return true;
+        }
+    }
+    return false;
+};
+
 Level.prototype.update = function(deltaTime) {
     this.stateTime += deltaTime;
     this.time += deltaTime;
     for (var i = 0; i < this.floors.length; ++i) {
         this.floors[i].update(deltaTime);
+        if (this.floors[i].state === Floor.State.RENOVATED) {
+            var shuffledFloors = arrayUtil.shuffle(GameData.floors);
+            var j = 0;
+            while (this.hasFloorId(shuffledFloors[j].id)) {
+                ++j;
+            }
+            this.floors[i] = this.createFloor(shuffledFloors[j], i);
+        }
     }
     this.elevator.update(deltaTime);
     for (var i = 0; i < this.characters.length;) {

@@ -9,7 +9,8 @@ GameData.floors =
             {id: "customer", chance: 5},
             {id: "horse", chance: 1},
             {id: "heavy", chance: 5},
-            {id: "runner", chance: 2}
+            {id: "runner", chance: 2},
+            {id: "renovator", chance: 1}
         ]
     },
     {
@@ -44,6 +45,7 @@ GameData.floors =
         spawnIds: [
             {id: "customer", chance: 5},
             {id: "car", chance: 2},
+            {id: "renovator", chance: 1}
         ]
     },
     {
@@ -220,6 +222,14 @@ GameData.characters =
         width: 6,
         minTip: 30
     },
+    'renovator': {
+        destinations : getAllButExcluded(),
+        characterConstructor: Renovator,
+        weight: 1,
+        width: 2,
+        minTip: 0,
+        maxTip: 0
+    }
 };
 
 BaseCharacter.loadSprites();
