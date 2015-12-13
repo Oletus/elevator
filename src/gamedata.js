@@ -154,19 +154,21 @@ GameData.characters =
         destinations : getAllButExcluded(),
         characterConstructor: Character,
         weight: 4,
-        maxTip : 15
+        minTip : 5,
+        maxTip : 20
     },
     'runner' : {
         destinations : getAllButExcluded(),
         characterConstructor: Runner,
         weight: 1,
         minTip : 20,
-        maxTip : 20
+        maxTip : 50
     },
     'horse': {
         destinations : getAllButExcluded(),
         characterConstructor: Horse,
-        weight: 2
+        weight: 2,
+        minTip : 5
     }
 };
 
