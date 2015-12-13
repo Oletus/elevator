@@ -103,7 +103,7 @@ Elevator.prototype.update = function(deltaTime) {
             var c = mathUtil.clamp(0, 0.1, 0.2 - distanceFromTarget);
             this.floorNumber = this.floorNumber * (1.0 - c) + this.targetFloor * c;
         }
-        if (snappiness < 0.01) {
+        if (snappiness < 0.01 && this.level.floors[Math.round(this.floorNumber)].canOpenDoor()) {
             this.doorOpenTimer += deltaTime;
         }
     } else {

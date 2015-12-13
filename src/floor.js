@@ -19,7 +19,7 @@ var Floor = function(options) {
     objectUtil.initWithDefaults(this, defaults, options);
     this.alarm = 0;
     this.stateTime = 0;
-    this.state = Floor.State.IDLE;
+    this.state = Floor.State.APPEARING;
 };
 
 Floor.prototype.removeOccupant = function(toRemove) {
@@ -29,9 +29,10 @@ Floor.prototype.removeOccupant = function(toRemove) {
 };
 
 Floor.State = {
-    IDLE: 0,
-    RENOVATING: 1,
-    RENOVATED: 2
+    APPEARING: 0,
+    IDLE: 1,
+    RENOVATING: 2,
+    RENOVATED: 3
 };
 
 Floor.height = 8;
@@ -91,8 +92,9 @@ Floor.prototype.renderFg = function(ctx) {
         ctx.globalAlpha = alarmAlpha;
         Floor.alarmSprite.draw(ctx, 0, 0);
     }
-    if (this.state === Floor.State.RENOVATING) {
-        ctx.globalAlpha = mathUtil.clamp(0, 1, this.stateTime);
+    if (this.state === Floor.State.RENOVATING || this.state === Floor.State.APPEARING) {
+        var alpha = this.state === Floor.State.RENOVATING ? this.stateTime : 1.0 - this.stateTime;
+        ctx.globalAlpha = mathUtil.clamp(0, 1, alpha);
         Floor.renovationSprite.draw(ctx, 0, 0);
     }
     ctx.restore();
@@ -130,6 +132,10 @@ Floor.prototype.update = function(deltaTime) {
     if (this.state === Floor.State.RENOVATING) {
         if (this.stateTime > 1) {
             this.state = Floor.State.RENOVATED;
+        }
+    } else if (this.state === Floor.State.APPEARING) {
+        if (this.stateTime > 1) {
+            this.state = Floor.State.IDLE;
         }
     }
 
