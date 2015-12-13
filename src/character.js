@@ -137,8 +137,7 @@ BaseCharacter.prototype.render = function(ctx) {
     ctx.translate(this.x, drawY);
     this.renderBody(ctx);
 
-    ctx.translate(0, -4);
-    ctx.scale(1 / 6, 1 / 6);
+    ctx.translate(0, -4 * 6);
     ctx.textAlign = 'center';
 
     var drewIcon = false;
@@ -164,10 +163,9 @@ BaseCharacter.prototype.render = function(ctx) {
  * ctx has its current transform set centered on the floor at the x center of the character.
  */
 BaseCharacter.prototype.renderBody = function(ctx) {
-    var scale = 1 / 6;
     var flip = this.facingRight ? 1 : -1;
-    this.legsSprite.drawRotatedNonUniform(ctx, 0, -1, 0, scale * flip, scale);
-    this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 15) * 1) / 6, 0, scale * flip, scale);
+    this.legsSprite.drawRotatedNonUniform(ctx, 0, -6, 0, flip);
+    this.bodySprite.drawRotatedNonUniform(ctx, 0, -12 + Math.floor(Math.sin(this.bobbleTime * 15) * 1), 0, flip);
 };
 
 BaseCharacter.coinSprite = new AnimatedSprite({
@@ -184,15 +182,15 @@ BaseCharacter.coinSprite = new AnimatedSprite({
 
 BaseCharacter.coinAnimation = new AnimatedSpriteInstance(BaseCharacter.coinSprite);
 
-BaseCharacter.tipParticleAppearance = Particle.spriteAppearance(BaseCharacter.coinAnimation, 1 / 6);
+BaseCharacter.tipParticleAppearance = Particle.spriteAppearance(BaseCharacter.coinAnimation, 1);
 
 BaseCharacter.tipParticleEmitter = new ParticleEmitter({
     appearance: BaseCharacter.tipParticleAppearance,
     size: 1,
     minLifetime: 4,
     maxLifetime: 4,
-    minVelocity: 10,
-    maxVelocity: 15,
+    minVelocity: 60,
+    maxVelocity: 90,
     direction: -90,
     directionSpread: 40,
     sizeFunc: function(t) { return 1; },
@@ -204,7 +202,7 @@ BaseCharacter.prototype.spawnTip = function() {
     for (var i = 0; i < tip; ++i) {
         this.level.particles.addParticle(BaseCharacter.tipParticleEmitter.emitParticle({
             x: this.x,
-            y: this.level.getFloorFloorY(this.floorNumber) - 4
+            y: this.level.getFloorFloorY(this.floorNumber) - 24
         }));
     }
 };
@@ -230,7 +228,7 @@ BaseCharacter.prototype.update = function(deltaTime) {
     } else if (this.state === BaseCharacter.State.APPROACHING) {
         targetX = this.approachTargetX;
     } else if (wantOut && (!this.elevator || this.elevator.doorOpen)) {
-        targetX = -10;
+        targetX = -1000;
     } else if (this.elevatorTargetX !== undefined) {
         targetX = this.elevatorTargetX;
     } else if (this.state === BaseCharacter.State.RUSHING && this.level.elevator.hasSpace(this.width)) {
@@ -238,27 +236,27 @@ BaseCharacter.prototype.update = function(deltaTime) {
     } else if (this.floorTargetX !== undefined) {
         targetX = this.floorTargetX;
     } else {
-        targetX = doorThresholdX - 1 - this.width * 0.5;
+        targetX = doorThresholdX - (1 - this.width * 0.5) * TILE_WIDTH;
     }
     
     // Determine wall positions
     var wallXRight = 0;
-    var wallXLeft = -5;
+    var wallXLeft = -500;
     if (this.elevator) { // Character is in elevator
         this.floorNumber = this.elevator.floorNumber;
         if (this.elevator.doorVisual > 0 && this.state !== BaseCharacter.State.RUSHING) {
-            wallXLeft = doorThresholdX + this.elevator.doorVisual;
+            wallXLeft = doorThresholdX + this.elevator.doorVisual * TILE_WIDTH;
         }
-        wallXRight = doorThresholdX + 7;
+        wallXRight = doorThresholdX + 7 * TILE_WIDTH;
     } else {
         if (this.state === BaseCharacter.State.RUSHING) {
-            wallXRight = doorThresholdX + 8;
+            wallXRight = doorThresholdX + 8 * TILE_WIDTH;
         } else if (this.level.floors[this.floorNumber].doorVisual === 0 &&
             this.level.elevator.hasSpace(this.width))
         {
-            wallXRight = doorThresholdX + 7;
+            wallXRight = doorThresholdX + 7 * TILE_WIDTH;
         } else {
-            wallXRight = doorThresholdX - this.level.floors[this.floorNumber].doorVisual;
+            wallXRight = doorThresholdX - this.level.floors[this.floorNumber].doorVisual * TILE_WIDTH;
         }
     }
     
@@ -274,11 +272,11 @@ BaseCharacter.prototype.update = function(deltaTime) {
     }
 
     // Collide with walls
-    if (this.x > wallXRight - this.width * 0.5) {
-        this.x = wallXRight - this.width * 0.5;
+    if (this.x > wallXRight - this.width * 0.5 * TILE_WIDTH) {
+        this.x = wallXRight - this.width * 0.5 * TILE_WIDTH;
     }
-    if (this.x < wallXLeft + this.width * 0.5) {
-        this.x = wallXLeft + this.width * 0.5;
+    if (this.x < wallXLeft + this.width * 0.5 * TILE_WIDTH) {
+        this.x = wallXLeft + this.width * 0.5 * TILE_WIDTH;
     }
     
     // Change status based on when crossing elevator threshold
@@ -335,7 +333,7 @@ BaseCharacter.prototype.update = function(deltaTime) {
     }
     
     // Check if the character has left the level
-    if (this.x + this.width < -1 && this.floorNumber === this.goalFloor) {
+    if (this.x + this.width * TILE_WIDTH < -3 && this.floorNumber === this.goalFloor) {
         this.dead = true;
     }
     if (this.floorNumber < -1) {
@@ -364,11 +362,10 @@ Horse.prototype = new BaseCharacter();
  * ctx has its current transform set centered on the floor at the x center of the character.
  */
 Horse.prototype.renderBody = function(ctx) {
-    var scale = 1 / 6;
     var flip = this.facingRight ? 1 : -1;
-    this.legsSprite.drawRotatedNonUniform(ctx, 1, -1, 0, scale * flip, scale);
-    this.legsSprite.drawRotatedNonUniform(ctx, -1, -1, 0, scale * flip, scale);
-    this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 15) * 1) / 6, 0, scale * flip, scale);
+    this.legsSprite.drawRotatedNonUniform(ctx, 6, -6, 0, flip);
+    this.legsSprite.drawRotatedNonUniform(ctx, -6, -6, 0, flip);
+    this.bodySprite.drawRotatedNonUniform(ctx, 0, -12 + Math.floor(Math.sin(this.bobbleTime * 15) * 1), 0, flip);
 };
 
 
@@ -426,10 +423,9 @@ Runner.prototype.update = function(deltaTime) {
  */
 Runner.prototype.renderBody = function(ctx) {
     if (this.state === BaseCharacter.State.RUSHING) {
-        var scale = 1 / 6;
         var flip = this.facingRight ? 1 : -1;
-        this.legsSprite.drawRotatedNonUniform(ctx, 0, -1, 0, scale * flip, scale);
-        Runner.runningSprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 15) * 1) / 6, 0, scale * flip, scale);
+        this.legsSprite.drawRotatedNonUniform(ctx, 0, -6, 0, flip);
+        Runner.runningSprite.drawRotatedNonUniform(ctx, 0, -12 + Math.floor(Math.sin(this.bobbleTime * 15) * 1), 0, flip);
     } else {
         BaseCharacter.prototype.renderBody.call(this, ctx);
     }
@@ -454,12 +450,11 @@ Ghost.scaringSprite = new Sprite('body-ghost-scaring.png');
  * ctx has its current transform set centered on the floor at the x center of the character.
  */
 Ghost.prototype.renderBody = function(ctx) {
-    var scale = 1 / 6;
     var flip = this.facingRight ? 1 : -1;
     if (this.scary) {
-        Ghost.scaringSprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 2) * 2) / 6, 0, scale * flip, scale);
+        Ghost.scaringSprite.drawRotatedNonUniform(ctx, 0, -12 + Math.floor(Math.sin(this.bobbleTime * 2) * 2), 0, flip);
     } else {
-        this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 2) * 2) / 6, 0, scale * flip, scale);
+        this.bodySprite.drawRotatedNonUniform(ctx, 0, -12 + Math.floor(Math.sin(this.bobbleTime * 2) * 2), 0, flip);
     }
 };
 
@@ -506,9 +501,8 @@ Car.animation = new AnimatedSprite({
 });
 
 Car.prototype.renderBody = function(ctx) {
-    var scale = 1 / 6;
     var flip = this.facingRight ? 1 : -1;
-    this.bodySprite.drawRotatedNonUniform(ctx, 0, -9 / 6, 0, scale * flip, scale);
+    this.bodySprite.drawRotatedNonUniform(ctx, 0, -9, 0, flip);
 };
 
 Car.prototype.update = function(deltaTime) {

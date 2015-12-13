@@ -57,16 +57,14 @@ Floor.prototype.renderBg = function(ctx) {
     var drawY = this.level.getFloorTopY(this.floorNumber);
     ctx.translate(0, drawY);
     ctx.fillStyle = '#888';
-    this.tilemap.render(ctx, function(tile) { return tile === 'h'; }, 0.05, 0.05);
+    //this.tilemap.render(ctx, function(tile) { return tile === 'h'; }, 0.05, 0.05);
     ctx.save();
-    ctx.translate(0, 1);
-    ctx.scale(1 / 6, 1 / 6);
+    ctx.translate(0, 6);
     Floor.bgSprites[this.id].draw(ctx, 0, 0);
     ctx.restore();
     
     ctx.save();
-    ctx.translate(22, -2);
-    ctx.scale(1 / 6, 1 / 6);
+    ctx.translate(22 * 6, -2 * 6);
     if (this.doorVisual === 0) {
         Elevator.doorOpen2Sprite.draw(ctx, -1, 21);
     } else {
@@ -77,8 +75,7 @@ Floor.prototype.renderBg = function(ctx) {
     ctx.restore();
     
     ctx.globalAlpha = 1;
-    ctx.translate(21.5, 1.5);
-    ctx.scale(1 / 6, 1 / 6);
+    ctx.translate(21.5 * 6, 1.5 * 6);
     ctx.fillStyle = 'black';
     ctx.textAlign = "right";
     var floorTextNumber = (this.floorNumber >= 10 ) ? (this.floorNumber + 1).toString() : '0' + (this.floorNumber + 1);
@@ -90,9 +87,7 @@ Floor.prototype.renderBg = function(ctx) {
 Floor.prototype.renderFg = function(ctx) {
     ctx.save();
     var drawY = this.level.getFloorTopY(this.floorNumber);
-    ctx.translate(0, drawY);
-    ctx.translate(0, 1);
-    ctx.scale(1 / 6, 1 / 6);
+    ctx.translate(0, drawY + 6);
     Floor.fgSprites[this.id].draw(ctx, 0, 0);
     ctx.restore();
 }
@@ -126,13 +121,13 @@ Floor.prototype.update = function(deltaTime) {
     }
     var usedSpace = 0;
     for (var i = 0; i < this.occupants.length; ++i) {
-        this.occupants[i].floorTargetX = this.level.getFloorWidth() - 1 - usedSpace - this.occupants[i].width * 0.5;
+        this.occupants[i].floorTargetX = this.level.getFloorWidth() - (1 + usedSpace + this.occupants[i].width * 0.5) * TILE_WIDTH;
         usedSpace += this.occupants[i].width;
     }
     
     var lastDude = this.occupants[this.occupants.length - 1];
     
-    if ( usedSpace >= this.level.getFloorWidth() - 1 && Math.abs(lastDude.x - lastDude.width * 0.5) < 0.2 ) {
+    if (usedSpace >= this.level.getFloorWidth() && Math.abs(lastDude.x - lastDude.width * 0.5 * TILE_WIDTH) < 1) {
         this.level.goToState(Level.State.FAIL);
     }
 };

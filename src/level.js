@@ -1,4 +1,6 @@
 
+var TILE_WIDTH = 6;
+
 var Level = function() {
     this.timeUntilSpawn = 0;
     this.time = 0;
@@ -27,7 +29,7 @@ var Level = function() {
     
     this.goToState(Level.State.IN_PROGRESS);
     
-    this.characterMoveSpeed = 10;
+    this.characterMoveSpeed = 60;
     this.elevatorMoveSpeed = 4;
     this.elevatorDoorOpenTime = 0.3;
     
@@ -37,7 +39,7 @@ var Level = function() {
     this.stateTime = 0;
     
     this.particles = new ParticleEngine({
-        gravityY: 40
+        gravityY: 240
     });
 };
 
@@ -74,22 +76,21 @@ Level.prototype.spawnCharacter = function() {
 };
 
 Level.prototype.getFloorTopY = function(floor) {
-    return (this.numFloors - floor - 1) * Floor.height;
+    return (this.numFloors - floor - 1) * Floor.height * 6;
 };
 
 Level.prototype.getFloorFloorY = function(floor) {
-    return (this.numFloors - floor - 1) * Floor.height + Floor.height - 1;
+    return ((this.numFloors - floor - 1) * Floor.height + Floor.height - 1) * 6;
 };
 
 Level.prototype.getFloorWidth = function() {
-    return 23;
+    return 23 * 6;
 };
 
 Level.prototype.render = function(ctx) {
     ctx.save();
     ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
-    ctx.scale(6, 6);
-    ctx.translate(-this.floors[0].tilemap.width * 0.5, -this.numFloors * Floor.height * 0.5);
+    ctx.translate(-this.floors[0].tilemap.width * 0.5 * 6, -this.numFloors * Floor.height * 0.5 * 6);
 
     this.elevator.renderBg(ctx);
     for (var i = 0; i < this.floors.length; ++i) {

@@ -123,7 +123,7 @@ Elevator.prototype.update = function(deltaTime) {
     var scaryOccupants = false;
     for (var i = 0; i < this.occupants.length; ++i) {
         var occupant = this.occupants[i];
-        occupant.elevatorTargetX = this.x + this.maxTotalOccupantWidth + 1 - fromRight - occupant.width * 0.5;
+        occupant.elevatorTargetX = this.x + (this.maxTotalOccupantWidth + 1 - fromRight - occupant.width * 0.5) * 6;
         fromRight += occupant.width;
         usedSpace += occupant.width;
         if (occupant.scary) {
@@ -142,7 +142,7 @@ Elevator.prototype.update = function(deltaTime) {
         var floorOccupant = floor.occupants[i];
         if (this.doorOpen && usedSpace + floorOccupant.width <= this.maxTotalOccupantWidth && (!scaryOccupants || floorOccupant.immuneToScary)) {
             usedSpace += floorOccupant.width;
-            floorOccupant.elevatorTargetX = this.x + 1 +  floorOccupant.width * 0.5;
+            floorOccupant.elevatorTargetX = this.x + (1 +  floorOccupant.width * 0.5) * 6;
         } else {
             floorOccupant.elevatorTargetX = undefined;
         }
@@ -154,7 +154,6 @@ Elevator.prototype.renderBg = function(ctx) {
     ctx.translate(this.x, 0);
     
     ctx.save();
-    ctx.scale(1 / 6, 1 / 6);
     Elevator.shaftSprite.draw(ctx, 0, 0);
     ctx.restore();
 
@@ -163,7 +162,6 @@ Elevator.prototype.renderBg = function(ctx) {
     ctx.translate(2, counterweightY);
 
     ctx.translate(0, - this.getBuckleY());
-    ctx.scale(1 / 6, 1 / 6);
     Elevator.counterweightSprite.draw(ctx, 0, 0);
     Elevator.wireSprite.draw(ctx, 0, -312);
     Elevator.wireSprite.draw(ctx, 19, -312);
@@ -174,10 +172,10 @@ Elevator.prototype.renderBg = function(ctx) {
 
 Elevator.prototype.getBuckleY = function() {
     if (this.getTotalWeight() > 3) {
-        return 1 / 6;
+        return 1;
     }
     if (this.getTotalWeight() < -3) {
-        return -1 / 6;
+        return -1;
     }
     return 0;
 };
@@ -189,9 +187,8 @@ Elevator.prototype.renderFg = function(ctx) {
     ctx.translate(0, drawY);
     ctx.fillStyle = 'red';
     ctx.save();
-    ctx.translate(0, -2 + this.getBuckleY());
+    ctx.translate(0, -12 + this.getBuckleY());
 
-    ctx.scale(1 / 6, 1 / 6);
     Elevator.wireSprite.draw(ctx, 6, -320);
     Elevator.wireSprite.draw(ctx, 36, -320);
     Elevator.sprite.draw(ctx, 0, 0);
