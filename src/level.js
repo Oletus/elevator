@@ -37,6 +37,10 @@ var Level = function() {
     this.score = 0;
     this.comboCount = 0;
     this.comboCharacters = [];
+    
+    this.particles = new ParticleEngine({
+        gravityY: 40
+    });
 };
 
 Level.State = {
@@ -90,6 +94,9 @@ Level.prototype.render = function(ctx) {
     for (var i = 0; i < this.characters.length; ++i) {
         this.characters[i].render(ctx);
     }
+    
+    this.particles.render(ctx);
+    
     ctx.restore();
     
     if (this.state === Level.State.FAIL) {
@@ -115,7 +122,9 @@ Level.prototype.update = function(deltaTime) {
         this.spawnCharacter();
         this.timeUntilSpawn = minTimeUntilSpawn + Math.random() * (maxTimeUntilSpawn - minTimeUntilSpawn);
     }
-        
+    
+    this.particles.update(deltaTime);
+    BaseCharacter.coinAnimation.update(deltaTime);
 };
 
 Level.prototype.resetCombo = function() {

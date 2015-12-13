@@ -60,8 +60,43 @@ BaseCharacter.prototype.render = function(ctx) {
     ctx.restore();
 };
 
+BaseCharacter.coinSprite = new AnimatedSprite({
+    'fly': [{src: 'coin1.png'},
+            {src: 'coin2.png'},
+            {src: 'coin3.png'},
+            {src: 'coin2.png'},
+            ],
+},
+{
+    durationMultiplier: 1000 / 60,
+    defaultDuration: 5
+});
+
+BaseCharacter.coinAnimation = new AnimatedSpriteInstance(BaseCharacter.coinSprite);
+
+BaseCharacter.tipParticleAppearance = Particle.spriteAppearance(BaseCharacter.coinAnimation, 1 / 6);
+
+BaseCharacter.tipParticleEmitter = new ParticleEmitter({
+    appearance: BaseCharacter.tipParticleAppearance,
+    size: 1,
+    minLifetime: 4,
+    maxLifetime: 4,
+    minVelocity: 10,
+    maxVelocity: 15,
+    direction: -90,
+    directionSpread: 40,
+    sizeFunc: function(t) { return 1; },
+    opacityFunc: function(t) { return 1; }
+});
+
 BaseCharacter.prototype.spawnTip = function() {
-    return 0;
+    var tip = this.getTip();
+    for (var i = 0; i < tip; ++i) {
+        this.level.particles.addParticle(BaseCharacter.tipParticleEmitter.emitParticle({
+            x: this.x,
+            y: this.level.getFloorFloorY(this.floorNumber) - 4
+        }));
+    }
 };
 
 BaseCharacter.prototype.getTip = function() {
