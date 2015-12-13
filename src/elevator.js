@@ -109,14 +109,14 @@ Elevator.prototype.update = function(deltaTime) {
         fromRight += this.occupants[i].width;
         usedSpace += this.occupants[i].width;
     }
-    if (this.doorOpen) {
-        var floor = this.level.floors[Math.round(this.floorNumber)];
-        for (var i = 0; i < floor.occupants.length; ++i) {
-            var floorOccupant = floor.occupants[i];
-            if (usedSpace + floorOccupant.width <= this.maxTotalOccupantWidth) {
-                usedSpace += floorOccupant.width;
-                floorOccupant.elevatorTargetX = this.x + 1 +  floorOccupant.width * 0.5;
-            }
+    var floor = this.level.floors[Math.round(this.floorNumber)];
+    for (var i = 0; i < floor.occupants.length; ++i) {
+        var floorOccupant = floor.occupants[i];
+        if (this.doorOpen && usedSpace + floorOccupant.width <= this.maxTotalOccupantWidth) {
+            usedSpace += floorOccupant.width;
+            floorOccupant.elevatorTargetX = this.x + 1 +  floorOccupant.width * 0.5;
+        } else {
+            floorOccupant.elevatorTargetX = undefined;
         }
     }
 };
