@@ -131,16 +131,12 @@ BaseCharacter.prototype.initBase = function(options) {
     this.iconSprite = new AnimatedSpriteInstance(BaseCharacter.iconAnimation);
 };
 
-BaseCharacter.prototype.render = function(ctx) {
-    ctx.save();
-    var drawY = this.level.getFloorFloorY(this.floorNumber);
-    ctx.translate(this.x, drawY);
-    this.renderBody(ctx);
-
-    ctx.translate(0, -4 * 6);
+BaseCharacter.prototype.renderIcon = function(ctx) {
+	ctx.translate(0, -4 * 6);
     ctx.textAlign = 'center';
 
-    var drewIcon = false;
+	var drewIcon = false;
+	
     if (!drewIcon && this.state === BaseCharacter.State.ESCAPING) {
         if (mathUtil.fmod(this.toggleIconTime * 3, 1) > 0.5) {
             this.iconSprite.drawRotated(ctx, 0, 0, 0);
@@ -150,6 +146,14 @@ BaseCharacter.prototype.render = function(ctx) {
     if (!drewIcon && (this.floorNumber !== this.goalFloor || this.elevator)) {
         whiteBitmapFont.drawText(ctx, '' + (this.goalFloor + 1), 0, 0);
     }
+}
+
+BaseCharacter.prototype.render = function(ctx) {
+    ctx.save();
+    var drawY = this.level.getFloorFloorY(this.floorNumber);
+    ctx.translate(this.x, drawY);
+    this.renderBody(ctx);
+	this.renderIcon(ctx);
     ctx.restore();
 };
 
