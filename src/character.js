@@ -180,8 +180,14 @@ var Character = function(options) {
 
 Character.prototype = new BaseCharacter();
 
-Character.bodySprites = {
-    'customer': new Sprite('body-customer.png')
+Character.bodySprites = {};
+
+BaseCharacter.loadSprites = function() {
+    for (var key in GameData.characters) {
+        if (GameData.characters.hasOwnProperty(key)) {
+            GameData.characters[key].characterConstructor.bodySprites[key] = new Sprite('body-' + key + '.png');
+        }
+    }
 };
 
 /**
@@ -203,9 +209,7 @@ var Horse = function(options) {
 
 Horse.prototype = new BaseCharacter();
 
-Horse.bodySprites = {
-    'horse': new Sprite('body-horse.png')
-};
+Horse.bodySprites = {};
 
 /**
  * ctx has its current transform set centered on the floor at the x center of the character.

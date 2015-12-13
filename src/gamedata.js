@@ -135,10 +135,19 @@ GameData.characters =
 {
     'customer' : {
         destinations : getAllButExcluded(),
-        characterConstructor: Character
+        characterConstructor: Character,
+        weight: 1,
+    },
+    'heavy' : {
+        destinations : getAllButExcluded(),
+        characterConstructor: Character,
+        weight: 2
     },
     'horse': {
         destinations : getAllButExcluded(),
-        characterConstructor: Horse
+        characterConstructor: Horse,
+        weight: 2
     }
 };
+
+BaseCharacter.loadSprites();
