@@ -147,12 +147,6 @@ BaseCharacter.prototype.render = function(ctx) {
             drewIcon = true;
         }
     }
-    if (!drewIcon && this.queueTime >= this.maxQueueTime && !this.elevator && this.floorNumber !== this.goalFloor) {
-        if (this.toggleIconTime >= 0.87) {
-            whiteBitmapFont.drawText(ctx, 'HURRY', 0, 0);
-            drewIcon = true;
-        }
-    }
     if (!drewIcon && (this.floorNumber !== this.goalFloor || this.elevator)) {
         whiteBitmapFont.drawText(ctx, '' + (this.goalFloor + 1), 0, 0);
     }
