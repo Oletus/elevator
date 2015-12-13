@@ -45,12 +45,12 @@ Floor.prototype.render = function(ctx) {
     ctx.save();
     var drawY = this.level.getFloorTopY(this.floorNumber);
     ctx.translate(0, drawY);
-    ctx.fillStyle = '#222';
-    this.tilemap.render(ctx, function(tile) { return tile === 'x'; }, 0.05, 0.05);
+    /*ctx.fillStyle = '#222';
+    this.tilemap.render(ctx, function(tile) { return tile === 'x'; }, 0.05, 0.05);*/
     ctx.fillStyle = '#888';
     this.tilemap.render(ctx, function(tile) { return tile === 'h'; }, 0.05, 0.05);
     ctx.save();
-    ctx.translate(0, -0.3333333);
+    ctx.translate(0, 1);
     ctx.scale(1 / 6, 1 / 6);
     Floor.sprite.draw(ctx, 0, 0);
     ctx.restore();
