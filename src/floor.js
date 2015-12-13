@@ -18,7 +18,12 @@ var Floor = function(options) {
         name: 'Products',
         elevator: null,
         level: null,
-        spawnIds : [{id: "customer", chance: 0.5}, {id: "horse", chance: 0.3}, {id: "heavy", chance: 0.2}],
+        spawnIds : [
+            {id: "customer", chance: 5},
+            {id: "horse", chance: 3},
+            {id: "heavy", chance: 2},
+            {id: "runner", chance: 1}
+        ],
         excludeAsDestination : false
     };
     objectUtil.initWithDefaults(this, defaults, options);
@@ -70,7 +75,11 @@ Floor.prototype.render = function(ctx) {
 };
 
 Floor.prototype.spawnCharacter = function() {
-    var roll = Math.random();
+    var totalChance = 0;
+    for ( var i = 0; i < this.spawnIds.length; i++ ) {
+        totalChance += this.spawnIds[i].chance;
+    }
+    var roll = Math.random() * totalChance;
     var cumulativeChance = 0;
     
     for ( var i = 0; i < this.spawnIds.length; i++ ) {

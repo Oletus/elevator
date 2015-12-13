@@ -14,6 +14,17 @@ BaseCharacter.legsAnimation = new AnimatedSprite({
     defaultDuration: 5
 });
 
+BaseCharacter.loadSprites = function() {
+    for (var key in GameData.characters) {
+        if (GameData.characters.hasOwnProperty(key)) {
+            if (GameData.characters[key].characterConstructor.bodySprites === undefined) {
+                GameData.characters[key].characterConstructor.bodySprites = {};
+            }
+            GameData.characters[key].characterConstructor.bodySprites[key] = new Sprite('body-' + key + '.png');
+        }
+    }
+};
+
 BaseCharacter.prototype.initBase = function(options) {
     var defaults = {
         floorNumber: 0, // Floor number rises upwards
@@ -98,6 +109,16 @@ BaseCharacter.prototype.render = function(ctx) {
         }
     }
     ctx.restore();
+};
+
+/**
+ * ctx has its current transform set centered on the floor at the x center of the character.
+ */
+BaseCharacter.prototype.renderBody = function(ctx) {
+    var scale = 1 / 6;
+    var flip = this.facingRight ? 1 : -1;
+    this.legsSprite.drawRotatedNonUniform(ctx, 0, -1, 0, scale * flip, scale);
+    this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 15) * 1) / 6, 0, scale * flip, scale);
 };
 
 BaseCharacter.coinSprite = new AnimatedSprite({
@@ -233,25 +254,6 @@ var Character = function(options) {
 
 Character.prototype = new BaseCharacter();
 
-Character.bodySprites = {};
-
-BaseCharacter.loadSprites = function() {
-    for (var key in GameData.characters) {
-        if (GameData.characters.hasOwnProperty(key)) {
-            GameData.characters[key].characterConstructor.bodySprites[key] = new Sprite('body-' + key + '.png');
-        }
-    }
-};
-
-/**
- * ctx has its current transform set centered on the floor at the x center of the character.
- */
-Character.prototype.renderBody = function(ctx) {
-    var scale = 1 / 6;
-    var flip = this.facingRight ? 1 : -1;
-    this.legsSprite.drawRotatedNonUniform(ctx, 0, -1, 0, scale * flip, scale);
-    this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 15) * 1) / 6, 0, scale * flip, scale);
-};
 
 var Horse = function(options) {
     options.width = 4;
@@ -260,8 +262,6 @@ var Horse = function(options) {
 };
 
 Horse.prototype = new BaseCharacter();
-
-Horse.bodySprites = {};
 
 /**
  * ctx has its current transform set centered on the floor at the x center of the character.
@@ -272,5 +272,20 @@ Horse.prototype.renderBody = function(ctx) {
     this.legsSprite.drawRotatedNonUniform(ctx, 1, -1, 0, scale * flip, scale);
     this.legsSprite.drawRotatedNonUniform(ctx, -1, -1, 0, scale * flip, scale);
     this.bodySprite.drawRotatedNonUniform(ctx, 0, -2 + Math.floor(Math.sin(this.bobbleTime * 15) * 1) / 6, 0, scale * flip, scale);
+};
+
+
+var Runner = function(options) {
+    this.initBase(options);
+    this.bodySprite = Runner.bodySprites[this.id];
+};
+
+Runner.prototype = new BaseCharacter();
+
+/**
+ * ctx has its current transform set centered on the floor at the x center of the character.
+ */
+Runner.prototype.update = function(deltaTime) {
+    BaseCharacter.prototype.update.call(this, deltaTime);
 };
 

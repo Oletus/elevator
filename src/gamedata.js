@@ -143,6 +143,11 @@ GameData.characters =
         characterConstructor: Character,
         weight: 4
     },
+    'runner' : {
+        destinations : getAllButExcluded(),
+        characterConstructor: Runner,
+        weight: 4
+    },
     'horse': {
         destinations : getAllButExcluded(),
         characterConstructor: Horse,
