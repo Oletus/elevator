@@ -159,7 +159,7 @@ Elevator.prototype.renderBg = function(ctx) {
 
     ctx.save();
     var counterweightY = this.level.getFloorTopY(this.level.floors.length - this.floorNumber - 1.5);
-    ctx.translate(2, counterweightY);
+    ctx.translate(12, counterweightY);
 
     ctx.translate(0, - this.getBuckleY());
     Elevator.counterweightSprite.draw(ctx, 0, 0);
