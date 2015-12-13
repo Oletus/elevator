@@ -42,11 +42,7 @@ Elevator.prototype.removeOccupant = function(toRemove) {
 };
 
 Elevator.prototype.getTotalUsedSpace = function() {
-    var usedSpace = 0;
-    for (var i = 0; i < this.occupants.length; ++i) {
-        usedSpace += this.occupants[i].width;
-    }
-    return usedSpace;
+    return Level.getTotalUsedSpace(this.occupants);
 };
 
 Elevator.prototype.hasSpace = function(space) {

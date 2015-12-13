@@ -28,6 +28,8 @@ var Level = function() {
     this.characters = [];
     this.spawnCharacter();
     
+    this.state = Level.State.IN_PROGRESS;
+    
     this.characterMoveSpeed = 10;
     this.elevatorMoveSpeed = 4;
     this.elevatorDoorOpenTime = 0.3;
@@ -37,15 +39,29 @@ var Level = function() {
     this.comboCharacters = [];
 };
 
+Level.State = {
+    IN_PROGRESS: 0,
+    FAIL: 1
+};
+
+Level.failSprite = new Sprite('level-fail.png');
+
 Level.prototype.spawnCharacter = function() {
+    if (this.state !== Level.State.IN_PROGRESS) {
+        return;
+    }
     var shuffledFloors = arrayUtil.shuffle(this.floors);
     
     for ( var i = 0; i < shuffledFloors.length; i++ ) {
         if ( shuffledFloors[i].spawnIds.length !== 0 ) {
-            var character = shuffledFloors[i].spawnCharacter();
-            this.characters.push(character);
-            return;
+            var spawnFloor = shuffledFloors[i];
+            break;
         }
+    }
+    var character = spawnFloor.spawnCharacter();
+    this.characters.push(character);
+    if (Level.getTotalUsedSpace(spawnFloor.occupants) > this.getFloorWidth() - 1) {
+        this.state = Level.State.FAIL;
     }
 };
 
@@ -75,6 +91,10 @@ Level.prototype.render = function(ctx) {
         this.characters[i].render(ctx);
     }
     ctx.restore();
+    
+    if (this.state === Level.State.FAIL) {
+        Level.failSprite.drawRotated(ctx, ctx.canvas.width * 0.5, ctx.canvas.height * 0.5, 0);
+    }
 };
 
 Level.prototype.update = function(deltaTime) {
@@ -133,17 +153,33 @@ Level.prototype.reachedGoal = function(character) {
 };
 
 Level.prototype.upPress = function(playerNumber) {
-    this.elevator.upPress();
+    if (this.state === Level.State.IN_PROGRESS) {
+        this.elevator.upPress();
+    }
 };
 
 Level.prototype.downPress = function(playerNumber) {
-    this.elevator.downPress();
+    if (this.state === Level.State.IN_PROGRESS) {
+        this.elevator.downPress();
+    }
 };
 
 Level.prototype.upRelease = function(playerNumber) {
-    this.elevator.upRelease();
+    if (this.state === Level.State.IN_PROGRESS) {
+        this.elevator.upRelease();
+    }
 };
 
 Level.prototype.downRelease = function(playerNumber) {
-    this.elevator.downRelease();
+    if (this.state === Level.State.IN_PROGRESS) {
+        this.elevator.downRelease();
+    }
+};
+
+Level.getTotalUsedSpace = function(occupants) {
+    var usedSpace = 0;
+    for (var i = 0; i < occupants.length; ++i) {
+        usedSpace += occupants[i].width;
+    }
+    return usedSpace;
 };

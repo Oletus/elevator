@@ -70,8 +70,8 @@ Floor.prototype.render = function(ctx) {
 
 Floor.prototype.spawnCharacter = function() {
     var characterId = arrayUtil.randomItem(this.spawnIds);
-    var character = BaseCharacter.create({x: 1, floorNumber: this.floorNumber, level: this.level, id: characterId});
-    
+    var character = BaseCharacter.create({x: -2, floorNumber: this.floorNumber, level: this.level, id: characterId});
+
     this.occupants.push(character);
     return character;
 }
