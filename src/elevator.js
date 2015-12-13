@@ -161,9 +161,8 @@ Elevator.prototype.renderBg = function(ctx) {
     ctx.save();
     var counterweightY = this.level.getFloorTopY(this.level.floors.length - this.floorNumber - 1.5);
     ctx.translate(2, counterweightY);
-    
-    var buckleY = (this.getTotalWeight() > 3) ? 1 / 6 : 0;
-    ctx.translate(0, - buckleY);
+
+    ctx.translate(0, - this.getBuckleY());
     ctx.scale(1 / 6, 1 / 6);
     Elevator.counterweightSprite.draw(ctx, 0, 0);
     Elevator.wireSprite.draw(ctx, 0, -312);
@@ -173,6 +172,16 @@ Elevator.prototype.renderBg = function(ctx) {
     ctx.restore();
 };
 
+Elevator.prototype.getBuckleY = function() {
+    if (this.getTotalWeight() > 3) {
+        return 1 / 6;
+    }
+    if (this.getTotalWeight() < -3) {
+        return -1 / 6;
+    }
+    return 0;
+};
+
 Elevator.prototype.renderFg = function(ctx) {
     ctx.save();
     ctx.translate(this.x, 0);
@@ -180,8 +189,7 @@ Elevator.prototype.renderFg = function(ctx) {
     ctx.translate(0, drawY);
     ctx.fillStyle = 'red';
     ctx.save();
-    var buckleY = (this.getTotalWeight() > 3) ? 1 / 6 : 0;
-    ctx.translate(0, -2 + buckleY);
+    ctx.translate(0, -2 + this.getBuckleY());
 
     ctx.scale(1 / 6, 1 / 6);
     Elevator.wireSprite.draw(ctx, 6, -320);
