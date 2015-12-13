@@ -99,7 +99,10 @@ Level.prototype.render = function(ctx) {
     ctx.restore();
     
     if (this.state === Level.State.FAIL) {
-        Level.failSprite.drawRotated(ctx, ctx.canvas.width * 0.5, ctx.canvas.height * 0.5, 0);
+        Level.failSprite.drawRotated(ctx, ctx.canvas.width * 0.5, ctx.canvas.height * 0.4, 0);
+        
+        ctx.textAlign = 'center';
+        bigBitmapFont.drawText(ctx, 'FINAL SCORE: ' + this.score, ctx.canvas.width * 0.5, ctx.canvas.height * 0.6);
     }
 };
 

@@ -1,21 +1,30 @@
 
 
-var BitmapFont = function(color) {
-    if (color !== undefined) {
-        this.sprite = new Sprite('bitmapfont.png', Sprite.turnSolidColored(color));
+var BitmapFont = function(options) {
+    var defaults = {
+        spriteSrc: 'bitmapfont.png',
+        characterHeight: 6,
+        characterWidth: 4,
+        charactersPerRow: undefined,
+        color: undefined
+    };
+    objectUtil.initWithDefaults(this, defaults, options);
+    if (this.color !== undefined) {
+        this.sprite = new Sprite(this.spriteSrc, Sprite.turnSolidColored(this.color));
     } else {
-        this.sprite = new Sprite('bitmapfont.png');
+        this.sprite = new Sprite(this.spriteSrc);
     }
-    this.charactersPerRow = 32;
-    this.characterHeight = 6;
-    this.characterWidth = 4;
+
 };
 
 BitmapFont.prototype.drawCharacter = function(ctx, character) {
-    var code = character.charCodeAt(0);
-    var row = Math.floor(code / this.charactersPerRow);
-    var col = code - (row * this.charactersPerRow);
     if (this.sprite.loaded) {
+        if (this.charactersPerRow === undefined) {
+            this.charactersPerRow = this.sprite.width / this.characterWidth
+        }
+        var code = character.charCodeAt(0);
+        var row = Math.floor(code / this.charactersPerRow);
+        var col = code - (row * this.charactersPerRow);
         ctx.drawImage(this.sprite.img,
                       col * this.characterWidth, row * this.characterHeight,
                       this.characterWidth, this.characterHeight,

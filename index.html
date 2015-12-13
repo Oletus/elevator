@@ -87,8 +87,9 @@ Game.prototype.update = function(deltaTime) {
 
 var DEV_MODE = (window.location.href.indexOf("?devMode") != -1);
 
-var blackBitmapFont = new BitmapFont('black');
-var whiteBitmapFont = new BitmapFont('white');
+var blackBitmapFont = new BitmapFont({color: 'black'});
+var whiteBitmapFont = new BitmapFont({color: 'white'});
+var bigBitmapFont = new BitmapFont({spriteSrc: 'bitmapfont-big.png', characterWidth: 8, characterHeight: 12});
 
 window['start'] = function() {
     var DEBUG_MAIN_LOOP = DEV_MODE && true; // Set to true to allow fast-forwarding main loop with 'f'
