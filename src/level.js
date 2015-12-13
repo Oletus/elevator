@@ -73,9 +73,6 @@ Level.prototype.spawnCharacter = function() {
     }
     var character = spawnFloor.spawnCharacter();
     this.characters.push(character);
-    if (Level.getTotalUsedSpace(spawnFloor.occupants) > this.getFloorWidth() - 1) {
-        this.goToState(Level.State.FAIL);
-    }
 };
 
 Level.prototype.getFloorTopY = function(floor) {
