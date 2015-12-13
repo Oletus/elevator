@@ -154,7 +154,7 @@ Elevator.prototype.renderBg = function(ctx) {
     ctx.translate(this.x, 0);
     
     ctx.save();
-    Elevator.shaftSprite.draw(ctx, 0, 0);
+    Elevator.shaftSprite.draw(ctx, -6, -6);
     ctx.restore();
 
     ctx.save();
