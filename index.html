@@ -49,6 +49,7 @@ var Game = function(resizer) {
     this.input = new InputMapper(this, 1);
     this.input.addListener(Gamepad.BUTTONS.UP_OR_ANALOG_UP, ['up', 'w'], this.upPress, this.upRelease);
     this.input.addListener(Gamepad.BUTTONS.DOWN_OR_ANALOG_DOWN, ['down', 's'], this.downPress, this.downRelease);
+    this.input.addListener(Gamepad.BUTTONS.START, ['enter', 'space'], this.startPress, this.startRelease);
 };
 
 Game.prototype.render = function(ctx) {
@@ -62,6 +63,15 @@ Game.prototype.render = function(ctx) {
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     this.level.render(ctx);
     return ctx;
+};
+
+Game.prototype.startPress = function(playerNumber) {
+    if (this.level.state === Level.State.FAIL && this.level.stateTime >= 0.5 ) {
+        this.level = new Level();
+    }
+};
+
+Game.prototype.startRelease = function(playerNumber) {
 };
 
 Game.prototype.downPress = function(playerNumber) {
