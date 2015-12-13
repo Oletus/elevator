@@ -67,7 +67,11 @@ Floor.prototype.renderBg = function(ctx) {
     ctx.save();
     ctx.translate(22, -2);
     ctx.scale(1 / 6, 1 / 6);
-    Elevator.doorOpenSprite.draw(ctx, -1, 21);
+    if (this.doorVisual === 0) {
+        Elevator.doorOpen2Sprite.draw(ctx, -1, 21);
+    } else {
+        Elevator.doorOpenSprite.draw(ctx, -1, 21);
+    }
     ctx.globalAlpha = this.doorVisual;
     Elevator.doorSprite.draw(ctx, -1, 21);
     ctx.restore();

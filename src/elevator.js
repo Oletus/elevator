@@ -34,6 +34,7 @@ Elevator.sprite = new Sprite('lift.png');
 Elevator.shaftSprite = new Sprite('shaft.png');
 Elevator.doorSprite = new Sprite('door_closed.png');
 Elevator.doorOpenSprite = new Sprite('door_open1.png');
+Elevator.doorOpen2Sprite = new Sprite('door_open2.png');
 
 Elevator.prototype.removeOccupant = function(toRemove) {
     if (this.occupants.indexOf(toRemove) >= 0) {
@@ -153,7 +154,11 @@ Elevator.prototype.renderFg = function(ctx) {
     } else {
         this.doorVisual = 1.0 - (this.doorOpenTimer - this.level.elevatorDoorOpenTime * 0.5) / (this.level.elevatorDoorOpenTime * 0.5);
     }
-    Elevator.doorOpenSprite.draw(ctx, 1, 21);
+    if (this.doorVisual === 0) {
+        Elevator.doorOpen2Sprite.draw(ctx, 1, 21);
+    } else {
+        Elevator.doorOpenSprite.draw(ctx, 1, 21);
+    }
     ctx.globalAlpha = this.doorVisual;
     Elevator.doorSprite.draw(ctx, 1, 21);
     ctx.restore();
