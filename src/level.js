@@ -119,6 +119,9 @@ Level.prototype.render = function(ctx) {
         
         ctx.textAlign = 'center';
         bigBitmapFont.drawText(ctx, 'FINAL SCORE: ' + this.score, ctx.canvas.width * 0.5, ctx.canvas.height * 0.6);
+        
+        var key = game.input.getKeyInstruction(game.startPress, 0);
+        bigBitmapFont.drawText(ctx, 'PRESS ' + key + ' TO RESTART', ctx.canvas.width * 0.5, ctx.canvas.height * 0.7);
     }
 };
 

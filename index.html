@@ -144,6 +144,8 @@ GameParameters.prototype.initGUI = function() {
 
 Game.parameters = new GameParameters();
 
+var game;
+
 window['start'] = function() {
     var DEBUG_MAIN_LOOP = DEV_MODE && true; // Set to true to allow fast-forwarding main loop with 'f'
 
@@ -156,7 +158,7 @@ window['start'] = function() {
     Game.music.playSingular(true);
     
     var resizer = new CanvasResizer({mode: CanvasResizer.Mode.FIXED_RESOLUTION, width: 192, height: 300});
-    var game = new Game(resizer);
+    game = new Game(resizer);
     startMainLoop([resizer, game, new LoadingBar()], {debugMode: DEBUG_MAIN_LOOP});
 };
 </script>
