@@ -222,7 +222,7 @@ BaseCharacter.prototype.update = function(deltaTime) {
     // Determine target x
     var targetX = undefined;
     var wantOut = (Math.round(this.floorNumber) === this.goalFloor) || this.state === BaseCharacter.State.ESCAPING;
-    if (this.state === BaseCharacter.State.DOING_ACTION) {
+    if (this.state === BaseCharacter.State.DOING_ACTION || this.state === BaseCharacter.State.DISAPPEARING) {
         targetX = this.x;
     } else if (this.state === BaseCharacter.State.APPROACHING) {
         targetX = this.approachTargetX;
