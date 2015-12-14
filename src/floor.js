@@ -41,6 +41,7 @@ Floor.fgSprites = {};
 Floor.bgSprites = {};
 Floor.alarmSprite = new Sprite('floor-alarm.png');
 Floor.renovationSprite = new Sprite('floor-renovation.png');
+Floor.renovatingSound = new Audio('renovating');
 
 Floor.loadSprites = function() {
     for (var i = 0; i < GameData.floors.length; ++i) {
@@ -158,6 +159,7 @@ Floor.prototype.update = function(deltaTime) {
 
     if (this.state === Floor.State.RENOVATING) {
         if (this.stateTime > 1) {
+            Floor.renovatingSound.play();
             this.state = Floor.State.RENOVATED;
         }
     } else if (this.state === Floor.State.APPEARING) {

@@ -69,6 +69,7 @@ BaseCharacter.alertSound = new Audio('customer-alert');
 BaseCharacter.fallSound = new Audio('customer-fall');
 BaseCharacter.fanfareSound = new Audio('band-fanfare');
 BaseCharacter.ghostShriekSound = new Audio('ghost-shriek');
+BaseCharacter.magnetizedSound = new Audio('magnetized');
 
 BaseCharacter.loadSprites = function() {
     for (var key in GameData.characters) {
@@ -737,6 +738,9 @@ Reverser.prototype.update = function(deltaTime) {
     BaseCharacter.prototype.update.call(this, deltaTime);
     if (this.state === BaseCharacter.State.NORMAL) {
         if (this.elevator && Math.abs(this.x - this.elevatorTargetX) < 0.05) {
+            if (!this.reversingControls) {
+                BaseCharacter.magnetizedSound.play();
+            }
             this.reversingControls = true;
         } else {
             this.reversingControls = false;
