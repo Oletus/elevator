@@ -24,7 +24,7 @@ GameData.floors =
             {id: "bandmember1", chance: 1},
             {id: "bandmember2", chance: 1},
             {id: "groom", chance: 1},
-            {id: "bride", chance: 1}
+            {id: "gaygroom", chance: 1},
         ]
     },
     {
@@ -89,8 +89,8 @@ GameData.floors =
         spawnIds: [
             {id: "customer", chance: 6},
             {id: "cat", chance: 4},
-            {id: "groom", chance: 1},
-            {id: "bride", chance: 1}
+            {id: "bride", chance: 1},
+            {id: "lesbianbride", chance: 1}
         ]
     },    /*,
     {
@@ -350,6 +350,32 @@ GameData.characters =
         band: 'wedding',
         spawnWith: ['groom'],
         bandSize: 2
+    },
+    'gaygroom': {
+        destinations : getAllButExcluded(),
+        characterConstructor: BandMember,
+        idLimit: 1,
+        weight: 1,
+        width: 2,
+        minTip: 20,
+        maxTip: 20,
+        band: 'wedding',
+        spawnWith: ['groom'],
+        bandSize: 2,
+        bodyId: 'groom'
+    },
+    'lesbianbride': {
+        destinations : getAllButExcluded(),
+        characterConstructor: BandMember,
+        idLimit: 1,
+        weight: 1,
+        width: 2,
+        minTip: 20,
+        maxTip: 20,
+        band: 'wedding',
+        spawnWith: ['bride'],
+        bandSize: 2,
+        bodyId: 'bride'
     },
     'magnetman': {
         destinations : getAllButExcluded(),

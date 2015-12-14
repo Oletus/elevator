@@ -98,7 +98,8 @@ BaseCharacter.prototype.initBase = function(options) {
         numberOfLegs: 1,
         legsSpread: 12,
         spawnWith: null,
-        reversingControls: false
+        reversingControls: false,
+        bodyId: null
     };
     objectUtil.initWithDefaults(this, defaults, options);
     this.legsSprite = new AnimatedSpriteInstance(BaseCharacter.legsAnimation);
@@ -157,7 +158,10 @@ BaseCharacter.prototype.initBase = function(options) {
     this.stateTime = 0;
     this.alwaysBobble = false;
     this.iconSprite = new AnimatedSpriteInstance(BaseCharacter.iconAnimation);
-    this.bodySprite = BaseCharacter.bodySprites[this.id];
+    if (this.bodyId === null) {
+        this.bodyId = this.id;
+    }
+    this.bodySprite = BaseCharacter.bodySprites[this.bodyId];
 };
 
 BaseCharacter.prototype.renderIcon = function(ctx) {
