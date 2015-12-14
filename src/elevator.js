@@ -106,6 +106,7 @@ Elevator.prototype.update = function(deltaTime) {
     if (moveIntent === 0) {
         if (this.targetFloor === undefined) {
             this.targetFloor = Math.round(this.floorNumber + this.currentMovementSpeed * 0.15);
+            this.targetFloor = mathUtil.clamp(0, this.level.floors.length - 1, this.targetFloor);
         }
         var distanceFromTarget = Math.abs(this.floorNumber - this.targetFloor);
         this.currentMovementSpeed *= mathUtil.clamp(0, 0.99, 0.8 + distanceFromTarget * 0.3);
