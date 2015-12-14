@@ -570,7 +570,7 @@ Runner.prototype.update = function(deltaTime) {
             changeState(this, BaseCharacter.State.APPROACHING);
             this.alerting = false;
         }
-        if (this.elevator && this.x >= doorThresholdX + 2 || this.floorNumber === this.goalFloor) {
+        if ((this.elevator && this.x >= doorThresholdX + 5 + this.width * 6 * 0.5) || this.floorNumber === this.goalFloor) {
             changeState(this, BaseCharacter.State.NORMAL);
             this.moveSpeedMultiplier = 1.5;
             this.alerting = false;
