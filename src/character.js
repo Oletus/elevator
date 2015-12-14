@@ -50,7 +50,10 @@ BaseCharacter.iconAnimation = new AnimatedSprite({
             {src: 'icon-music-playing2.png'}
         ],
         'wedding': [{src: 'icon-wedding.png', duration: 0}],
-        'wedding-playing': [{src: 'icon-wedding-playing.png', duration: 0}],
+        'wedding-playing': [
+            {src: 'icon-wedding-playing.png'},
+            {src: 'icon-wedding.png'}
+        ],
 },
 {
     durationMultiplier: 1000 / 60,
@@ -425,7 +428,7 @@ var BandMember = function(options) {
 BandMember.prototype = new BaseCharacter();
 
 BandMember.prototype.renderIcon = function(ctx) {
-    if (!this.hasBand || this.sinceBand < 1) {
+    if (!this.hasBand || this.state === BaseCharacter.State.DOING_ACTION) {
         this.iconSprite.drawRotated(ctx, 0, 0, 0);
     } else {
         BaseCharacter.prototype.renderIcon.call(this, ctx);
@@ -455,15 +458,20 @@ BandMember.prototype.update = function(deltaTime) {
                         occupant.hasBand = true;
                         occupant.iconSprite.setAnimation(this.band + '-playing');
                         occupant.goalFloor = commonGoal;
+                        changeState(occupant, BaseCharacter.State.DOING_ACTION);
                     }
                 }
                 BaseCharacter.fanfareSound.play();
                 this.iconSprite.setAnimation(this.band + '-playing');
                 this.goalFloor = commonGoal;
+                changeState(this, BaseCharacter.State.DOING_ACTION);
             }
         }
     } else {
         this.sinceBand += deltaTime;
+        if (this.sinceBand > 0.7) {
+            changeState(this, BaseCharacter.State.NORMAL);
+        }
     }
 };
 
