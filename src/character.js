@@ -55,6 +55,10 @@ BaseCharacter.iconAnimation = new AnimatedSprite({
             {src: 'icon-wedding-playing.png'},
             {src: 'icon-wedding.png'}
         ],
+        'alert': [
+            {src: 'icon-alert1.png'},
+            {src: 'icon-alert2.png'}
+        ],
 },
 {
     durationMultiplier: 1000 / 60,
@@ -484,6 +488,7 @@ var Runner = function(options) {
     this.approachTargetX = Math.floor(12 + Math.random() * 20);
     this.alerting = false;
     this.alertTime = this.level.time - 1;
+    this.iconSprite.setAnimation('alert');
 };
 
 Runner.prototype = new BaseCharacter();
@@ -544,12 +549,9 @@ Runner.prototype.update = function(deltaTime) {
 };
 
 Runner.prototype.renderIcon = function(ctx) {
-    var drewIcon = false;    
-    if (!drewIcon && this.alerting) {
-        whiteBitmapFont.drawText(ctx, '!', 0, -3);
-        drewIcon = true;
-    }
-    if (!drewIcon) {
+    if (this.alerting) {
+        this.iconSprite.drawRotated(ctx, 0, 0, 0);
+    } else {
         BaseCharacter.prototype.renderIcon.call(this, ctx);
     }
 }
