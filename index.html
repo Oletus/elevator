@@ -108,6 +108,7 @@ var whiteBitmapFont = new BitmapFont({color: 'white'});
 var bigBitmapFont = new BitmapFont({spriteSrc: 'bitmapfont-big.png', characterWidth: 8, characterHeight: 12});
 
 Game.music = new Audio('elevator_music');
+Game.gameOverSound = new Audio('gameover');
 
 /**
  * @constructor
@@ -157,8 +158,6 @@ window['start'] = function() {
     if (DEV_MODE) {
         Game.parameters.initGUI();
     }
-
-    Game.music.playSingular(true);
     
     var resizer = new CanvasResizer({mode: CanvasResizer.Mode.FIXED_RESOLUTION, width: 192, height: 312});
     game = new Game(resizer);

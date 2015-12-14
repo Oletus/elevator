@@ -21,6 +21,7 @@ var Level = function() {
     this.characters = [];
     
     this.goToState(Level.State.IN_PROGRESS);
+    Game.music.playSingular(true);
     
     this.characterMoveSpeed = 60;
     this.elevatorMoveSpeed = 4;
