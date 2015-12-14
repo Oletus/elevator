@@ -218,13 +218,13 @@ GameData.characters =
         destinations : getAllButExcluded(),
         characterConstructor: Character,
         weight: 1,
-        bodyIds: ['customer']
+        bodyIds: ['customer', 'customer-darker']
     },
     'customerette' : {
         destinations : getAllButExcluded(),
         characterConstructor: Character,
         weight: 1,
-        bodyIds: ['customerette']
+        bodyIds: ['customerette', 'customerette-darker']
     },    
     'soldier' : {
         destinations : getAllButExcluded(),

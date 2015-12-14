@@ -77,7 +77,7 @@ BaseCharacter.loadSprites = function() {
             if (GameData.characters[key].bodyIds) {
                 for (var i = 0; i < GameData.characters[key].bodyIds.length; ++i) {
                     var bodyId = GameData.characters[key].bodyIds[i];
-                    BaseCharacter.bodySprites[key] = new Sprite('body-' + bodyId + '.png');
+                    BaseCharacter.bodySprites[bodyId] = new Sprite('body-' + bodyId + '.png');
                 }
             } else {
                 BaseCharacter.bodySprites[key] = new Sprite('body-' + key + '.png');
