@@ -212,6 +212,7 @@ GameData.characters =
     'runner' : {
         destinations : getAllButExcluded(),
         characterConstructor: Runner,
+        constructorLimit: 1,
         weight: 1,
         minTip: 20,
         maxTip: 30,
@@ -220,6 +221,7 @@ GameData.characters =
     'stretcher' : {
         destinations : getAllButExcluded(),
         characterConstructor: Runner,
+        constructorLimit: 1,
         weight: 3,
         width: 4,
         minTip: 20,

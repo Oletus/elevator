@@ -5,6 +5,16 @@ var stringUtil = {}; // Utilities for working with JS strings
 var objectUtil = {}; // Utilities for working with JS objects
 
 /**
+ * Count the number of matches in an array.
+ * @param {Array} array Array to check.
+ * @param {function} matchFunc Function that takes one array item and returns true if it should be counted.
+ * @return {number} The number of matching entries.
+ */
+arrayUtil.count = function(array, matchFunc) {
+    return array.filter(matchFunc).length;
+};
+
+/**
  * Filter an array by removing elements that are found in the other array.
  * @param {Array} array Array to filter.
  * @param {Array} arrayToRemove Values to remove from the first array.

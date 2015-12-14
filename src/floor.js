@@ -101,18 +101,35 @@ Floor.prototype.renderFg = function(ctx) {
 }
 
 Floor.prototype.spawnCharacter = function() {
+    var that = this;
+    var canSpawn = function(id) {
+        if (GameData.characters[id].constructorLimit !== undefined) {
+            var count = arrayUtil.count(that.level.characters, function(c) {
+                return (c instanceof GameData.characters[id].characterConstructor);
+            });
+            if (count >= GameData.characters[id].constructorLimit) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     var totalChance = 0;
     for ( var i = 0; i < this.spawnIds.length; i++ ) {
-        totalChance += this.spawnIds[i].chance;
+        if (canSpawn(this.spawnIds[i].id)) {
+            totalChance += this.spawnIds[i].chance;
+        }
     }
     var roll = Math.random() * totalChance;
     var cumulativeChance = 0;
     
     for ( var i = 0; i < this.spawnIds.length; i++ ) {
-        cumulativeChance += this.spawnIds[i].chance;
-        if ( roll <= cumulativeChance ) {
-            var characterId = this.spawnIds[i].id;
-            break;
+        if (canSpawn(this.spawnIds[i].id)) {
+            cumulativeChance += this.spawnIds[i].chance;
+            if ( roll <= cumulativeChance ) {
+                var characterId = this.spawnIds[i].id;
+                break;
+            }
         }
     }
     
@@ -120,7 +137,7 @@ Floor.prototype.spawnCharacter = function() {
     
     this.occupants.push(character);
     return character;
-}
+};
 
 Floor.prototype.canOpenDoor = function() {
     return (this.state === Floor.State.IDLE);
