@@ -407,9 +407,9 @@ Cat.legsAnimation = new AnimatedSprite({
 
 Cat.prototype.renderBody = function(ctx) {
     var flip = this.facingRight ? 1 : -1;
-    this.bodySprite.drawRotatedNonUniform(ctx, 0, -4 + Math.floor(Math.sin(this.bobbleTime * 15) * 1), 0, flip);
-    this.legsSprite.drawRotatedNonUniform(ctx, -2, -2, 0, flip);
-    this.legsSprite.drawRotatedNonUniform(ctx, 2, -2, 0, flip);
+    this.bodySprite.drawRotatedNonUniform(ctx, 1, -4 + Math.floor(Math.sin(this.bobbleTime * 15) * 1), 0, flip);
+    this.legsSprite.drawRotatedNonUniform(ctx, -1, -2, 0, flip);
+    this.legsSprite.drawRotatedNonUniform(ctx, 3, -2, 0, flip);
 };
 
 
