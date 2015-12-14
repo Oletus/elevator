@@ -131,7 +131,10 @@ Elevator.prototype.update = function(deltaTime) {
     this.doorOpenTimer = mathUtil.clamp(0, this.level.elevatorDoorOpenTime, this.doorOpenTimer);
     this.doorOpen = this.doorOpenTimer > this.level.elevatorDoorOpenTime * 0.5;
     this.floorNumber += this.currentMovementSpeed * deltaTime;
-    this.floorNumber = mathUtil.clamp(0, this.level.numFloors - 1, this.floorNumber);
+    this.floorNumber = mathUtil.clamp(-0.04, this.level.numFloors - 1 + 0.04, this.floorNumber);
+    if (this.floorNumber < 0 || this.floorNumber > this.level.numFloors - 1) {
+        this.currentMovementSpeed = 0;
+    }
     
     
     // Put band members next to each other
