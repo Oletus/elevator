@@ -77,6 +77,12 @@ Sprite.prototype._reload = function() {
 Sprite.gfxPath = 'assets/gfx/';
 
 /**
+ * Set to true so that draw functions will only try to apply transforms at 1 pixel increments. 
+ * Can be set at any time. Can help with pixel art style drawing.
+ */
+Sprite.alignPixels = false;
+
+/**
  * Filter for turning the sprite solid colored.
  */
 Sprite.turnSolidColored = function(solidColor) {
@@ -193,7 +199,11 @@ Sprite.prototype.drawRotated = function(ctx, centerX, centerY, angleRadians, /* 
         ctx.translate(centerX, centerY);
         ctx.rotate(angleRadians);
         ctx.scale(scale, scale);
-        ctx.translate(-this.width * 0.5, -this.height * 0.5);
+        if (Sprite.alignPixels) {
+            ctx.translate(Math.floor(-this.width * 0.5), Math.floor(-this.height * 0.5));
+        } else {
+            ctx.translate(-this.width * 0.5, -this.height * 0.5);
+        }
         ctx.drawImage(this.img, 0, 0);
         ctx.restore();
     }
@@ -226,7 +236,11 @@ Sprite.prototype.drawRotatedNonUniform = function(ctx, centerX, centerY, angleRa
         ctx.translate(centerX, centerY);
         ctx.rotate(angleRadians);
         ctx.scale(scaleX, scaleY);
-        ctx.translate(-this.width * 0.5, -this.height * 0.5);
+        if (Sprite.alignPixels) {
+            ctx.translate(Math.floor(-this.width * 0.5), Math.floor(-this.height * 0.5));
+        } else {
+            ctx.translate(-this.width * 0.5, -this.height * 0.5);
+        }
         ctx.drawImage(this.img, 0, 0);
         ctx.restore();
     }

@@ -42,6 +42,13 @@ BaseCharacter.legsAnimation = new AnimatedSprite({
 BaseCharacter.iconAnimation = new AnimatedSprite({
         'escaping': [{src: 'icon-escaping.png', duration: 0}],
         'renovating': [{src: 'icon-renovating.png', duration: 0}],
+        'music': [{src: 'icon-music.png', duration: 0}],
+        'music-playing': [
+            {src: 'icon-music-playing1.png'},
+            {src: 'icon-music-playing2.png'},
+            {src: 'icon-music-playing3.png'},
+            {src: 'icon-music-playing2.png'}
+        ],
 },
 {
     durationMultiplier: 1000 / 60,
@@ -158,7 +165,7 @@ BaseCharacter.prototype.renderIcon = function(ctx) {
 BaseCharacter.prototype.render = function(ctx) {
     ctx.save();
     var drawY = this.level.getFloorFloorY(this.floorNumber);
-    ctx.translate(this.x, drawY);
+    ctx.translate(Math.floor(this.x), drawY);
     this.renderBody(ctx);
     ctx.save();
     ctx.translate(0, -30);
@@ -374,6 +381,53 @@ var Horse = function(options) {
 };
 
 Horse.prototype = new BaseCharacter();
+
+
+var BandMember = function(options) {
+    this.initBase(options);
+    this.hasBand = false;
+    this.iconSprite.setAnimation('music');
+    this.sinceBand = 0;
+};
+
+BandMember.prototype = new BaseCharacter();
+
+BandMember.prototype.renderIcon = function(ctx) {
+    if (!this.hasBand || this.sinceBand < 1) {
+        this.iconSprite.drawRotated(ctx, 0, 0, 0);
+    } else {
+        BaseCharacter.prototype.renderIcon.call(this, ctx);
+    }
+};
+
+BandMember.prototype.update = function(deltaTime) {
+    BaseCharacter.prototype.update.call(this, deltaTime);
+    if (!this.hasBand) {
+        this.goalFloor = Math.round(this.floorNumber + 1) % this.level.floors.length;
+        if (this.elevator) {
+            var canPlay = function(c) {
+                return (c instanceof BandMember) &&
+                       c.elevatorTargetX !== undefined &&
+                       Math.abs(c.x - c.elevatorTargetX) < 0.1 &&
+                       !c.hasBand;
+            };
+            var count = arrayUtil.count(this.elevator.occupants, canPlay);
+            if (count > 1) {
+                this.hasBand = true;
+                for (var i = 0; i < this.elevator.occupants.length; ++i) {
+                    if (canPlay(this.elevator.occupants[i])) {
+                        this.elevator.occupants[i].hasBand = true;
+                        this.elevator.occupants[i].iconSprite.setAnimation('music-playing');
+                    }
+                }
+                BaseCharacter.fanfareSound.play();
+                this.iconSprite.setAnimation('music-playing');
+            }
+        }
+    } else {
+        this.sinceBand += deltaTime;
+    }
+};
 
 
 var Runner = function(options) {

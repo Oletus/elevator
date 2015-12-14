@@ -19,7 +19,8 @@ GameData.floors =
         spawnIds: [
             {id: "customer", chance: 5},
             {id: "horse", chance: 5},
-            {id: "heavy", chance: 1}
+            {id: "heavy", chance: 1},
+            {id: "bandmember1", chance: 100},
         ]
     },
     {
@@ -36,7 +37,8 @@ GameData.floors =
         name: "Business lounge",
         spawnIds: [
             {id: "customer", chance: 3},
-            {id: "runner", chance: 3}
+            {id: "runner", chance: 3},
+            {id: "bandmember2", chance: 100}
         ]
     },
     {
@@ -264,7 +266,34 @@ GameData.characters =
         width: 2,
         minTip: 0,
         maxTip: 0
+    },
+    'bandmember1': {
+        destinations : getAllButExcluded(),
+        characterConstructor: BandMember,
+        constructorLimit: 2,
+        weight: 1,
+        width: 2,
+        minTip: 1,
+        maxTip: 1
+    },
+    'bandmember2': {
+        destinations : getAllButExcluded(),
+        characterConstructor: BandMember,
+        constructorLimit: 2,
+        weight: 1,
+        width: 2,
+        minTip: 1,
+        maxTip: 1
     }
+    /*'bandmember3': {
+        destinations : getAllButExcluded(),
+        characterConstructor: BandMember,
+        constructorLimit: 3,
+        weight: 1,
+        width: 2,
+        minTip: 1,
+        maxTip: 1
+    }*/
 };
 
 BaseCharacter.loadSprites();
