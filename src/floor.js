@@ -58,7 +58,7 @@ Floor.prototype.renderBg = function(ctx) {
     ctx.translate(0, drawY);
     ctx.save();
     ctx.translate(0, 6);
-    Floor.bgSprites[this.id].draw(ctx, 0, 0);
+    Floor.bgSprites[this.id].draw(ctx, 0, -9);
     ctx.restore();
     
     ctx.save();
@@ -73,7 +73,7 @@ Floor.prototype.renderBg = function(ctx) {
     ctx.restore();
     
     ctx.globalAlpha = 1;
-    ctx.translate(21.5 * 6, 1.5 * 6);
+    ctx.translate(21.5 * 6, -1);
     ctx.fillStyle = 'black';
     ctx.textAlign = "right";
     var floorTextNumber = (this.floorNumber >= 10 ) ? (this.floorNumber + 1).toString() : '0' + (this.floorNumber + 1);
