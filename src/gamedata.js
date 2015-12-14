@@ -52,7 +52,7 @@ GameData.floors =
         name: "Garage",
         spawnIds: [
             {id: "customer", chance: 5},
-            {id: "car", chance: 2},
+            {id: "car", chance: 1},
             {id: "renovator", chance: 1}
         ]
     },
