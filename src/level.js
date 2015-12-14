@@ -164,12 +164,14 @@ Level.prototype.render = function(ctx) {
             bigBitmapFont.drawText(ctx, 'FINAL SCORE: ' + this.score, ctx.canvas.width * 0.5, ctx.canvas.height * 0.6);
         }
 
-        var key = game.input.getKeyInstruction(game.startPress, 0);
-        var whatNow = 'RESTART';
-        if (this.state === Level.State.TITLE_SCREEN) {
-            whatNow = 'START';
+        if (mathUtil.fmod(this.time * 0.5, 1) < 0.5) {
+            var key = game.input.getKeyInstruction(game.startPress, 0);
+            var whatNow = 'RESTART';
+            if (this.state === Level.State.TITLE_SCREEN) {
+                whatNow = 'START';
+            }
+            bigBitmapFont.drawText(ctx, 'PRESS ' + key + ' TO ' + whatNow, ctx.canvas.width * 0.5, ctx.canvas.height * 0.7);
         }
-        bigBitmapFont.drawText(ctx, 'PRESS ' + key + ' TO ' + whatNow, ctx.canvas.width * 0.5, ctx.canvas.height * 0.7);
     }
     ctx.globalAlpha = 1.0;
 };
@@ -259,27 +261,19 @@ Level.prototype.reachedGoal = function(character) {
 };
 
 Level.prototype.upPress = function(playerNumber) {
-    if (this.state === Level.State.IN_PROGRESS) {
-        this.elevator.upPress();
-    }
+    this.elevator.upPress();
 };
 
 Level.prototype.downPress = function(playerNumber) {
-    if (this.state === Level.State.IN_PROGRESS) {
-        this.elevator.downPress();
-    }
+    this.elevator.downPress();
 };
 
 Level.prototype.upRelease = function(playerNumber) {
-    if (this.state === Level.State.IN_PROGRESS) {
-        this.elevator.upRelease();
-    }
+    this.elevator.upRelease();
 };
 
 Level.prototype.downRelease = function(playerNumber) {
-    if (this.state === Level.State.IN_PROGRESS) {
-        this.elevator.downRelease();
-    }
+    this.elevator.downRelease();
 };
 
 Level.getTotalUsedSpace = function(occupants) {

@@ -90,7 +90,7 @@ Elevator.prototype.update = function(deltaTime) {
     if (this.reverseControls) {
         moveIntent = -moveIntent;
     }
-    if (this.level.state !== Level.State.IN_PROGRESS) {
+    if (this.level.state === Level.State.FAIL) {
         moveIntent = 0;
     }
     if (this.getTotalWeight() > 3) {
