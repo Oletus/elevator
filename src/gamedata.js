@@ -6,7 +6,8 @@ GameData.floors =
         id: "acme",
         name: "Acme",
         spawnIds: [
-            {id: "customer", chance: 6},
+            {id: "customer", chance: 4},
+            {id: "customerette", chance: 2},
             {id: "horse", chance: 1},
             {id: "heavy", chance: 4},
             {id: "runner", chance: 2},
@@ -18,7 +19,8 @@ GameData.floors =
         id: "stables",
         name: "Stables",
         spawnIds: [
-            {id: "customer", chance: 5},
+            {id: "customer", chance: 3},
+            {id: "customerette", chance: 3},
             {id: "horse", chance: 5},
             {id: "heavy", chance: 1},
             {id: "bandmember1", chance: 1},
@@ -31,7 +33,8 @@ GameData.floors =
         id: "graveyard",
         name: "Graveyard",
         spawnIds: [
-            {id: "customer", chance: 5},
+            {id: "customer", chance: 2},
+            {id: "customerette", chance: 2},
             {id: "ghost", chance: 5},
             {id: "cat", chance: 2},
             {id: "horse", chance: 1}
@@ -41,7 +44,8 @@ GameData.floors =
         id: "lounge",
         name: "Business lounge",
         spawnIds: [
-            {id: "customer", chance: 3},
+            {id: "customer", chance: 2},
+            {id: "customerette", chance: 2},
             {id: "runner", chance: 3},
             {id: "bandmember1", chance: 1},
             {id: "bandmember2", chance: 1},
@@ -53,7 +57,8 @@ GameData.floors =
         id: "garage",
         name: "Garage",
         spawnIds: [
-            {id: "customer", chance: 8},
+            {id: "customer", chance: 6},
+            {id: "customerette", chance: 2},
             {id: "car", chance: 1},
             {id: "renovator", chance: 2},
             {id: "magnetman", chance: 1}
@@ -71,7 +76,8 @@ GameData.floors =
         spawnIds: [
             {id: "clown", chance: 5},
             {id: "horse", chance: 2},
-            {id: "customer", chance: 1}
+            {id: "customer", chance: 1},
+            {id: "customerette", chance: 1}
         ]
     },
      {
@@ -88,7 +94,8 @@ GameData.floors =
         id: "catcafe",
         name: "Cat Cafe",
         spawnIds: [
-            {id: "customer", chance: 6},
+            {id: "customer", chance: 2},
+            {id: "customerette", chance: 4},
             {id: "cat", chance: 4},
             {id: "bride", chance: 1},
             {id: "lesbianbride", chance: 1}
@@ -210,8 +217,15 @@ GameData.characters =
     'customer' : {
         destinations : getAllButExcluded(),
         characterConstructor: Character,
-        weight: 1
+        weight: 1,
+        bodyIds: ['customer']
     },
+    'customerette' : {
+        destinations : getAllButExcluded(),
+        characterConstructor: Character,
+        weight: 1,
+        bodyIds: ['customerette']
+    },    
     'soldier' : {
         destinations : getAllButExcluded(),
         characterConstructor: Character,
@@ -364,7 +378,7 @@ GameData.characters =
         band: 'wedding',
         spawnWith: ['groom'],
         bandSize: 2,
-        bodyId: 'groom'
+        bodyIds: ['groom']
     },
     'lesbianbride': {
         destinations : getAllButExcluded(),
@@ -377,7 +391,7 @@ GameData.characters =
         band: 'wedding',
         spawnWith: ['bride'],
         bandSize: 2,
-        bodyId: 'bride'
+        bodyIds: ['bride']
     },
     'magnetman': {
         destinations : getAllButExcluded(),

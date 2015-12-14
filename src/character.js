@@ -74,7 +74,14 @@ BaseCharacter.magnetizedSound = new Audio('magnetized');
 BaseCharacter.loadSprites = function() {
     for (var key in GameData.characters) {
         if (GameData.characters.hasOwnProperty(key)) {
-            BaseCharacter.bodySprites[key] = new Sprite('body-' + key + '.png');
+            if (GameData.characters[key].bodyIds) {
+                for (var i = 0; i < GameData.characters[key].bodyIds.length; ++i) {
+                    var bodyId = GameData.characters[key].bodyIds[i];
+                    BaseCharacter.bodySprites[key] = new Sprite('body-' + bodyId + '.png');
+                }
+            } else {
+                BaseCharacter.bodySprites[key] = new Sprite('body-' + key + '.png');
+            }
         }
     }
 };
@@ -100,7 +107,7 @@ BaseCharacter.prototype.initBase = function(options) {
         legsSpread: 12,
         spawnWith: null,
         reversingControls: false,
-        bodyId: null
+        bodyIds: null
     };
     objectUtil.initWithDefaults(this, defaults, options);
     this.legsSprite = new AnimatedSpriteInstance(BaseCharacter.legsAnimation);
@@ -159,10 +166,12 @@ BaseCharacter.prototype.initBase = function(options) {
     this.stateTime = 0;
     this.alwaysBobble = false;
     this.iconSprite = new AnimatedSpriteInstance(BaseCharacter.iconAnimation);
-    if (this.bodyId === null) {
-        this.bodyId = this.id;
+
+    var bodyId = this.id;
+    if (this.bodyIds !== null) {
+        bodyId = arrayUtil.shuffle(this.bodyIds)[0];
     }
-    this.bodySprite = BaseCharacter.bodySprites[this.bodyId];
+    this.bodySprite = BaseCharacter.bodySprites[bodyId];
 };
 
 BaseCharacter.prototype.renderIcon = function(ctx) {
