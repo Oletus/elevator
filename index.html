@@ -158,7 +158,7 @@ window['start'] = function() {
 
     Game.music.playSingular(true);
     
-    var resizer = new CanvasResizer({mode: CanvasResizer.Mode.FIXED_RESOLUTION, width: 192, height: 300});
+    var resizer = new CanvasResizer({mode: CanvasResizer.Mode.FIXED_RESOLUTION, width: 192, height: 312});
     game = new Game(resizer);
     startMainLoop([resizer, game, new LoadingBar()], {debugMode: DEBUG_MAIN_LOOP});
 };

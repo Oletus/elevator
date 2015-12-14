@@ -68,6 +68,7 @@ Level.prototype.goToState = function(state) {
 }
 
 Level.failSprite = new Sprite('level-fail.png');
+Level.topSprite = new Sprite('top.png');
 
 Level.prototype.spawnCharacter = function() {
     if (this.state !== Level.State.IN_PROGRESS) {
@@ -86,11 +87,11 @@ Level.prototype.spawnCharacter = function() {
 };
 
 Level.prototype.getFloorTopY = function(floor) {
-    return (this.numFloors - floor - 1) * Floor.height * 6;
+    return (this.numFloors - floor - 1) * Floor.height * 6 + 12;
 };
 
 Level.prototype.getFloorFloorY = function(floor) {
-    return ((this.numFloors - floor - 1) * Floor.height + Floor.height - 1) * 6;
+    return ((this.numFloors - floor - 1) * Floor.height + Floor.height - 1) * 6 + 12;
 };
 
 Level.prototype.getFloorWidth = function() {
@@ -123,6 +124,9 @@ Level.prototype.render = function(ctx) {
     for (var i = 0; i < this.floors.length; ++i) {
         this.floors[i].renderFg(ctx);
     }
+    
+    var topY = this.getFloorTopY(this.floors.length) + 6;
+    Level.topSprite.draw(ctx, 0, topY);
     
     this.particles.render(ctx);
     
