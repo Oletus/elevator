@@ -129,6 +129,27 @@ Elevator.prototype.update = function(deltaTime) {
     this.doorOpen = this.doorOpenTimer > this.level.elevatorDoorOpenTime * 0.5;
     this.floorNumber += this.currentMovementSpeed * deltaTime;
     this.floorNumber = mathUtil.clamp(0, this.level.numFloors - 1, this.floorNumber);
+    
+    
+    // Put band members next to each other
+    arrayUtil.stableSort(this.occupants, function(a, b) {
+        var aValue = 0;
+        var bValue = 0;
+        if (a instanceof BandMember) {
+            aValue = -1;
+        }
+        if (b instanceof BandMember) {
+            bValue = -1;
+        }
+        if (aValue < bValue) {
+            return -1;
+        } else if (bValue < aValue) {
+            return 1;
+        } else {
+            return 0;
+        }
+    });
+    
     var fromRight = this.maxWidthCapacity - this.getTotalUsedSpace();
     var usedSpace = 0;
     var scaryOccupants = false;
