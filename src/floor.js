@@ -73,7 +73,7 @@ Floor.prototype.renderBg = function(ctx) {
     ctx.restore();
     
     ctx.globalAlpha = 1;
-    ctx.translate(21.5 * 6, -1);
+    ctx.translate(21.5 * 6, 0);
     ctx.fillStyle = 'black';
     ctx.textAlign = "right";
     var floorTextNumber = (this.floorNumber >= 10 ) ? (this.floorNumber + 1).toString() : '0' + (this.floorNumber + 1);
@@ -85,7 +85,7 @@ Floor.prototype.renderBg = function(ctx) {
 Floor.prototype.renderFg = function(ctx) {
     ctx.save();
     var drawY = this.level.getFloorTopY(this.floorNumber);
-    ctx.translate(0, drawY + 6);
+    ctx.translate(0, drawY - 3);
     Floor.fgSprites[this.id].draw(ctx, 0, 0);
     var alarmAlpha = this.alarm * Math.max(Math.sin(this.level.time * 3.5) * 0.8 + 0.2, 0);
     if (alarmAlpha > 0.01) {
