@@ -188,9 +188,10 @@ Level.prototype.hasFloorId = function(id) {
 Level.prototype.update = function(deltaTime) {
     this.stateTime += deltaTime;
     this.time += deltaTime;
+    this.elevator.update(deltaTime);
     for (var i = 0; i < this.floors.length; ++i) {
         this.floors[i].update(deltaTime);
-        if (this.floors[i].state === Floor.State.RENOVATED) {
+        if (this.floors[i].state === Floor.State.RENOVATED && this.floors[i].stateTime > 2) {
             var shuffledFloors = arrayUtil.shuffle(GameData.floors);
             var j = 0;
             while (this.hasFloorId(shuffledFloors[j].id)) {
@@ -199,7 +200,6 @@ Level.prototype.update = function(deltaTime) {
             this.floors[i] = this.createFloor(shuffledFloors[j], i);
         }
     }
-    this.elevator.update(deltaTime);
     for (var i = 0; i < this.characters.length;) {
         this.characters[i].update(deltaTime);
         if (this.characters[i].dead) {

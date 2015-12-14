@@ -20,6 +20,8 @@ var Floor = function(options) {
     this.alarm = 0;
     this.stateTime = 0;
     this.state = Floor.State.APPEARING;
+    this.doorVisual = 1.0;
+    this.doorOpen = false;
 };
 
 Floor.prototype.removeOccupant = function(toRemove) {
@@ -93,8 +95,11 @@ Floor.prototype.renderFg = function(ctx) {
         ctx.globalAlpha = alarmAlpha;
         Floor.alarmSprite.draw(ctx, 0, 0);
     }
-    if (this.state === Floor.State.RENOVATING || this.state === Floor.State.APPEARING) {
+    if (this.state === Floor.State.RENOVATING || this.state === Floor.State.APPEARING || this.state === Floor.State.RENOVATED) {
         var alpha = this.state === Floor.State.RENOVATING ? this.stateTime : 1.0 - this.stateTime;
+        if (this.state === Floor.State.RENOVATED) {
+            alpha = 1.0;
+        }
         ctx.globalAlpha = mathUtil.clamp(0, 1, alpha);
         Floor.renovationSprite.draw(ctx, 0, 0);
     }
@@ -168,11 +173,9 @@ Floor.prototype.update = function(deltaTime) {
         }
     }
 
-    if (this.canOpenDoor()) {
-        if (Math.round(this.elevator.floorNumber) == this.floorNumber) {
-            this.doorOpen = this.elevator.doorOpen;
-            this.doorVisual = this.elevator.doorVisual;
-        }
+    if (this.canOpenDoor() && Math.round(this.elevator.floorNumber) == this.floorNumber) {
+        this.doorOpen = this.elevator.doorOpen;
+        propertyToValue(this, 'doorVisual', this.elevator.doorVisual, deltaTime * 2 / this.level.elevatorDoorOpenTime);
     } else {
         this.doorOpen = false;
         propertyToValue(this, 'doorVisual', 1, deltaTime * 2);
