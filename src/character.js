@@ -166,7 +166,7 @@ BaseCharacter.prototype.renderIcon = function(ctx) {
         }
     }
     if (!drewIcon && (this.floorNumber !== this.goalFloor || this.elevator)) {
-        whiteBitmapFont.drawText(ctx, '' + (this.goalFloor + 1), 0, 0);
+        whiteBitmapFont.drawText(ctx, '' + (this.goalFloor + 1), 0, -3);
     }
 }
 
@@ -176,7 +176,7 @@ BaseCharacter.prototype.render = function(ctx) {
     ctx.translate(Math.floor(this.x), drawY);
     this.renderBody(ctx);
     ctx.save();
-    ctx.translate(0, -30);
+    ctx.translate(0, -28);
     ctx.textAlign = 'center';
     this.renderIcon(ctx);
     ctx.restore();
@@ -546,7 +546,7 @@ Runner.prototype.update = function(deltaTime) {
 Runner.prototype.renderIcon = function(ctx) {
     var drewIcon = false;    
     if (!drewIcon && this.alerting) {
-        whiteBitmapFont.drawText(ctx, '!', 0, 0);
+        whiteBitmapFont.drawText(ctx, '!', 0, -3);
         drewIcon = true;
     }
     if (!drewIcon) {
