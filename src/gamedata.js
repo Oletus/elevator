@@ -62,7 +62,17 @@ GameData.floors =
             {id: "horse", chance: 2},
             {id: "customer", chance: 1}
         ]
-    },  /*,
+    },
+    {
+        id: "battlefield",
+        name: "Battlefield",
+        spawnIds: [
+            {id: "soldier", chance: 4},
+            {id: "horse", chance: 1},
+            {id: "stretcher", chance: 1},
+            {id: "ghost", chance: 1}
+        ]
+    },     /*,
     {
         id: "bioweapon",
         name: "Bio weapons lab"
@@ -181,6 +191,12 @@ GameData.characters =
         characterConstructor: Character,
         weight: 1
     },
+    'soldier' : {
+        destinations : getAllButExcluded(),
+        characterConstructor: Character,
+        weight: 1,
+        immuneToScary: true
+    },
     'clown' : {
         destinations : getAllButExcluded(),
         characterConstructor: Character,
@@ -201,11 +217,26 @@ GameData.characters =
         maxTip: 30,
         takesSpaceInLine: false
     },
+    'stretcher' : {
+        destinations : getAllButExcluded(),
+        characterConstructor: Runner,
+        weight: 3,
+        width: 4,
+        minTip: 20,
+        maxTip: 30,
+        takesSpaceInLine: false,
+        numberOfLegs: 2,
+        legsSpread: 15,
+        immuneToScary: true
+    },
     'horse': {
         destinations : getAllButExcluded(),
         characterConstructor: Horse,
+        width: 4,
         weight: 2,
-        minTip: 5
+        minTip: 5,
+        numberOfLegs: 2,
+        legsSpread: 12
     },
     'ghost': {
         destinations : getAllButExcluded(),
@@ -219,7 +250,7 @@ GameData.characters =
     'car': {
         destinations : getAllButExcluded(),
         characterConstructor: Car,
-        weight: 10,
+        weight: 8,
         width: 6,
         minTip: 30
     },
