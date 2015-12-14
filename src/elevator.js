@@ -118,7 +118,7 @@ Elevator.prototype.update = function(deltaTime) {
         this.targetFloor = undefined;
         this.currentMovementSpeed = this.currentMovementSpeed * 0.9 + (appliedIntent * this.level.elevatorMoveSpeed) * 0.1;
     }
-    if (snappiness > 0.01 || moveIntent !== 0) {
+    if (snappiness > 0.01 || moveIntent !== 0 || !this.level.floors[Math.round(this.floorNumber)].canOpenDoor()) {
         this.doorOpenTimer -= deltaTime;
     }
     this.doorOpenTimer = mathUtil.clamp(0, this.level.elevatorDoorOpenTime, this.doorOpenTimer);
