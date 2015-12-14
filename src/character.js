@@ -386,6 +386,33 @@ var Horse = function(options) {
 Horse.prototype = new BaseCharacter();
 
 
+var Cat = function(options) {
+    this.initBase(options);
+    this.legsSprite = new AnimatedSpriteInstance(Cat.legsAnimation);
+};
+
+Cat.prototype = new BaseCharacter();
+
+Cat.legsAnimation = new AnimatedSprite({
+        'idle': [{src: 'catlegs2.png', duration: 0}],
+        'walking': [
+            {src: 'catlegs1.png'},
+            {src: 'catlegs2.png'},
+        ],
+},
+{
+    durationMultiplier: 1000 / 60,
+    defaultDuration: 5
+});
+
+Cat.prototype.renderBody = function(ctx) {
+    var flip = this.facingRight ? 1 : -1;
+    this.bodySprite.drawRotatedNonUniform(ctx, 0, -4 + Math.floor(Math.sin(this.bobbleTime * 15) * 1), 0, flip);
+    this.legsSprite.drawRotatedNonUniform(ctx, -2, -2, 0, flip);
+    this.legsSprite.drawRotatedNonUniform(ctx, 2, -2, 0, flip);
+};
+
+
 var BandMember = function(options) {
     this.initBase(options);
     this.hasBand = false;

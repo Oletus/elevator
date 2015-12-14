@@ -43,7 +43,7 @@ GameData.floors =
             {id: "runner", chance: 3},
             {id: "bandmember1", chance: 1},
             {id: "bandmember2", chance: 1},
-            {id: "groom", chance: 100},
+            {id: "groom", chance: 1},
             {id: "bride", chance: 1}
         ]
     },
@@ -71,7 +71,7 @@ GameData.floors =
             {id: "customer", chance: 1}
         ]
     },
-    {
+     {
         id: "battlefield",
         name: "Battlefield",
         spawnIds: [
@@ -80,7 +80,17 @@ GameData.floors =
             {id: "stretcher", chance: 1},
             {id: "ghost", chance: 1}
         ]
-    },     /*,
+    },
+    {
+        id: "catcafe",
+        name: "Cat Cafe",
+        spawnIds: [
+            {id: "customer", chance: 6},
+            {id: "cat", chance: 4},
+            {id: "groom", chance: 1},
+            {id: "bride", chance: 1}
+        ]
+    },    /*,
     {
         id: "bioweapon",
         name: "Bio weapons lab"
@@ -247,6 +257,15 @@ GameData.characters =
         minTip: 5,
         numberOfLegs: 2,
         legsSpread: 12
+    },
+    'cat': {
+        destinations : getAllButExcluded(),
+        characterConstructor: Cat,
+        width: 1,
+        weight: 0.5,
+        minTip: 1,
+        maxTip: 3,
+        numberOfLegs: 0
     },
     'ghost': {
         destinations : getAllButExcluded(),
