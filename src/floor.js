@@ -111,6 +111,14 @@ Floor.prototype.spawnCharacter = function() {
                 return false;
             }
         }
+        if (GameData.characters[id].idLimit !== undefined) {
+            var count = arrayUtil.count(that.level.characters, function(c) {
+                return (c.id === id);
+            });
+            if (count >= GameData.characters[id].idLimit) {
+                return false;
+            }
+        }
         return true;
     }
     

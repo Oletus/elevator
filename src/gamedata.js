@@ -20,7 +20,10 @@ GameData.floors =
             {id: "customer", chance: 5},
             {id: "horse", chance: 5},
             {id: "heavy", chance: 1},
-            {id: "bandmember1", chance: 100},
+            {id: "bandmember1", chance: 1},
+            {id: "bandmember2", chance: 1},
+            {id: "groom", chance: 1},
+            {id: "bride", chance: 1}
         ]
     },
     {
@@ -38,7 +41,10 @@ GameData.floors =
         spawnIds: [
             {id: "customer", chance: 3},
             {id: "runner", chance: 3},
-            {id: "bandmember2", chance: 100}
+            {id: "bandmember1", chance: 1},
+            {id: "bandmember2", chance: 1},
+            {id: "groom", chance: 1},
+            {id: "bride", chance: 1}
         ]
     },
     {
@@ -270,21 +276,23 @@ GameData.characters =
     'bandmember1': {
         destinations : getAllButExcluded(),
         characterConstructor: BandMember,
-        constructorLimit: 2,
+        idLimit: 1,
         weight: 1,
         width: 2,
-        minTip: 1,
-        maxTip: 1
+        minTip: 15,
+        maxTip: 15,
+        band: 'music'
     },
     'bandmember2': {
         destinations : getAllButExcluded(),
         characterConstructor: BandMember,
-        constructorLimit: 2,
+        idLimit: 1,
         weight: 1,
         width: 2,
-        minTip: 1,
-        maxTip: 1
-    }
+        minTip: 15,
+        maxTip: 15,
+        band: 'music'
+    },
     /*'bandmember3': {
         destinations : getAllButExcluded(),
         characterConstructor: BandMember,
@@ -294,6 +302,26 @@ GameData.characters =
         minTip: 1,
         maxTip: 1
     }*/
+    'groom': {
+        destinations : getAllButExcluded(),
+        characterConstructor: BandMember,
+        idLimit: 1,
+        weight: 1,
+        width: 2,
+        minTip: 20,
+        maxTip: 20,
+        band: 'wedding'
+    },
+    'bride': {
+        destinations : getAllButExcluded(),
+        characterConstructor: BandMember,
+        idLimit: 1,
+        weight: 1,
+        width: 2,
+        minTip: 20,
+        maxTip: 20,
+        band: 'wedding'
+    }
 };
 
 BaseCharacter.loadSprites();

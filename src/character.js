@@ -49,6 +49,8 @@ BaseCharacter.iconAnimation = new AnimatedSprite({
             {src: 'icon-music-playing3.png'},
             {src: 'icon-music-playing2.png'}
         ],
+        'wedding': [{src: 'icon-wedding.png', duration: 0}],
+        'wedding-playing': [{src: 'icon-wedding-playing.png', duration: 0}],
 },
 {
     durationMultiplier: 1000 / 60,
@@ -360,7 +362,7 @@ BaseCharacter.prototype.update = function(deltaTime) {
     }
     
     // Check if the character has left the level
-    if (this.x + this.width * TILE_WIDTH < -3 && this.floorNumber === this.goalFloor) {
+    if (this.x + this.width * TILE_WIDTH < -3 && wantOut) {
         this.dead = true;
     }
     if (this.floorNumber < -1) {
@@ -386,8 +388,9 @@ Horse.prototype = new BaseCharacter();
 var BandMember = function(options) {
     this.initBase(options);
     this.hasBand = false;
-    this.iconSprite.setAnimation('music');
     this.sinceBand = 0;
+    this.band = options.band;
+    this.iconSprite.setAnimation(this.band);
 };
 
 BandMember.prototype = new BaseCharacter();
@@ -405,11 +408,13 @@ BandMember.prototype.update = function(deltaTime) {
     if (!this.hasBand) {
         this.goalFloor = Math.round(this.floorNumber + 1) % this.level.floors.length;
         if (this.elevator) {
+            var band = this.band;
             var canPlay = function(c) {
                 return (c instanceof BandMember) &&
                        c.elevatorTargetX !== undefined &&
                        Math.abs(c.x - c.elevatorTargetX) < 0.1 &&
-                       !c.hasBand;
+                       !c.hasBand &&
+                       c.band === band;
             };
             var count = arrayUtil.count(this.elevator.occupants, canPlay);
             if (count > 1) {
@@ -417,11 +422,11 @@ BandMember.prototype.update = function(deltaTime) {
                 for (var i = 0; i < this.elevator.occupants.length; ++i) {
                     if (canPlay(this.elevator.occupants[i])) {
                         this.elevator.occupants[i].hasBand = true;
-                        this.elevator.occupants[i].iconSprite.setAnimation('music-playing');
+                        this.elevator.occupants[i].iconSprite.setAnimation(this.band + '-playing');
                     }
                 }
                 BaseCharacter.fanfareSound.play();
-                this.iconSprite.setAnimation('music-playing');
+                this.iconSprite.setAnimation(this.band + '-playing');
             }
         }
     } else {
