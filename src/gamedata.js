@@ -268,7 +268,8 @@ GameData.characters =
         weight: 0.5,
         minTip: 1,
         maxTip: 3,
-        numberOfLegs: 0
+        numberOfLegs: 0,
+        immuneToScary: true
     },
     'ghost': {
         destinations : getAllButExcluded(),
