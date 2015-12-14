@@ -90,6 +90,9 @@ Elevator.prototype.update = function(deltaTime) {
     if (this.reverseControls) {
         moveIntent = -moveIntent;
     }
+    if (this.level.state !== Level.State.IN_PROGRESS) {
+        moveIntent = 0;
+    }
     if (this.getTotalWeight() > 3) {
         var slowDown = Math.min((this.getTotalWeight() - 2) * 0.2, 0.8);
         moveIntent = Math.min(moveIntent, 1.0 - slowDown);
