@@ -394,9 +394,25 @@ Character.prototype = new BaseCharacter();
 
 var Horse = function(options) {
     this.initBase(options);
+    this.legsSprite = new AnimatedSpriteInstance(Horse.legsAnimation);
 };
 
 Horse.prototype = new BaseCharacter();
+
+Horse.legsAnimation = new AnimatedSprite({
+        'idle': [{src: 'horselegs-idle.png', duration: 0}],
+        'walking': [
+            {src: 'horselegs-walking1.png'},
+            {src: 'horselegs-walking2.png'},
+            {src: 'horselegs-walking3.png'},
+            {src: 'horselegs-walking4.png'},
+            {src: 'horselegs-walking5.png'}
+        ],
+},
+{
+    durationMultiplier: 1000 / 60,
+    defaultDuration: 5
+});
 
 
 var Cat = function(options) {
