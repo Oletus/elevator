@@ -6,11 +6,12 @@ GameData.floors =
         id: "acme",
         name: "Acme",
         spawnIds: [
-            {id: "customer", chance: 5},
+            {id: "customer", chance: 6},
             {id: "horse", chance: 1},
-            {id: "heavy", chance: 5},
+            {id: "heavy", chance: 4},
             {id: "runner", chance: 2},
-            {id: "renovator", chance: 1}
+            {id: "renovator", chance: 2},
+            {id: "magnetman", chance: 2}
         ]
     },
     {
@@ -51,9 +52,10 @@ GameData.floors =
         id: "garage",
         name: "Garage",
         spawnIds: [
-            {id: "customer", chance: 5},
+            {id: "customer", chance: 8},
             {id: "car", chance: 1},
-            {id: "renovator", chance: 1}
+            {id: "renovator", chance: 2},
+            {id: "magnetman", chance: 1}
         ]
     },
     {
@@ -348,6 +350,15 @@ GameData.characters =
         band: 'wedding',
         spawnWith: ['groom'],
         bandSize: 2
+    },
+    'magnetman': {
+        destinations : getAllButExcluded(),
+        characterConstructor: Reverser,
+        constructorLimit: 1,
+        weight: 1,
+        width: 2,
+        minTip: 30,
+        maxTip: 30,
     }
 };
 

@@ -28,6 +28,7 @@ var Elevator = function(options) {
     this.doorOpen = false;
     this.comboText = null;
     this.targetFloor = this.floorNumber;
+    this.reverseControls = false;
 };
 
 Elevator.sprite = new Sprite('lift.png');
@@ -86,6 +87,9 @@ Elevator.prototype.downRelease = function() {
 
 Elevator.prototype.update = function(deltaTime) {
     var moveIntent = this.moveUp + this.moveDown;
+    if (this.reverseControls) {
+        moveIntent = -moveIntent;
+    }
     if (this.getTotalWeight() > 3) {
         var slowDown = Math.min((this.getTotalWeight() - 2) * 0.2, 0.8);
         moveIntent = Math.min(moveIntent, 1.0 - slowDown);
@@ -128,6 +132,7 @@ Elevator.prototype.update = function(deltaTime) {
     var fromRight = this.maxWidthCapacity - this.getTotalUsedSpace();
     var usedSpace = 0;
     var scaryOccupants = false;
+    this.reverseControls = false;
     for (var i = 0; i < this.occupants.length;) {
         var occupant = this.occupants[i];
         occupant.elevatorTargetX = this.x + (this.maxWidthCapacity + 1 - fromRight - occupant.width * 0.5) * 6;
@@ -140,6 +145,9 @@ Elevator.prototype.update = function(deltaTime) {
             this.occupants.splice(i, 1);
         } else {
             ++i;
+        }
+        if (occupant.reversingControls) {
+            this.reverseControls = true;
         }
     }
     if (scaryOccupants) {

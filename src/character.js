@@ -42,6 +42,7 @@ BaseCharacter.legsAnimation = new AnimatedSprite({
 BaseCharacter.iconAnimation = new AnimatedSprite({
         'escaping': [{src: 'icon-escaping.png', duration: 0}],
         'renovating': [{src: 'icon-renovating.png', duration: 0}],
+        'reverse': [{src: 'icon-reverse.png', duration: 0}],
         'music': [{src: 'icon-music.png', duration: 0}],
         'music-playing': [
             {src: 'icon-music-playing1.png'},
@@ -92,7 +93,8 @@ BaseCharacter.prototype.initBase = function(options) {
         takesSpaceInLine: true,
         numberOfLegs: 1,
         legsSpread: 12,
-        spawnWith: null
+        spawnWith: null,
+        reversingControls: false
     };
     objectUtil.initWithDefaults(this, defaults, options);
     this.legsSprite = new AnimatedSpriteInstance(BaseCharacter.legsAnimation);
@@ -699,4 +701,31 @@ Renovator.prototype.update = function(deltaTime) {
 
 Renovator.prototype.renderIcon = function(ctx) {
     this.iconSprite.drawRotated(ctx, 0, 0, 0);
+};
+
+
+var Reverser = function(options) {
+    this.initBase(options);
+    this.iconSprite.setAnimation('reverse');
+};
+
+Reverser.prototype = new BaseCharacter();
+
+Reverser.prototype.update = function(deltaTime) {
+    BaseCharacter.prototype.update.call(this, deltaTime);
+    if (this.state === BaseCharacter.State.NORMAL) {
+        if (this.elevator && Math.abs(this.x - this.elevatorTargetX) < 0.05) {
+            this.reversingControls = true;
+        } else {
+            this.reversingControls = false;
+        }
+    }
+};
+
+Reverser.prototype.renderIcon = function(ctx) {
+    if (this.reversingControls && mathUtil.fmod(this.stateTime, 1) < 0.5) {
+        this.iconSprite.drawRotated(ctx, 0, 0, 0);
+    } else {
+        BaseCharacter.prototype.renderIcon.call(this, ctx);
+    }
 };
