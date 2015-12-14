@@ -259,6 +259,7 @@ GameData.characters =
     'renovator': {
         destinations : getAllButExcluded(),
         characterConstructor: Renovator,
+        constructorLimit: 1,
         weight: 1,
         width: 2,
         minTip: 0,
