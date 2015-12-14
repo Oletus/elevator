@@ -72,6 +72,8 @@ Game.prototype.render = function(ctx) {
 Game.prototype.startPress = function(playerNumber) {
     if (this.level.state === Level.State.FAIL && this.level.stateTime >= 0.5 ) {
         this.level = new Level();
+    } else if (this.level.state === Level.State.TITLE_SCREEN && this.level.stateTime > 0.5) {
+        this.level.goToState(Level.State.IN_PROGRESS);
     }
 };
 

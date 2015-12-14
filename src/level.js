@@ -20,7 +20,7 @@ var Level = function() {
     }
     this.characters = [];
     
-    this.goToState(Level.State.IN_PROGRESS);
+    this.goToState(Level.State.TITLE_SCREEN);
     Game.music.playSingular(true);
     
     this.characterMoveSpeed = 60;
@@ -36,7 +36,7 @@ var Level = function() {
         gravityY: 240
     });
     
-    this.levelOverFade = 0;
+    this.pauseFade = 1;
 };
 
 Level.prototype.createFloor = function(floorParameters, i) {
@@ -53,8 +53,9 @@ Level.prototype.createFloor = function(floorParameters, i) {
 };
 
 Level.State = {
-    IN_PROGRESS: 0,
-    FAIL: 1
+    TITLE_SCREEN: 0,
+    IN_PROGRESS: 1,
+    FAIL: 2
 };
 
 Level.moneySound = new Audio('money-chime');
@@ -69,6 +70,7 @@ Level.prototype.goToState = function(state) {
 }
 
 Level.failSprite = new Sprite('level-fail.png');
+Level.titleSprite = new Sprite('level-title.png');
 Level.topSprite = new Sprite('top.png');
 Level.bottomSprite = new Sprite('bottom.png');
 
@@ -143,20 +145,33 @@ Level.prototype.render = function(ctx) {
     
     ctx.restore();
     
-    if (this.state === Level.State.FAIL) {
-        ctx.globalAlpha = this.levelOverFade * 0.5;
+
+    if (this.pauseFade > 0) {
+        ctx.globalAlpha = this.pauseFade * 0.5;
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        ctx.globalAlpha = this.levelOverFade;
-        Level.failSprite.drawRotated(ctx, ctx.canvas.width * 0.5, ctx.canvas.height * 0.4, 0);
-        
-        ctx.textAlign = 'center';
-        bigBitmapFont.drawText(ctx, 'FINAL SCORE: ' + this.score, ctx.canvas.width * 0.5, ctx.canvas.height * 0.6);
-        
-        var key = game.input.getKeyInstruction(game.startPress, 0);
-        bigBitmapFont.drawText(ctx, 'PRESS ' + key + ' TO RESTART', ctx.canvas.width * 0.5, ctx.canvas.height * 0.7);
-        ctx.globalAlpha = 1.0;
     }
+    if (this.state === Level.State.FAIL || this.state === Level.State.TITLE_SCREEN) {
+        ctx.globalAlpha = this.pauseFade;
+        ctx.textAlign = 'center';
+
+        if (this.state === Level.State.TITLE_SCREEN) {
+            Level.titleSprite.drawRotated(ctx, ctx.canvas.width * 0.5, ctx.canvas.height * 0.3, 0);
+            bigBitmapFont.drawText(ctx, 'LD34 GAME BY: OLLI ETUAHO, KIMMO KESKINEN, SAKARI LEPPA, VALTTERI HEINONEN & ANASTASIA DIATLOVA',
+                                   ctx.canvas.width * 0.5 - (mathUtil.fmod(this.time * 0.05, 1) - 0.5) * ctx.canvas.width * 5, ctx.canvas.height * 0.57);
+        } else if (this.state === Level.State.FAIL) {
+            Level.failSprite.drawRotated(ctx, ctx.canvas.width * 0.5, ctx.canvas.height * 0.4, 0);
+            bigBitmapFont.drawText(ctx, 'FINAL SCORE: ' + this.score, ctx.canvas.width * 0.5, ctx.canvas.height * 0.6);
+        }
+
+        var key = game.input.getKeyInstruction(game.startPress, 0);
+        var whatNow = 'RESTART';
+        if (this.state === Level.State.TITLE_SCREEN) {
+            whatNow = 'START';
+        }
+        bigBitmapFont.drawText(ctx, 'PRESS ' + key + ' TO ' + whatNow, ctx.canvas.width * 0.5, ctx.canvas.height * 0.7);
+    }
+    ctx.globalAlpha = 1.0;
 };
 
 Level.prototype.hasFloorId = function(id) {
@@ -202,10 +217,10 @@ Level.prototype.update = function(deltaTime) {
     this.particles.update(deltaTime);
     BaseCharacter.coinAnimation.update(deltaTime); // Shared between all particles
     
-    if (this.state === Level.State.FAIL) {
-        propertyToValue(this, 'levelOverFade', 1, deltaTime);
+    if (this.state === Level.State.IN_PROGRESS) {
+        propertyToValue(this, 'pauseFade', 0, deltaTime);
     } else {
-        propertyToValue(this, 'levelOverFade', 0, deltaTime);
+        propertyToValue(this, 'pauseFade', 1, deltaTime);
     }
 };
 
