@@ -84,6 +84,12 @@ Level.prototype.spawnCharacter = function() {
     }
     var character = spawnFloor.spawnCharacter();
     this.characters.push(character);
+    if (character.spawnWith !== null) {
+        for (var j = 0; j < character.spawnWith.length; ++j) {
+            var character2 = shuffledFloors[(i + 1 + j) % shuffledFloors.length].spawnCharacter(character.spawnWith[j]);
+            this.characters.push(character2);
+        }
+    }
 };
 
 Level.prototype.getFloorTopY = function(floor) {

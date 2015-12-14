@@ -88,7 +88,8 @@ BaseCharacter.prototype.initBase = function(options) {
         scary: false,
         takesSpaceInLine: true,
         numberOfLegs: 1,
-        legsSpread: 12
+        legsSpread: 12,
+        spawnWith: null
     };
     objectUtil.initWithDefaults(this, defaults, options);
     this.legsSprite = new AnimatedSpriteInstance(BaseCharacter.legsAnimation);
@@ -391,6 +392,7 @@ var BandMember = function(options) {
     this.sinceBand = 0;
     this.band = options.band;
     this.iconSprite.setAnimation(this.band);
+    this.bandSize = options.bandSize ? options.bandSize : 2;
 };
 
 BandMember.prototype = new BaseCharacter();
@@ -417,16 +419,20 @@ BandMember.prototype.update = function(deltaTime) {
                        c.band === band;
             };
             var count = arrayUtil.count(this.elevator.occupants, canPlay);
-            if (count > 1) {
+            if (count >= this.bandSize) {
+                var commonGoal = Math.floor(Math.random() * this.level.floors.length);
                 this.hasBand = true;
                 for (var i = 0; i < this.elevator.occupants.length; ++i) {
-                    if (canPlay(this.elevator.occupants[i])) {
-                        this.elevator.occupants[i].hasBand = true;
-                        this.elevator.occupants[i].iconSprite.setAnimation(this.band + '-playing');
+                    var occupant = this.elevator.occupants[i];
+                    if (canPlay(occupant)) {
+                        occupant.hasBand = true;
+                        occupant.iconSprite.setAnimation(this.band + '-playing');
+                        occupant.goalFloor = commonGoal;
                     }
                 }
                 BaseCharacter.fanfareSound.play();
                 this.iconSprite.setAnimation(this.band + '-playing');
+                this.goalFloor = commonGoal;
             }
         }
     } else {

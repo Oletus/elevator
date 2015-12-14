@@ -43,7 +43,7 @@ GameData.floors =
             {id: "runner", chance: 3},
             {id: "bandmember1", chance: 1},
             {id: "bandmember2", chance: 1},
-            {id: "groom", chance: 1},
+            {id: "groom", chance: 100},
             {id: "bride", chance: 1}
         ]
     },
@@ -281,7 +281,9 @@ GameData.characters =
         width: 2,
         minTip: 15,
         maxTip: 15,
-        band: 'music'
+        band: 'music',
+        spawnWith: ['bandmember2'],
+        bandSize: 2
     },
     'bandmember2': {
         destinations : getAllButExcluded(),
@@ -291,7 +293,9 @@ GameData.characters =
         width: 2,
         minTip: 15,
         maxTip: 15,
-        band: 'music'
+        band: 'music',
+        spawnWith: ['bandmember1'],
+        bandSize: 2
     },
     /*'bandmember3': {
         destinations : getAllButExcluded(),
@@ -310,7 +314,9 @@ GameData.characters =
         width: 2,
         minTip: 20,
         maxTip: 20,
-        band: 'wedding'
+        band: 'wedding',
+        spawnWith: ['bride'],
+        bandSize: 2
     },
     'bride': {
         destinations : getAllButExcluded(),
@@ -320,7 +326,9 @@ GameData.characters =
         width: 2,
         minTip: 20,
         maxTip: 20,
-        band: 'wedding'
+        band: 'wedding',
+        spawnWith: ['groom'],
+        bandSize: 2
     }
 };
 

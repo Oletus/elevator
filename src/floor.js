@@ -100,43 +100,45 @@ Floor.prototype.renderFg = function(ctx) {
     ctx.restore();
 }
 
-Floor.prototype.spawnCharacter = function() {
-    var that = this;
-    var canSpawn = function(id) {
-        if (GameData.characters[id].constructorLimit !== undefined) {
-            var count = arrayUtil.count(that.level.characters, function(c) {
-                return (c instanceof GameData.characters[id].characterConstructor);
-            });
-            if (count >= GameData.characters[id].constructorLimit) {
-                return false;
+Floor.prototype.spawnCharacter = function(characterId) {
+    if (characterId === undefined) {
+        var that = this;
+        var canSpawn = function(id) {
+            if (GameData.characters[id].constructorLimit !== undefined) {
+                var count = arrayUtil.count(that.level.characters, function(c) {
+                    return (c instanceof GameData.characters[id].characterConstructor);
+                });
+                if (count >= GameData.characters[id].constructorLimit) {
+                    return false;
+                }
+            }
+            if (GameData.characters[id].idLimit !== undefined) {
+                var count = arrayUtil.count(that.level.characters, function(c) {
+                    return (c.id === id);
+                });
+                if (count >= GameData.characters[id].idLimit) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        var totalChance = 0;
+        for ( var i = 0; i < this.spawnIds.length; i++ ) {
+            if (canSpawn(this.spawnIds[i].id)) {
+                totalChance += this.spawnIds[i].chance;
             }
         }
-        if (GameData.characters[id].idLimit !== undefined) {
-            var count = arrayUtil.count(that.level.characters, function(c) {
-                return (c.id === id);
-            });
-            if (count >= GameData.characters[id].idLimit) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    var totalChance = 0;
-    for ( var i = 0; i < this.spawnIds.length; i++ ) {
-        if (canSpawn(this.spawnIds[i].id)) {
-            totalChance += this.spawnIds[i].chance;
-        }
-    }
-    var roll = Math.random() * totalChance;
-    var cumulativeChance = 0;
-    
-    for ( var i = 0; i < this.spawnIds.length; i++ ) {
-        if (canSpawn(this.spawnIds[i].id)) {
-            cumulativeChance += this.spawnIds[i].chance;
-            if ( roll <= cumulativeChance ) {
-                var characterId = this.spawnIds[i].id;
-                break;
+        var roll = Math.random() * totalChance;
+        var cumulativeChance = 0;
+        
+        for ( var i = 0; i < this.spawnIds.length; i++ ) {
+            if (canSpawn(this.spawnIds[i].id)) {
+                cumulativeChance += this.spawnIds[i].chance;
+                if ( roll <= cumulativeChance ) {
+                    characterId = this.spawnIds[i].id;
+                    break;
+                }
             }
         }
     }
