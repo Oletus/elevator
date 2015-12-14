@@ -505,7 +505,7 @@ BandMember.prototype.update = function(deltaTime) {
         }
     } else {
         this.sinceBand += deltaTime;
-        if (this.sinceBand > 0.7) {
+        if (this.sinceBand > Game.parameters['bandUnionDuration']) {
             changeState(this, BaseCharacter.State.NORMAL);
         }
     }
