@@ -69,6 +69,7 @@ Level.prototype.goToState = function(state) {
 
 Level.failSprite = new Sprite('level-fail.png');
 Level.topSprite = new Sprite('top.png');
+Level.bottomSprite = new Sprite('bottom.png');
 
 Level.prototype.spawnCharacter = function() {
     if (this.state !== Level.State.IN_PROGRESS) {
@@ -111,6 +112,9 @@ Level.prototype.getFloorCapacity = function() {
 Level.prototype.render = function(ctx) {
     ctx.save();
     ctx.translate(0, 6);
+    
+    var bottomY = this.getFloorTopY(-1) - 3;
+    Level.bottomSprite.draw(ctx, 0, bottomY);
 
     this.elevator.renderBg(ctx);
     for (var i = 0; i < this.floors.length; ++i) {
