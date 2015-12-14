@@ -198,7 +198,8 @@ GameData.characters =
         characterConstructor: Runner,
         weight: 1,
         minTip: 20,
-        maxTip: 30
+        maxTip: 30,
+        takesSpaceInLine: false
     },
     'horse': {
         destinations : getAllButExcluded(),

@@ -77,6 +77,7 @@ BaseCharacter.prototype.initBase = function(options) {
         moveSpeedMultiplier: 1,
         immuneToScary: false,
         scary: false,
+        takesSpaceInLine: true
     };
     objectUtil.initWithDefaults(this, defaults, options);
     this.legsSprite = new AnimatedSpriteInstance(BaseCharacter.legsAnimation);
@@ -393,7 +394,9 @@ Runner.prototype.update = function(deltaTime) {
     BaseCharacter.prototype.update.call(this, deltaTime);
     var doorThresholdX = this.level.getFloorWidth();
     if (this.state === BaseCharacter.State.INITIALIZING) {
+        // Cut to front of line conceptually
         this.level.floors[Math.round(this.floorNumber)].removeOccupant(this);
+        this.level.floors[Math.round(this.floorNumber)].occupants.splice(0, 0, this);
         changeState(this, BaseCharacter.State.APPROACHING);
         this.moveSpeedMultiplier = 1.0;
     } else if (this.state === BaseCharacter.State.APPROACHING) {
