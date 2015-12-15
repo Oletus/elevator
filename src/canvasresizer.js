@@ -76,6 +76,38 @@ var CanvasResizer = function(options) {
     this.resize();
     this._scale = 1.0;
     this._wrapCtx = null;
+    this._wrapCtxPixelate = null;
+};
+
+/**
+ * Create a wrapper for an object that forwards method calls and set/get on properties.
+ * @param {Object} toWrap Object to wrap.
+ * @param {function()=} excludeFromForwarding Function that takes a key string and returns true if it should be
+ *                      excluded from forwarding. Defaults to not excluding anything.
+ * @return {Object} Wrapped object.
+ */
+CanvasResizer.wrap = function(toWrap, excludeFromForwarding) {
+    if (excludeFromForwarding === undefined) {
+        excludeFromForwarding = function() { return false; };
+    }
+    var wrapper = {};
+    for (var prop in toWrap) {
+        (function(p) {
+            if (!excludeFromForwarding(p)) {
+                if (typeof toWrap[p] == 'function') {
+                    wrapper[p] = function() {
+                        toWrap[p].apply(toWrap, arguments); 
+                    };
+                } else  {
+                    Object.defineProperty(wrapper, p, {
+                        get: function() { return toWrap[p]; },
+                        set: function(v) { toWrap[p] = v; }
+                    });
+                }
+            }
+        })(prop);
+    }
+    return wrapper;
 };
 
 CanvasResizer.Mode = {
@@ -165,24 +197,10 @@ CanvasResizer.prototype.render = function() {
 
         // Wrap the context so that when ctx.canvas.width/height is queried, they return the coordinate system width/height.
         if (this._wrapCtx == null) {
-            var wrapCtx = {};
-            for (var prop in ctx) {
-                if (prop.indexOf('webkit') != 0) {
-                    (function(p) {
-                        if (typeof ctx[prop] == 'function') {
-                            wrapCtx[p] = function() {
-                                ctx[p].apply(ctx, arguments); 
-                            };
-                        } else if (prop != 'canvas') {
-                            Object.defineProperty(wrapCtx, p, {
-                                get: function() { return ctx[p]; },
-                                set: function(v) { ctx[p] = v; }
-                            });
-                        }
-                    })(prop);
-                }
-            }
-            
+            var wrapCtx = CanvasResizer.wrap(ctx, function(prop) {
+                return (prop.indexOf('webkit') === 0 || prop === 'canvas');
+            });
+
             wrapCtx.canvas = {};
             var that = this;
             Object.defineProperty(wrapCtx.canvas, 'width', {
@@ -194,6 +212,55 @@ CanvasResizer.prototype.render = function() {
             this._wrapCtx = wrapCtx;
         }
         return this._wrapCtx;
+    }
+    if (this.mode == CanvasResizer.Mode.FIXED_RESOLUTION) {
+        var ctx = this.canvas.getContext('2d');
+        if (this._wrapCtxPixelate == null) {
+            var pixelatingStack = [true];
+            var wrapCtx = CanvasResizer.wrap(ctx, function(prop) {
+                return (prop.indexOf('webkit') === 0 || 
+                       prop == 'translate' || prop == 'scale' || prop == 'rotate' ||
+                       prop == 'transform' || prop == 'setTransform' ||
+                       prop == 'save' || prop == 'restore');
+            });
+            wrapCtx.translate = function(x, y) {
+                if (pixelatingStack[pixelatingStack.length - 1]) {
+                    ctx.translate(Math.round(x), Math.round(y));
+                } else {
+                    ctx.translate(x, y);
+                }
+            };
+            wrapCtx.scale = function(x, y) {
+                if (Math.round(x) !== x || Math.round(y) !== y) {
+                    pixelatingStack[pixelatingStack.length - 1] = false;
+                }
+                ctx.scale(x, y);
+            };
+            wrapCtx.rotate = function(angle) {
+                if (angle !== 0) {
+                    pixelatingStack[pixelatingStack.length - 1] = false;
+                }
+                ctx.rotate(angle);
+            };
+            wrapCtx.transform = function(a, b, c, d, e, f) {
+                pixelatingStack[pixelatingStack.length - 1] = false;
+                ctx.transform(a, b, c, d, e, f);
+            };
+            wrapCtx.setTransform = function(a, b, c, d, e, f) {
+                pixelatingStack[pixelatingStack.length - 1] = false;
+                ctx.setTransform(a, b, c, d, e, f);
+            };
+            wrapCtx.save = function() {
+                pixelatingStack.push(pixelatingStack[pixelatingStack.length - 1]);
+                ctx.save();
+            };
+            wrapCtx.restore = function() {
+                pixelatingStack.pop();
+                ctx.restore();
+            };
+            this._wrapCtxPixelate = wrapCtx;
+        }
+        return this._wrapCtxPixelate;
     }
 };
 

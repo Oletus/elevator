@@ -146,6 +146,36 @@ objectUtil.initWithDefaults = function(obj, defaults, options) {
     }
 };
 
+/**
+ * Create a wrapper for an object that forwards method calls and set/get on properties.
+ * @param {Object} toWrap Object to wrap.
+ * @param {function()=} excludeFromForwarding Function that takes a key string and returns true if it should be
+ *                      excluded from forwarding. Defaults to not excluding anything.
+ * @return {Object} Wrapped object.
+ */
+objectUtil.wrap = function(toWrap, excludeFromForwarding) {
+    if (excludeFromForwarding === undefined) {
+        excludeFromForwarding = function() { return false; };
+    }
+    var wrapper = {};
+    for (var prop in toWrap) {
+        (function(p) {
+            if (!excludeFromForwarding(p)) {
+                if (typeof toWrap[p] == 'function') {
+                    wrapper[p] = function() {
+                        toWrap[p].apply(toWrap, arguments); 
+                    };
+                } else  {
+                    Object.defineProperty(wrapper, p, {
+                        get: function() { return toWrap[p]; },
+                        set: function(v) { toWrap[p] = v; }
+                    });
+                }
+            }
+        })(prop);
+    }
+    return wrapper;
+};
 
 
 
