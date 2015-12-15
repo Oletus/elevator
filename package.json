@@ -6,5 +6,9 @@
   "license": "?",
   "dependencies": {
     "howler": "^1.1.28"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-fluent-ffmpeg": "^1.0.2"
   }
 }
