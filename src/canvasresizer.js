@@ -48,7 +48,6 @@ var CanvasResizer = function(options) {
     this.canvasWidthToHeight = this.width / this.height;
 
     if (this.mode === CanvasResizer.Mode.FIXED_RESOLUTION) {
-        this.canvas.style.imageRendering = 'pixelated';
         this.canvas.width = this.width;
         this.canvas.height = this.height;
     }
@@ -75,8 +74,9 @@ var CanvasResizer = function(options) {
     window.addEventListener('resize', resize, false);
     this.resize();
     this._scale = 1.0;
-    this._wrapCtx = null;
-    this._wrapCtxPixelate = null;
+    this._wrapCtx = null; // Wrapper context for coordinate system change
+    this._wrapCtxPixelate = null; // Wrapper context for automatically aligning pixel art
+    this._copyCanvas = null; // For upscaling pixelated copy of the image
 };
 
 /**
@@ -139,6 +139,108 @@ CanvasResizer.prototype.resize = function() {
  * Do nothing. This function exists just for mainloop.js compatibility.
  */
 CanvasResizer.prototype.update = function() {
+};
+
+/**
+ * @return {Object} An object with render() and update() functions. render() will display an upscaled pixelated
+ * canvas instead of the regular CanvasResizer canvas when supporting the CanvasResizer mode requires that.
+ */
+CanvasResizer.prototype.pixelator = function() {
+    var that = this;
+    var gl;
+    var tex;
+    var initCopyCanvas = function() {
+        that._copyCanvas = document.createElement('canvas');
+        gl = that._copyCanvas.getContext('webgl') || that._copyCanvas.getContext('experimental-webgl');
+        if (gl) {
+            // Shaders
+            var vertSrc = [
+                'attribute vec2 aVertexPosition;',
+                'varying vec2 vTexCoord;',
+                'void main() {',
+                '    gl_Position = vec4(aVertexPosition * 2.0 - vec2(1.0), 0.0, 1.0);',
+                '    vTexCoord = vec2(aVertexPosition.x, 1.0 - aVertexPosition.y);',
+                '}'
+            ].join('\n');
+            var fragSrc = [
+                'precision mediump float;',
+                'uniform sampler2D uTex;',
+                'varying vec2 vTexCoord;',
+                'void main() {',
+                '    gl_FragColor = texture2D(uTex, vTexCoord);',
+                '}'
+            ].join('\n');
+            var positionAttribLocation = 0;
+            var vertShader = gl.createShader(gl.VERTEX_SHADER);
+            gl.shaderSource(vertShader, vertSrc);
+            gl.compileShader(vertShader);
+            var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+            gl.shaderSource(fragShader, fragSrc);
+            gl.compileShader(fragShader);
+            var program = gl.createProgram();
+            gl.attachShader(program, vertShader);
+            gl.attachShader(program, fragShader);
+            gl.bindAttribLocation(program, positionAttribLocation, "aVertexPosition");
+            gl.linkProgram(program);
+            gl.useProgram(program);
+            if (gl.getProgramParameter(program, gl.LINK_STATUS) === 0) {
+                gl = null;
+                return;
+            }
+            
+            // Vertex buffer
+            var positionData = new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0]);
+            var vertexBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.DYNAMIC_DRAW);
+            gl.vertexAttribPointer(positionAttribLocation, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(0);
+            
+            // Texture
+            tex = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, tex);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        }
+    }
+    var drawToCopyCanvas = function(canvas) {
+        // Replace original canvas on page
+        if (that.canvas.parentNode === that.parentElement) {
+            that.parentElement.replaceChild(that._copyCanvas, that.canvas);
+        }
+        that._copyCanvas.width = that.canvas.width * that._canvasPixelationRatio;
+        that._copyCanvas.height = that.canvas.height * that._canvasPixelationRatio;
+        that._copyCanvas.style.marginLeft = that.canvas.style.marginLeft;
+        that._copyCanvas.style.marginTop = that.canvas.style.marginTop;
+        that._copyCanvas.style.width = that.canvas.style.width;
+        that._copyCanvas.style.height = that.canvas.style.height;
+        gl.viewport(0, 0, that._copyCanvas.width, that._copyCanvas.height);
+        gl.clearColor(0, 0, 0, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, that.canvas);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+    return {
+        update: function() {},
+        render: function() {
+            if (that.mode === CanvasResizer.Mode.FIXED_RESOLUTION) {
+                if (!that.canvas.style.imageRendering) {
+                    if (!that._copyCanvas) {
+                        initCopyCanvas();
+                    }
+                    if (gl) {
+                        drawToCopyCanvas(that.canvas);
+                    }
+                }
+            }
+            else if (that._copyCanvas && that._copyCanvas.parentNode === that.parentElement) {
+                that.parentElement.replaceChild(that.canvas, that._copyCanvas);
+            }
+        }
+    }
 };
 
 /**
@@ -331,7 +433,9 @@ CanvasResizer.prototype.changeCanvasDimensions = function(width, height) {
  */
 CanvasResizer.prototype.changeMode = function(mode) {
     this.mode = mode;
-    this.canvas.style.imageRendering = 'auto';
+    if ('imageRendering' in this.canvas.style) {
+        this.canvas.style.imageRendering = 'auto';
+    }
     this.resize();
 };
 
@@ -396,15 +500,26 @@ CanvasResizer.prototype._resizeFixedResolution = function() {
                 styleWidth = parentWidth;
                 styleHeight = Math.floor(styleWidth / this.canvasWidthToHeight);
             }
-            this.canvas.style.imageRendering = 'auto';
+            if ('imageRendering' in this.canvas.style) {
+                this.canvas.style.imageRendering = 'auto';
+            }
         } else {
             var i = 1;
             while ((i + 1) * this.width <= maxWidth && (i + 1) * this.height <= maxHeight) {
                 ++i;
             }
+            this._canvasPixelationRatio = i;
             styleWidth = (this.width * i) / window.devicePixelRatio;
             styleHeight = (this.height * i) / window.devicePixelRatio;
-            this.canvas.style.imageRendering = 'pixelated';
+            if ('imageRendering' in this.canvas.style) {
+                this.canvas.style.imageRendering = 'pixelated';
+                if (!this.canvas.style.imageRendering || this.canvas.style.imageRendering === 'auto') {
+                    this.canvas.style.imageRendering = '-moz-crisp-edges';
+                }
+                if (!this.canvas.style.imageRendering || this.canvas.style.imageRendering === 'auto') {
+                    this.canvas.style.imageRendering = '-webkit-optimize-contrast';
+                }
+            }
         }
     } else if (this.mode === CanvasResizer.Mode.FIXED_RESOLUTION_INTERPOLATED) {
         if (parentWidthToHeight > this.canvasWidthToHeight) {
