@@ -114,7 +114,11 @@ Level.prototype.getFloorCapacity = function() {
 
 Level.prototype.render = function(ctx) {
     ctx.save();
-    ctx.translate(0, 6);
+    var xTranslate = ctx.canvas.width * 0.5 - 6 * 16;
+    var yTranslate = ctx.canvas.height * 0.5 - 6 * 25;
+    ctx.translate(xTranslate, yTranslate);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(-xTranslate, -yTranslate - 1, ctx.canvas.width, yTranslate + 1);
     
     var bottomY = this.getFloorTopY(-1) - 3;
     Level.bottomSprite.draw(ctx, 0, bottomY);
@@ -174,6 +178,20 @@ Level.prototype.render = function(ctx) {
         }
     }
     ctx.globalAlpha = 1.0;
+    
+    ctx.save();
+    ctx.translate(xTranslate, yTranslate);
+    ctx.fillStyle = '#000'
+    // Black borders on left and right side of the level
+    //ctx.fillRect(-xTranslate, 0, xTranslate, ctx.canvas.height);
+    //ctx.fillRect(32 * 6, 0, ctx.canvas.width, ctx.canvas.height);
+    if (yTranslate > 5 * 6) {
+        // Black border above level
+        ctx.fillRect(-xTranslate, -yTranslate, ctx.canvas.width, yTranslate - 5 * 6);
+    }
+    // Black border below level
+    ctx.fillRect(0, 51 * 6, 32 * 6, ctx.canvas.height);
+    ctx.restore();
 };
 
 Level.prototype.hasFloorId = function(id) {

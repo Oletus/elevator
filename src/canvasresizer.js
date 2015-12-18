@@ -7,13 +7,17 @@
  * @param {Object} options Object with the following optional keys:
  *  canvas: HTMLCanvasElement (one is created by default)
  *  mode: CanvasResizer.Mode (defaults to filling the window)
- *  width: number Width of the coordinate space.
- *  height: number Height of the coordinate space.
+ *  width: number Width of the canvas coordinate space.
+ *  height: number Height of the canvas coordinate space.
  *  parentElement: HTMLElement (defaults to the document body)
  *  wrapperElement: HTMLElement Optional wrapper element that tightly wraps
  *      the canvas. Useful for implementing HTML-based UI on top of the canvas.
  *      The wrapper element should already be the parent of the canvas when it
  *      is passed in.
+ *  maxInterpolatedScale: Only has an effect in FIXED_RESOLUTION or MINIMUM_*
+ *      mode. Maximum scale at which the canvas will be drawn interpolated
+ *      instead of pixelated. Good for games targeting mobile where having
+ *      unused areas of the screen at the edges should be avoided.
  */
 var CanvasResizer = function(options) {
     var defaults = {
@@ -22,7 +26,8 @@ var CanvasResizer = function(options) {
         width: 16,
         height: 9,
         parentElement: document.body,
-        wrapperElement: null
+        wrapperElement: null,
+        maxInterpolatedScale: 2
     };
 
     for(var key in defaults) {
@@ -70,13 +75,18 @@ var CanvasResizer = function(options) {
         this.parentElement.appendChild(this.wrapperElement);
         // Assume that wrapper already wraps the canvas - don't re-append the
         // canvas to the wrapper since the wrapper might have other children.
+        if (this.canvas.parentNode !== this.wrapperElement) {
+            console.log("Warning: canvas is not a child of wrapperElement in CanvasResizer");
+        }
     }
+    this.parentElement.style.position = 'relative'; // Needed for workaround when "imageRendering" is not supported.
     window.addEventListener('resize', resize, false);
     this.resize();
     this._scale = 1.0;
     this._wrapCtx = null; // Wrapper context for coordinate system change
     this._wrapCtxPixelate = null; // Wrapper context for automatically aligning pixel art
     this._copyCanvas = null; // For upscaling pixelated copy of the image
+    this._pixelator = null;
 };
 
 /**
@@ -123,7 +133,14 @@ CanvasResizer.Mode = {
     FIXED_ASPECT_RATIO: 3,
     // Make the canvas fill the containing element completely, with the
     // coordinate space being set according to the canvas dimensions:
-    DYNAMIC: 4
+    DYNAMIC: 4,
+    // Set minimum resolution for the canvas, but with the option to have a
+    // bit more on the edges:
+    MINIMUM_RESOLUTION: 5,
+    // Set fixed width but minimum height for the canvas:
+    MINIMUM_HEIGHT: 6,
+    // Set fixed height but minimum width for the canvas:
+    MINIMUM_WIDTH: 7
 };
 
 /**
@@ -146,6 +163,9 @@ CanvasResizer.prototype.update = function() {
  * canvas instead of the regular CanvasResizer canvas when supporting the CanvasResizer mode requires that.
  */
 CanvasResizer.prototype.pixelator = function() {
+    if (this._pixelator) {
+        return this._pixelator;
+    }
     var that = this;
     var gl;
     var tex;
@@ -207,8 +227,14 @@ CanvasResizer.prototype.pixelator = function() {
     }
     var drawToCopyCanvas = function(canvas) {
         // Replace original canvas on page
-        if (that.canvas.parentNode === that.parentElement) {
-            that.parentElement.replaceChild(that._copyCanvas, that.canvas);
+        if (that._copyCanvas.parentNode !== that.parentElement)
+        {
+            // Hack: the original canvas is kept around with opacity 0 so that it can still handle events.
+            that.canvas.style.opacity = "0";
+            that.canvas.style.position = "absolute";
+            that.canvas.style.left = "0";
+            that.canvas.style.top = "0";
+            that.parentElement.insertBefore(that._copyCanvas, that.canvas);
         }
         that._copyCanvas.width = that.canvas.width * that._canvasPixelationRatio;
         that._copyCanvas.height = that.canvas.height * that._canvasPixelationRatio;
@@ -223,10 +249,12 @@ CanvasResizer.prototype.pixelator = function() {
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, that.canvas);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
-    return {
+    this._pixelator = {
         update: function() {},
         render: function() {
-            if (that.mode === CanvasResizer.Mode.FIXED_RESOLUTION) {
+            if ((that.mode === CanvasResizer.Mode.FIXED_RESOLUTION ||
+                 that._isInMinMode()) &&
+                that._canvasPixelationRatio >= that.maxInterpolatedScale) {
                 if (!that.canvas.style.imageRendering) {
                     if (!that._copyCanvas) {
                         initCopyCanvas();
@@ -237,10 +265,12 @@ CanvasResizer.prototype.pixelator = function() {
                 }
             }
             else if (that._copyCanvas && that._copyCanvas.parentNode === that.parentElement) {
-                that.parentElement.replaceChild(that.canvas, that._copyCanvas);
+                that.canvas.style.opacity = "1";
+                that.parentElement.removeChild(that._copyCanvas);
             }
         }
-    }
+    };
+    return this._pixelator;
 };
 
 /**
@@ -254,6 +284,7 @@ CanvasResizer.prototype.render = function() {
         var parentHeight = parentProperties.height;
         var parentWidthToHeight = parentProperties.widthToHeight;
         if (this.mode === CanvasResizer.Mode.FIXED_RESOLUTION ||
+            this._isInMinMode() ||
             this.mode === CanvasResizer.Mode.FIXED_RESOLUTION_INTERPOLATED) {
             this._resizeFixedResolution();
         } else if (this.mode === CanvasResizer.Mode.FIXED_COORDINATE_SYSTEM ||
@@ -315,7 +346,8 @@ CanvasResizer.prototype.render = function() {
         }
         return this._wrapCtx;
     }
-    if (this.mode == CanvasResizer.Mode.FIXED_RESOLUTION) {
+    if (this.mode === CanvasResizer.Mode.FIXED_RESOLUTION ||
+        this._isInMinMode()) {
         var ctx = this.canvas.getContext('2d');
         if (this._wrapCtxPixelate == null) {
             var pixelatingStack = [true];
@@ -446,6 +478,7 @@ CanvasResizer.prototype.getScale = function() {
     if (this.mode === CanvasResizer.Mode.FIXED_COORDINATE_SYSTEM) {
         return this.canvas.width / this.width;
     } else if (this.mode === CanvasResizer.Mode.FIXED_RESOLUTION ||
+               this._isInMinMode() ||
                this.mode === CanvasResizer.Mode.FIXED_RESOLUTION_INTERPOLATED)
     {
         return this._scale;
@@ -472,12 +505,19 @@ CanvasResizer.prototype._getParentProperties = function() {
     return parentProperties;
 };
 
+CanvasResizer.prototype._isInMinMode = function() {
+    return this.mode === CanvasResizer.Mode.MINIMUM_RESOLUTION ||
+           this.mode === CanvasResizer.Mode.MINIMUM_HEIGHT ||
+           this.mode === CanvasResizer.Mode.MINIMUM_WIDTH;
+}
+
 /**
  * Resize the canvas in one of the fixed resolution modes.
  * @protected
  */
 CanvasResizer.prototype._resizeFixedResolution = function() {
     if (this.mode !== CanvasResizer.Mode.FIXED_RESOLUTION &&
+        !this._isInMinMode() &&
         this.mode !== CanvasResizer.Mode.FIXED_RESOLUTION_INTERPOLATED) {
         return;
     }
@@ -489,28 +529,32 @@ CanvasResizer.prototype._resizeFixedResolution = function() {
     var parentWidthToHeight = parentProperties.widthToHeight;
     var styleWidth = 0;
     var styleHeight = 0;
-    if (this.mode === CanvasResizer.Mode.FIXED_RESOLUTION) {
+    if (this.mode === CanvasResizer.Mode.FIXED_RESOLUTION ||
+        this._isInMinMode()) {
         var maxWidth = parentWidth * window.devicePixelRatio;
         var maxHeight = parentHeight * window.devicePixelRatio;
-        if (this.canvas.width > maxWidth || this.canvas.height > maxHeight) {
+        var scale = 1;
+        if (this.width * this.maxInterpolatedScale > maxWidth || this.height * this.maxInterpolatedScale > maxHeight) {
             if (parentWidthToHeight > this.canvasWidthToHeight) {
+                // Height is the limiting factor
                 styleHeight = parentHeight;
                 styleWidth = Math.floor(this.canvasWidthToHeight * styleHeight);
+                scale = parentHeight * window.devicePixelRatio / this.height;
             } else {
+                // Width is the limiting factor
                 styleWidth = parentWidth;
                 styleHeight = Math.floor(styleWidth / this.canvasWidthToHeight);
+                scale = parentWidth * window.devicePixelRatio / this.width;
             }
             if ('imageRendering' in this.canvas.style) {
                 this.canvas.style.imageRendering = 'auto';
             }
         } else {
-            var i = 1;
-            while ((i + 1) * this.width <= maxWidth && (i + 1) * this.height <= maxHeight) {
-                ++i;
+            while ((scale + 1) * this.width <= maxWidth && (scale + 1) * this.height <= maxHeight) {
+                ++scale;
             }
-            this._canvasPixelationRatio = i;
-            styleWidth = (this.width * i) / window.devicePixelRatio;
-            styleHeight = (this.height * i) / window.devicePixelRatio;
+            styleWidth = (this.width * scale) / window.devicePixelRatio;
+            styleHeight = (this.height * scale) / window.devicePixelRatio;
             if ('imageRendering' in this.canvas.style) {
                 this.canvas.style.imageRendering = 'pixelated';
                 if (!this.canvas.style.imageRendering || this.canvas.style.imageRendering === 'auto') {
@@ -521,6 +565,21 @@ CanvasResizer.prototype._resizeFixedResolution = function() {
                 }
             }
         }
+        if (this._isInMinMode()) {
+            var w = this.width;
+            var h = this.height;
+            while (scale * (w + 1) <= maxWidth && this.mode !== CanvasResizer.Mode.MINIMUM_HEIGHT) {
+                w++;
+            }
+            while (scale * (h + 1) <= maxHeight && this.mode !== CanvasResizer.Mode.MINIMUM_WIDTH) {
+                h++;
+            }
+            styleWidth = w * scale / window.devicePixelRatio;
+            styleHeight = h * scale / window.devicePixelRatio;
+            this.canvas.width = w;
+            this.canvas.height = h;
+        }
+        this._canvasPixelationRatio = scale;
     } else if (this.mode === CanvasResizer.Mode.FIXED_RESOLUTION_INTERPOLATED) {
         if (parentWidthToHeight > this.canvasWidthToHeight) {
             styleHeight = parentHeight;
