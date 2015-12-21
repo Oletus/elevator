@@ -15,9 +15,9 @@
  *      The wrapper element should already be the parent of the canvas when it
  *      is passed in.
  *  maxInterpolatedScale: Only has an effect in FIXED_RESOLUTION or MINIMUM_*
- *      mode. Maximum scale at which the canvas will be drawn interpolated
+ *      modes. Maximum scale at which the canvas will be drawn interpolated
  *      instead of pixelated. Good for games targeting mobile where having
- *      unused areas of the screen at the edges should be avoided.
+ *      large unused areas (black bars) on the screen should be avoided.
  */
 var CanvasResizer = function(options) {
     var defaults = {
@@ -134,8 +134,9 @@ CanvasResizer.Mode = {
     // Make the canvas fill the containing element completely, with the
     // coordinate space being set according to the canvas dimensions:
     DYNAMIC: 4,
-    // Set minimum resolution for the canvas, but with the option to have a
-    // bit more on the edges:
+    // Set minimum resolution for the canvas with zoom levels that are identical
+    // to FIXED_RESOLUTION, but also extend it from the edges to fill the
+    // parent element:
     MINIMUM_RESOLUTION: 5,
     // Set fixed width but minimum height for the canvas:
     MINIMUM_HEIGHT: 6,
@@ -417,7 +418,7 @@ CanvasResizer.prototype.getCanvasPosition = function(event, touchIdentifier) {
         var touchIndex = 0;
         if (touchIdentifier !== undefined) {
             for (var i = 0; i < event.touches.length; ++i) {
-                if (event.touches[i].identifier === touchIdentifier) {
+                if (('' + event.touches[i].identifier) === ('' + touchIdentifier)) {
                     touchIndex = i;
                     break;
                 }
