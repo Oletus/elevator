@@ -404,15 +404,27 @@ CanvasResizer.prototype.render = function() {
  * @param {MouseEvent|PointerEvent|TouchEvent} Event to get the position from.
  * In case of a touch event, the position is retrieved from the first touch
  * point.
+ * @param {string=} touchIdentifier In case the event is a touch event, the
+ * identifier of the touch point to get the position from. By default uses
+ * the first entry in event.touches.
  * @return {Object} Object with x and y keys for horizontal and vertical
  * positions in the canvas coordinate space.
  */
-CanvasResizer.prototype.getCanvasPosition = function(event) {
+CanvasResizer.prototype.getCanvasPosition = function(event, touchIdentifier) {
     var rect = this.canvas.getBoundingClientRect();
     var x, y;
     if (event.touches !== undefined && event.touches.length > 0) {
-        x = event.touches[0].clientX;
-        y = event.touches[0].clientY;
+        var touchIndex = 0;
+        if (touchIdentifier !== undefined) {
+            for (var i = 0; i < event.touches.length; ++i) {
+                if (event.touches[i].identifier === touchIdentifier) {
+                    touchIndex = i;
+                    break;
+                }
+            }
+        }
+        x = event.touches[touchIndex].clientX;
+        y = event.touches[touchIndex].clientY;
     } else {
         x = event.clientX;
         y = event.clientY;

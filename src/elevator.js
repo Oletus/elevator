@@ -18,6 +18,8 @@ var Elevator = function(options) {
     // Player intent for moving
     this.moveUp = 0;
     this.moveDown = 0;
+    this.touchMoveUp = 0;
+    this.touchMoveDown = 0;
     this.currentMovementSpeed = 0;
 
     objectUtil.initWithDefaults(this, defaults, options);
@@ -86,7 +88,8 @@ Elevator.prototype.downRelease = function() {
 };
 
 Elevator.prototype.update = function(deltaTime) {
-    var moveIntent = this.moveUp + this.moveDown;
+    var moveIntent = mathUtil.clamp(-1, 1, this.moveUp + this.touchMoveUp) +
+                     mathUtil.clamp(-1, 1, this.moveDown + this.touchMoveDown);
     if (this.reverseControls) {
         moveIntent = -moveIntent;
     }

@@ -294,6 +294,26 @@ Level.prototype.downRelease = function(playerNumber) {
     this.elevator.downRelease();
 };
 
+Level.prototype.canvasPress = function(pos) {
+    if (pos.x > 140) {
+        if (pos.y > 312 / 2) {
+            this.elevator.touchMoveDown -= 1;
+        } else {
+            this.elevator.touchMoveUp += 1;
+        }
+    }
+};
+
+Level.prototype.canvasRelease = function(pos) {
+    if (pos.x > 140) {
+        if (pos.y > 312 / 2) {
+            this.elevator.touchMoveDown += 1;
+        } else {
+            this.elevator.touchMoveUp -= 1;
+        }
+    }
+};
+
 Level.getTotalUsedSpace = function(occupants) {
     var usedSpace = 0;
     for (var i = 0; i < occupants.length; ++i) {
