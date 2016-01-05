@@ -32,7 +32,7 @@ Audio.audioPath = 'assets/audio/';
 <script src="src/util2d.js"></script>
 <script src="src/utiljs.js"></script>
 <script src="src/tilemap.js"></script>
-<script src="src/bitmapfont.js"></script>
+<script src="src/monospacebitmapfont.js"></script>
 
 <script src="src/elevator.js"></script>
 <script src="src/level.js"></script>
@@ -132,9 +132,9 @@ Game.prototype.update = function(deltaTime) {
 
 var DEV_MODE = (window.location.href.indexOf("?devMode") != -1);
 
-var blackBitmapFont = new BitmapFont({color: 'black'});
-var whiteBitmapFont = new BitmapFont({color: 'white'});
-var bigBitmapFont = new BitmapFont({spriteSrc: 'bitmapfont-big.png', characterWidth: 8, characterHeight: 12});
+var blackBitmapFont = new MonospaceBitmapFont({color: 'black'});
+var whiteBitmapFont = new MonospaceBitmapFont({color: 'white'});
+var bigBitmapFont = new MonospaceBitmapFont({spriteSrc: 'bitmapfont-big.png', characterWidth: 8, characterHeight: 12});
 
 Game.music = new Audio('elevator_music');
 Game.gameOverSound = new Audio('gameover');

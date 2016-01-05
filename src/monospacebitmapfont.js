@@ -1,6 +1,11 @@
+'use strict';
 
-
-var BitmapFont = function(options) {
+/**
+ * Monospace bitmap font that uses a simple ASCII grid sprite sheet.
+ * @param {Object} options Constructor options.
+ * @constructor
+ */
+var MonospaceBitmapFont = function(options) {
     var defaults = {
         spriteSrc: 'bitmapfont.png',
         characterHeight: 6,
@@ -17,10 +22,15 @@ var BitmapFont = function(options) {
 
 };
 
-BitmapFont.prototype.drawCharacter = function(ctx, character) {
+/**
+ * Draw a single character.
+ * @param {CanvasRenderingContext2D} ctx Context to draw to.
+ * @param {string} A single-character string to draw.
+ */
+MonospaceBitmapFont.prototype.drawCharacter = function(ctx, character) {
     if (this.sprite.loaded) {
         if (this.charactersPerRow === undefined) {
-            this.charactersPerRow = this.sprite.width / this.characterWidth
+            this.charactersPerRow = this.sprite.width / this.characterWidth;
         }
         var code = character.charCodeAt(0);
         var row = Math.floor(code / this.charactersPerRow);
@@ -33,7 +43,14 @@ BitmapFont.prototype.drawCharacter = function(ctx, character) {
     }
 };
 
-BitmapFont.prototype.drawText = function(ctx, string, x, y) {
+/**
+ * Draw a string of text. The "textAlign" property of the canvas context affects its placement.
+ * @param {CanvasRenderingContext2D} ctx Context to draw to.
+ * @param {string} string String to draw.
+ * @param {number} x Horizontal coordinate.
+ * @param {number} y Vertical coordinate.
+ */
+MonospaceBitmapFont.prototype.drawText = function(ctx, string, x, y) {
     ctx.save();
     ctx.translate(x, y);
     var drawnWidth = string.length * this.characterWidth;
