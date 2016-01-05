@@ -18,6 +18,7 @@ Audio.audioPath = 'assets/audio/';
 <script src="src/particle.js"></script>
 <script src="src/canvasui.js"></script>
 <script src="src/lib/dat.gui.js"></script>
+<script src="src/gameparameters.js"></script>
 <!-- input -->
 <script src="src/lib/mousetrap.js"></script>
 <script src="src/lib/mousetrap-global-bind.js"></script>
@@ -123,7 +124,7 @@ Game.prototype.update = function(deltaTime) {
     this.time += deltaTime;
     this.level.update(deltaTime);
     this.input.update();
-    Audio.muteAll(Game.parameters['muteAudio']);
+    Audio.muteAll(Game.parameters.get('muteAudio'));
 };
 
 var DEV_MODE = (window.location.href.indexOf("?devMode") != -1);
@@ -135,42 +136,13 @@ var bigBitmapFont = new BitmapFont({spriteSrc: 'bitmapfont-big.png', characterWi
 Game.music = new Audio('elevator_music');
 Game.gameOverSound = new Audio('gameover');
 
-/**
- * @constructor
- */
-var GameParameters = function() {
-    var params = GameParameters.parameters;
-    for (var key in params) {
-        if (params.hasOwnProperty(key)) {
-            this[key] = params[key].initial;
-        }
-    }
-};
-
-GameParameters.parameters = {
+Game.parameters = new GameParameters({
     'initialSpawnInterval': {initial: 4, min: 0.5, max: 10},
     'spawnIntervalRandomness': {initial: 1, min: 0, max: 2},
     'floorCapacity': {initial: 22, min: 3, max: 50},
     'bandUnionDuration': {initial: 0.5, min: 0.1, max: 2},
-    'muteAudio': false,
-};
-
-GameParameters.prototype.initGUI = function() {
-    var gui = new dat.GUI();
-    var params = GameParameters.parameters;
-    for (var key in params) {
-        if (params.hasOwnProperty(key)) {
-            var param = params[key];
-            if (param.min !== undefined) {
-                gui.add(this, key, param.min, param.max);
-            } else {
-                gui.add(this, key);
-            }
-        }
-    }
-};
-
-Game.parameters = new GameParameters();
+    'muteAudio': false
+});
 
 var game;
 var resizer;
@@ -233,7 +205,7 @@ var eventListener = function(e) {
 window['start'] = function() {
     var DEBUG_MAIN_LOOP = DEV_MODE && true; // Set to true to allow fast-forwarding main loop with 'f'
 
-    Game.parameters['muteAudio'] = (DEV_MODE && true); // Set to true if sounds annoy developers
+    Game.parameters.set('muteAudio', (DEV_MODE && true)); // Set to true if sounds annoy developers
     
     if (DEV_MODE) {
         Game.parameters.initGUI();

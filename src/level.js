@@ -109,7 +109,7 @@ Level.prototype.getFloorWidth = function() {
 };
 
 Level.prototype.getFloorCapacity = function() {
-    return Game.parameters['floorCapacity'];
+    return Game.parameters.get('floorCapacity');
 };
 
 Level.prototype.render = function(ctx) {
@@ -229,9 +229,9 @@ Level.prototype.update = function(deltaTime) {
     this.timeUntilSpawn -= deltaTime;
     if (this.timeUntilSpawn <= 0) {
         this.spawnCharacter();
-        var randomMult = (1.0 + (Math.random() - 0.5) * Game.parameters['spawnIntervalRandomness']);
+        var randomMult = (1.0 + (Math.random() - 0.5) * Game.parameters.get('spawnIntervalRandomness'));
         var spawnIntervalFunc = Math.pow(this.time + 10, -0.3) * 2;
-        this.timeUntilSpawn = Game.parameters['initialSpawnInterval'] * spawnIntervalFunc * randomMult;
+        this.timeUntilSpawn = Game.parameters.get('initialSpawnInterval') * spawnIntervalFunc * randomMult;
     }
     
     this.particles.update(deltaTime);
