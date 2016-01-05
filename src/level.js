@@ -37,6 +37,8 @@ var Level = function() {
     });
     
     this.pauseFade = 1;
+    this.flashText = false;
+    this.flashTime = 0;
 };
 
 Level.prototype.createFloor = function(floorParameters, i) {
@@ -168,7 +170,7 @@ Level.prototype.render = function(ctx) {
             bigBitmapFont.drawText(ctx, 'FINAL SCORE: ' + this.score, ctx.canvas.width * 0.5, ctx.canvas.height * 0.6);
         }
 
-        if (mathUtil.fmod(this.time * 0.5, 1) < 0.5) {
+        if (this.flashText) {
             var key = game.input.getKeyInstruction(game.startPress, 0);
             var whatNow = 'RESTART';
             if (this.state === Level.State.TITLE_SCREEN) {
@@ -241,6 +243,15 @@ Level.prototype.update = function(deltaTime) {
         propertyToValue(this, 'pauseFade', 0, deltaTime);
     } else {
         propertyToValue(this, 'pauseFade', 1, deltaTime);
+    }
+
+    this.flashTime += deltaTime;
+    if (this.flashTime >= 1.0) {
+        this.flashTime = 0;
+        this.flashText = !this.flashText;
+        if (this.flashText) {
+            game.input.cycleDefaultControllerForInstruction();
+        }
     }
 };
 

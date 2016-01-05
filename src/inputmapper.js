@@ -19,6 +19,7 @@ var InputMapper = function(callbackObj, maxPlayers) {
     this.callbacks = []; // Callback information for mapping callbacks back to buttons
     this.upCallbacksForKey = {}; // Map from keys to lists of callbacks, so each key can have multiple callbacks
     this.downCallbacksForKey = {}; // Map from keys to lists of callbacks, so each key can have multiple callbacks
+    this._defaultController = new InputMapper.Controller(InputMapper.GAMEPAD, 0);
 };
 
 // Controller types
@@ -221,7 +222,19 @@ InputMapper.prototype._getLastUsedController = function(player) {
 };
 
 /**
- * Get instruction for a key. Prioritizes gamepad over keyboard if keyboard hasn't been used.
+ * Cycle the controller that is used for showing instructions by default.
+ */
+InputMapper.prototype.cycleDefaultControllerForInstruction = function() {
+    if (this._defaultController.controllerType === InputMapper.KEYBOARD) {
+        this._defaultController = new InputMapper.Controller(InputMapper.GAMEPAD, 0);
+    } else {
+        this._defaultController = new InputMapper.Controller(InputMapper.KEYBOARD, 0);
+    }
+};
+
+/**
+ * Get instruction for a key. Prioritizes gamepad over keyboard if keyboard hasn't been used. If you want to change the
+ * controller which is prioritized, call cycleDefaultControllerForInstruction().
  * @param {function} callback A callback that has been previously attached to a button.
  * @param {playerIndex} index of the player to return information for. Set to undefined if the listener doesn't care
  * about the player number.
@@ -234,7 +247,7 @@ InputMapper.prototype.getKeyInstruction = function(callback, playerIndex) {
             controller = this._getLastUsedController(this.players[playerIndex]);
         } else {
             // Gamepad instructions by default
-            controller = new InputMapper.Controller(InputMapper.GAMEPAD, 0);
+            controller = this._defaultController;
         }
     }
     var returnStr = [];
