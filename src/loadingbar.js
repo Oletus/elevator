@@ -59,18 +59,20 @@ LoadingBar.prototype.finished = function() {
  */
 LoadingBar.prototype.render = function(ctx) {
     if (this.sinceLoaded < 1.0) {
+        var barWidth = Math.min(ctx.canvas.width - 40, 200);
         ctx.save();
         ctx.globalAlpha = Math.min(1.0, (1.0 - this.sinceLoaded) * 1.5);
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
         ctx.fillStyle = '#fff';
-        ctx.fillRect(-100, -25, 200, 50);
+        ctx.fillRect(-barWidth * 0.5, -25, barWidth, 50);
         ctx.fillStyle = '#000';
-        ctx.fillRect(-95, -20, 190, 40);
+        ctx.fillRect(-(barWidth - 10) * 0.5, -20, barWidth - 10, 40);
         ctx.fillStyle = '#fff';
         // Fake some loading animation even if loading doesn't really take any time.
-        ctx.fillRect(-90, -15, 180 * Math.min(this.loadedFraction, this.sinceStarted * 4), 30);
+        var percentage = Math.min(this.loadedFraction, this.sinceStarted * 4);
+        ctx.fillRect(-(barWidth - 20) * 0.5, -15, (barWidth - 20) * percentage, 30);
         ctx.restore();
     }
 };
