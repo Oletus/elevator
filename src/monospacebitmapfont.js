@@ -7,7 +7,7 @@
  */
 var MonospaceBitmapFont = function(options) {
     var defaults = {
-        spriteSrc: 'bitmapfont.png',
+        spriteSrc: 'bitmapfont-tiny.png',
         characterHeight: 6,
         characterWidth: 4,
         charactersPerRow: undefined,
