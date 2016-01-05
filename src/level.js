@@ -163,7 +163,7 @@ Level.prototype.render = function(ctx) {
 
         if (this.state === Level.State.TITLE_SCREEN) {
             Level.titleSprite.drawRotated(ctx, ctx.canvas.width * 0.5, ctx.canvas.height * 0.3, 0);
-            bigBitmapFont.drawText(ctx, 'LD34 GAME BY: OLLI ETUAHO, KIMMO KESKINEN, SAKARI LEPPA, VALTTERI HEINONEN & ANASTASIA DIATLOVA',
+            bigBitmapFont.drawText(ctx, 'LD34 GAME BY: OLLI ETUAHO, KIMMO KESKINEN, SAKARI LEPPÄ, VALTTERI HEINONEN & ANASTASIA DIATLOVA',
                                    ctx.canvas.width * 0.5 - (mathUtil.fmod(this.time * 0.05, 1) - 0.5) * ctx.canvas.width * 5, ctx.canvas.height * 0.57);
         } else if (this.state === Level.State.FAIL) {
             Level.failSprite.drawRotated(ctx, ctx.canvas.width * 0.5, ctx.canvas.height * 0.4, 0);
