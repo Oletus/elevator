@@ -19,7 +19,6 @@ var MonospaceBitmapFont = function(options) {
     } else {
         this.sprite = new Sprite(this.spriteSrc);
     }
-
 };
 
 /**
