@@ -19,7 +19,7 @@ Audio.audioPath = 'assets/audio/';
 <script src="src/canvasresizer.js"></script>
 <script src="src/loadingbar.js"></script>
 <script src="src/particle.js"></script>
-<script src="src/canvasui.js"></script>
+<!--<script src="src/canvasui.js"></script>-->
 <script src="src/lib/dat.gui.js"></script>
 <script src="src/gameparameters.js"></script>
 <!-- input -->
@@ -46,12 +46,12 @@ Audio.audioPath = 'assets/audio/';
 var Game = function(resizer) {
     this.canvas = resizer.getCanvas();
     this.realCtx = this.canvas.getContext('2d');
-    this.canvasUI = new CanvasUI({
+    /*this.canvasUI = new CanvasUI({
         element: this.canvas,
         getCanvasPositionFromEvent: function(event) {
             return resizer.getCanvasPosition(event);
         }
-    });
+    });*/
     this.time = 0;
     this.level = new Level();
     
