@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Monospace bitmap font that uses a simple ASCII grid sprite sheet.
+ * Bitmap font that uses a simple ISO-8859-1 monospace grid sprite sheet.
  * @param {Object} options Constructor options.
  * @constructor
  */
@@ -11,7 +11,9 @@ var MonospaceBitmapFont = function(options) {
         characterHeight: 6,
         characterWidth: 4,
         charactersPerRow: undefined,
-        color: undefined
+        color: undefined,
+        closerKerningCharacters: [], // list of characters to kern closer when in pairs. for example: ['i', 'l']
+        kerningAmount: 1
     };
     objectUtil.initWithDefaults(this, defaults, options);
     if (this.color !== undefined) {
@@ -53,6 +55,21 @@ MonospaceBitmapFont.prototype.drawText = function(ctx, string, x, y) {
     ctx.save();
     ctx.translate(x, y);
     var drawnWidth = string.length * this.characterWidth;
+    var kerningActive = this.closerKerningCharacters.length > 0 && this.kerningAmount != 0;
+    var prevCharacterNarrow = false;
+    if (kerningActive) {
+        for (var i = 0; i < string.length; ++i) {
+            if (this.closerKerningCharacters.indexOf(string[i]) >= 0) {
+                if (prevCharacterNarrow) {
+                    drawnWidth -= this.kerningAmount;
+                }
+                prevCharacterNarrow = true;
+            } else {
+                prevCharacterNarrow = false;
+            }
+        }
+    }
+
     if (ctx.textAlign == 'center') {
         ctx.translate(-Math.floor(drawnWidth * 0.5), 0);
     } else if (ctx.textAlign == 'right') {
@@ -60,7 +77,17 @@ MonospaceBitmapFont.prototype.drawText = function(ctx, string, x, y) {
     }
     for (var i = 0; i < string.length; ++i) {
         this.drawCharacter(ctx, string[i]);
-        ctx.translate(this.characterWidth, 0);
+        if (kerningActive) {        
+            if (this.closerKerningCharacters.indexOf(string[i]) >= 0 && i + 1 < string.length &&
+                this.closerKerningCharacters.indexOf(string[i + 1]) >= 0) {
+                ctx.translate(this.characterWidth - this.kerningAmount, 0);
+            } else {
+                ctx.translate(this.characterWidth, 0);
+            }
+            
+        } else {
+            ctx.translate(this.characterWidth, 0);
+        }
     }
     ctx.restore();
 };
