@@ -52,8 +52,6 @@ MonospaceBitmapFont.prototype.drawCharacter = function(ctx, character) {
  * @param {number} y Vertical coordinate.
  */
 MonospaceBitmapFont.prototype.drawText = function(ctx, string, x, y) {
-    ctx.save();
-    ctx.translate(x, y);
     var drawnWidth = string.length * this.characterWidth;
     var kerningActive = this.closerKerningCharacters.length > 0 && this.kerningAmount != 0;
     var prevCharacterNarrow = false;
@@ -70,11 +68,20 @@ MonospaceBitmapFont.prototype.drawText = function(ctx, string, x, y) {
         }
     }
 
-    if (ctx.textAlign == 'center') {
-        ctx.translate(-Math.floor(drawnWidth * 0.5), 0);
-    } else if (ctx.textAlign == 'right') {
-        ctx.translate(-Math.floor(drawnWidth), 0);
+    var baselineTranslate = 0; // Default for top and hanging
+    if (ctx.textBaseline == 'bottom' || ctx.textBaseline == 'alphabetic' || ctx.textBaseline == 'ideographic') {
+        baselineTranslate = -this.characterHeight;
+    } else if (ctx.textBaseline == 'middle') {
+        baselineTranslate = Math.floor(-this.characterHeight * 0.5);
     }
+    var alignTranslate = 0;
+    if (ctx.textAlign == 'center') {
+        alignTranslate = -Math.floor(drawnWidth * 0.5);
+    } else if (ctx.textAlign == 'right') {
+        alignTranslate = -Math.floor(drawnWidth);
+    }
+    ctx.save();
+    ctx.translate(x + alignTranslate, y + baselineTranslate);
     for (var i = 0; i < string.length; ++i) {
         this.drawCharacter(ctx, string[i]);
         if (kerningActive) {        

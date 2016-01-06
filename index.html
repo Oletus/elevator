@@ -68,6 +68,7 @@ Game.prototype.render = function(ctx) {
     if (ctx === undefined) {
         ctx = this.realCtx;
     }
+    ctx.textBaseline = 'top';
     this.level.render(ctx);
     return ctx;
 };
