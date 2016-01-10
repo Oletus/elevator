@@ -1,8 +1,8 @@
 # The Everything Building
 
-[Ludum Dare 34 Jam Game](http://ludumdare.com/compo/ludum-dare-34/?action=preview&uid=52430) - ranked #2 Overall, #1 Fun - ### [<kbd>PLAY IT NOW</kbd>](http://oletus.github.io/elevator/)
-
 ![cropped gameplay](http://i.imgur.com/RGF0W6d.gif)
+
+[Ludum Dare 34 Jam Game](http://ludumdare.com/compo/ludum-dare-34/?action=preview&uid=52430) - ranked #2 Overall, #1 Fun - [<kbd>PLAY IT NOW</kbd>](http://oletus.github.io/elevator/)
 
 ### Elevator Operator’s Manual 
 
