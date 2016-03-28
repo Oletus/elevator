@@ -64,12 +64,12 @@ GameData.floors =
             {id: "magnetman", chance: 1}
         ]
     },
-    {
+    /*{
         id: "security",
         name: "Security",
         spawnIds: [],
         excludeAsDestination: true
-    },
+    },*/
     {
         id: "clowncamp",
         name: "Clown bootcamp",
