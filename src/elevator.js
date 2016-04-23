@@ -41,8 +41,8 @@ Elevator.doorSprite = new Sprite('door_closed.png');
 Elevator.doorOpenSprite = new Sprite('door_open1.png');
 Elevator.doorOpen2Sprite = new Sprite('door_open2.png');
 
-Elevator.whirrSound = new Audio('elevator-whirring');
-Elevator.dingSound = new Audio('elevator-ding');
+Elevator.whirrSound = new GJS.Audio('elevator-whirring');
+Elevator.dingSound = new GJS.Audio('elevator-ding');
 
 Elevator.prototype.removeOccupant = function(toRemove) {
     if (this.occupants.indexOf(toRemove) >= 0) {

@@ -11,10 +11,11 @@
 <script src="src/lib/hsl.js"></script>
 <script src="src/sprite.js"></script>
 <script src="src/animatedsprite.js"></script>
+<script src="src/lib/howler.core.js"></script>
 <script src="src/audio.js"></script>
 <script>
-Audio.defaultExtensions = ['ogg', 'mp3'];
-Audio.audioPath = 'assets/audio/';
+GJS.Audio.defaultExtensions = ['ogg', 'mp3'];
+GJS.Audio.audioPath = 'assets/audio/';
 </script>
 <script src="src/canvasresizer.js"></script>
 <script src="src/loadingbar.js"></script>
@@ -131,7 +132,7 @@ Game.prototype.update = function(deltaTime) {
     this.time += deltaTime;
     this.level.update(deltaTime);
     this.input.update();
-    Audio.muteAll(Game.parameters.get('muteAudio'));
+    GJS.Audio.muteAll(Game.parameters.get('muteAudio'));
 };
 
 var DEV_MODE = (window.location.href.indexOf("?devMode") != -1);
@@ -140,8 +141,8 @@ var blackBitmapFont = new MonospaceBitmapFont({color: 'black'});
 var whiteBitmapFont = new MonospaceBitmapFont({color: 'white'});
 var bigBitmapFont = new MonospaceBitmapFont({spriteSrc: 'bitmapfont-medium.png', characterWidth: 8, characterHeight: 13});
 
-Game.music = new Audio('elevator_music');
-Game.gameOverSound = new Audio('gameover');
+Game.music = new GJS.Audio('elevator_music');
+Game.gameOverSound = new GJS.Audio('gameover');
 
 Game.parameters = new GameParameters({
     'initialSpawnInterval': {initial: 4, min: 0.5, max: 10},

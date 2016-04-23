@@ -65,11 +65,11 @@ BaseCharacter.iconAnimation = new AnimatedSprite({
     defaultDuration: 5
 });
 
-BaseCharacter.alertSound = new Audio('customer-alert');
-BaseCharacter.fallSound = new Audio('customer-fall');
-BaseCharacter.fanfareSound = new Audio('band-fanfare');
-BaseCharacter.ghostShriekSound = new Audio('ghost-shriek');
-BaseCharacter.magnetizedSound = new Audio('magnetized');
+BaseCharacter.alertSound = new GJS.Audio('customer-alert');
+BaseCharacter.fallSound = new GJS.Audio('customer-fall');
+BaseCharacter.fanfareSound = new GJS.Audio('band-fanfare');
+BaseCharacter.ghostShriekSound = new GJS.Audio('ghost-shriek');
+BaseCharacter.magnetizedSound = new GJS.Audio('magnetized');
 
 BaseCharacter.loadSprites = function() {
     for (var key in GameData.characters) {
@@ -608,7 +608,7 @@ var Ghost = function(options) {
     this.didScareCount = 0;
 };
 
-//Ghost.scarySound = new Audio('ghost-shriek');
+//Ghost.scarySound = new GJS.Audio('ghost-shriek');
 
 Ghost.prototype = new BaseCharacter();
 

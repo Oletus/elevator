@@ -43,7 +43,7 @@ Floor.fgSprites = {};
 Floor.bgSprites = {};
 Floor.alarmSprite = new Sprite('floor-alarm.png');
 Floor.renovationSprite = new Sprite('floor-renovation.png');
-Floor.renovatingSound = new Audio('renovating');
+Floor.renovatingSound = new GJS.Audio('renovating');
 
 Floor.loadSprites = function() {
     for (var i = 0; i < GameData.floors.length; ++i) {

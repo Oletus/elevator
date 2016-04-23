@@ -60,7 +60,7 @@ Level.State = {
     FAIL: 2
 };
 
-Level.moneySound = new Audio('money-chime');
+Level.moneySound = new GJS.Audio('money-chime');
 
 Level.prototype.goToState = function(state) {
     if ( state === this.state ) {
