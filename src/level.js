@@ -306,8 +306,8 @@ Level.prototype.downRelease = function(playerNumber) {
 };
 
 Level.prototype.canvasPress = function(pos) {
-    if (pos.x > 140) {
-        if (pos.y > 312 / 2) {
+    if (pos.lastDown.x > 140) {
+        if (pos.lastDown.y > 312 / 2) {
             this.elevator.touchMoveDown -= 1;
         } else {
             this.elevator.touchMoveUp += 1;
@@ -316,8 +316,8 @@ Level.prototype.canvasPress = function(pos) {
 };
 
 Level.prototype.canvasRelease = function(pos) {
-    if (pos.x > 140) {
-        if (pos.y > 312 / 2) {
+    if (pos.lastDown.x > 140) {
+        if (pos.lastDown.y > 312 / 2) {
             this.elevator.touchMoveDown += 1;
         } else {
             this.elevator.touchMoveUp -= 1;

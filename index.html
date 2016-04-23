@@ -124,6 +124,9 @@ Game.prototype.canvasRelease = function(pos) {
     this.level.canvasRelease(pos);
 };
 
+Game.prototype.canvasMove = function(pos) {
+};
+
 Game.prototype.update = function(deltaTime) {
     this.time += deltaTime;
     this.level.update(deltaTime);
@@ -158,54 +161,6 @@ var coordinateIndices = {
     mouse: -1
 };
 
-var eventListener = function(e) {
-    var type;
-    var ids = [];
-    if (e.type === 'mousedown') {
-        type = 'down';
-        ids.push('mouse');
-    } else if (e.type === 'mouseup' || e.type === 'mouseout') {
-        type = 'up';
-        ids.push('mouse');
-    } else if (e.type === 'touchstart') {
-        type = 'down';
-        for (var i = 0; i < e.changedTouches.length; ++i) {
-            ids.push('touch' + e.changedTouches[i].identifier);
-        }
-    } else if (e.type === 'touchcancel' || e.type === 'touchend') {
-        type = 'up';
-        for (var i = 0; i < e.changedTouches.length; ++i) {
-            ids.push('touch' + e.changedTouches[i].identifier);
-        }
-    }
-    for (var i = 0; i < ids.length; ++i) {
-        var id = ids[i];
-        if (type === 'down') {
-            var touchId = undefined;
-            if (id !== 'mouse') {
-                touchId = id.substring(5);
-            }
-            var pos = resizer.getCanvasPosition(event, touchId);
-            coordinatesDown.push(pos);
-            coordinateIndices[id] = coordinatesDown.length - 1;
-            game.canvasPress(pos);
-        } else {
-            if (coordinateIndices.hasOwnProperty(id) && coordinateIndices[id] !== -1) {
-                var index = coordinateIndices[id];
-                var pos = coordinatesDown.splice(index, 1)[0];
-                for (var key in coordinateIndices) {
-                    if (coordinateIndices.hasOwnProperty(key) && coordinateIndices[key] > index) {
-                        coordinateIndices[key] = coordinateIndices[key] - 1;
-                    }
-                }
-                coordinateIndices[id] = -1;
-                game.canvasRelease(pos);
-            }
-        }
-    }
-    e.preventDefault();
-};
-
 window['start'] = function() {
     var DEBUG_MAIN_LOOP = DEV_MODE && true; // Set to true to allow fast-forwarding main loop with 'f'
 
@@ -216,14 +171,8 @@ window['start'] = function() {
     }
     
     resizer = new CanvasResizer({mode: CanvasResizer.Mode.MINIMUM_HEIGHT, width: 192, height: 312});
-    
-    resizer.canvas.addEventListener('mousedown', eventListener);
-    resizer.canvas.addEventListener('mouseup', eventListener);
-    resizer.canvas.addEventListener('mouseout', eventListener);
-    resizer.canvas.addEventListener('touchstart', eventListener);
-    resizer.canvas.addEventListener('touchend', eventListener);
-    resizer.canvas.addEventListener('touchcancel', eventListener);
     game = new Game(resizer);
+    resizer.createPointerEventListener(game, true);
     startMainLoop([resizer, game, new LoadingBar(), resizer.pixelator()], {debugMode: DEBUG_MAIN_LOOP});
 };
 </script>

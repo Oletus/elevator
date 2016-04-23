@@ -18,6 +18,9 @@
  *      modes. Maximum scale at which the canvas will be drawn interpolated
  *      instead of pixelated. Good for games targeting mobile where having
  *      large unused areas (black bars) on the screen should be avoided.
+ *  setCanvasSizeCallback: A function to call when the canvas width or height
+ *      properties are changed. Can be used to adjust Three.js renderer
+ *      parameters, for example.
  */
 var CanvasResizer = function(options) {
     var defaults = {
@@ -27,7 +30,8 @@ var CanvasResizer = function(options) {
         height: 9,
         parentElement: document.body,
         wrapperElement: null,
-        maxInterpolatedScale: 2
+        maxInterpolatedScale: 2,
+        setCanvasSizeCallback: null
     };
 
     for(var key in defaults) {
@@ -46,15 +50,13 @@ var CanvasResizer = function(options) {
         }
     } else {
         this.canvas = document.createElement('canvas');
-        this.canvas.width = this.width;
-        this.canvas.height = this.height;
+        this._setCanvasSize(this.width, this.height);
     }
     
     this.canvasWidthToHeight = this.width / this.height;
 
     if (this.mode === CanvasResizer.Mode.FIXED_RESOLUTION) {
-        this.canvas.width = this.width;
-        this.canvas.height = this.height;
+        this._setCanvasSize(this.width, this.height);
     }
 
     var that = this;
@@ -87,6 +89,20 @@ var CanvasResizer = function(options) {
     this._wrapCtxPixelate = null; // Wrapper context for automatically aligning pixel art
     this._copyCanvas = null; // For upscaling pixelated copy of the image
     this._pixelator = null;
+};
+
+/**
+ * Set the size properties of the main canvas element.
+ * @param {number} width Width to set.
+ * @param {number} height Height to set.
+ * @protected
+ */
+CanvasResizer.prototype._setCanvasSize = function(width, height) {
+    this.canvas.width = width;
+    this.canvas.height = height;
+    if (this.setCanvasSizeCallback !== null) {
+        this.setCanvasSizeCallback(width, height);
+    }
 };
 
 /**
@@ -292,14 +308,12 @@ CanvasResizer.prototype.render = function() {
                    this.mode === CanvasResizer.Mode.FIXED_ASPECT_RATIO) {
             if (parentWidthToHeight > this.canvasWidthToHeight) {
                 // Parent is wider, so there will be empty space on the left and right
-                this.canvas.height = parentHeight;
-                this.canvas.width = Math.floor(this.canvasWidthToHeight * this.canvas.height);
+                this._setCanvasSize(Math.floor(this.canvasWidthToHeight * parentHeight), parentHeight);
                 this.canvas.style.marginTop = '0';
                 this.canvas.style.marginLeft = Math.round((parentWidth - this.canvas.width) * 0.5) + 'px';
             } else {
                 // Parent is narrower, so there will be empty space on the top and bottom
-                this.canvas.width = parentWidth;
-                this.canvas.height = Math.floor(this.canvas.width / this.canvasWidthToHeight);
+                this._setCanvasSize(parentWidth, Math.floor(parentWidth / this.canvasWidthToHeight));
                 this.canvas.style.marginTop = Math.round((parentHeight - this.canvas.height) * 0.5) + 'px';
                 this.canvas.style.marginLeft = '0';
             }
@@ -307,8 +321,7 @@ CanvasResizer.prototype.render = function() {
             this.canvas.style.height = this.canvas.height + 'px';
             this.canvas.style.marginBottom = '-5px'; // This is to work around a bug in Firefox 38
         } else { // CanvasResizer.Mode.DYNAMIC
-            this.canvas.width = parentWidth;
-            this.canvas.height = parentHeight;
+            this._setCanvasSize(parentWidth, parentHeight);
             this.canvas.style.width = parentWidth + 'px';
             this.canvas.style.height = parentHeight + 'px';
             this.canvas.style.marginTop = '0';
@@ -326,6 +339,9 @@ CanvasResizer.prototype.render = function() {
     }
     if (this.mode == CanvasResizer.Mode.FIXED_COORDINATE_SYSTEM) {
         var ctx = this.canvas.getContext('2d');
+        if (ctx === null) {
+            throw "FIXED_COORDINATE_SYSTEM mode can only be used with a 2D canvas";
+        }
         var scale = this.canvas.width / this.width;
         ctx.setTransform(scale, 0, 0, scale, 0, 0);
 
@@ -350,6 +366,10 @@ CanvasResizer.prototype.render = function() {
     if (this.mode === CanvasResizer.Mode.FIXED_RESOLUTION ||
         this._isInMinMode()) {
         var ctx = this.canvas.getContext('2d');
+        if (ctx === null) {
+            // May be used with WebGL
+            return;
+        }
         if (this._wrapCtxPixelate == null) {
             var pixelatingStack = [true];
             var wrapCtx = CanvasResizer.wrap(ctx, function(prop) {
@@ -400,6 +420,15 @@ CanvasResizer.prototype.render = function() {
 };
 
 /**
+ * This function is here just so that it can be overridden by testing functions.
+ * @return {Object} Canvas bounding client rect.
+ * @protected
+ */
+CanvasResizer.prototype._getCanvasBoundingClientRect = function() {
+    return this.canvas.getBoundingClientRect();
+};
+
+/**
  * Get a canvas coordinate space position from a given event. The coordinate
  * space is relative to the width and height properties of the canvas.
  * @param {MouseEvent|PointerEvent|TouchEvent} Event to get the position from.
@@ -412,7 +441,7 @@ CanvasResizer.prototype.render = function() {
  * positions in the canvas coordinate space.
  */
 CanvasResizer.prototype.getCanvasPosition = function(event, touchIdentifier) {
-    var rect = this.canvas.getBoundingClientRect();
+    var rect = this._getCanvasBoundingClientRect();
     var x, y;
     if (event.touches !== undefined && event.touches.length > 0) {
         var touchIndex = 0;
@@ -448,6 +477,139 @@ CanvasResizer.prototype.getCanvasPosition = function(event, touchIdentifier) {
     } else {
         return {x: xRel, y: yRel};
     }
+};
+
+/**
+ * Create an event listener function that will normalize different events into unified API calls and make the event
+ * coordinates relative to the canvas coordinate system.
+ * @param {Object} callbackObject Object where canvasPress and canvasRelease functions will be called on.
+ * @param {boolean} listenOnCanvas Automatically add listeners on the canvas.
+ * @return {function} Function to be added as a mouse and touch listener to elements (for example the canvas element).
+ */
+CanvasResizer.prototype.createPointerEventListener = function(callbackObject, listenOnCanvas) {
+    var that = this;
+
+    var coordinates = [
+    ];
+    
+    var alwaysTracked = [
+        'mouse'
+    ];
+    
+    var coordinateIndices = {};
+    
+    for (var i = 0; i < alwaysTracked.length; ++i) {
+        var index = coordinates.length;
+        coordinateIndices[alwaysTracked[i]] = index;
+        coordinates.push({
+            current: new Vec2(-Infinity, -Infinity),
+            lastDown: new Vec2(-Infinity, -Infinity),
+            isDown: false,
+            index: index
+        });
+    }
+
+    var eventListener = function(e) {
+        var type;
+        var ids = [];
+        if (e.type === 'mousemove') {
+            type = 'move';
+            ids.push('mouse');
+        } else if (e.type === 'mousedown') {
+            type = 'down';
+            ids.push('mouse');
+        } else if (e.type === 'mouseup' || e.type === 'mouseout') {
+            type = 'up';
+            ids.push('mouse');
+        } else if (e.type === 'touchmove') {
+            type = 'move';
+            for (var i = 0; i < e.changedTouches.length; ++i) {
+                ids.push('touch' + e.changedTouches[i].identifier);
+            }
+        } else if (e.type === 'touchstart') {
+            type = 'down';
+            for (var i = 0; i < e.changedTouches.length; ++i) {
+                ids.push('touch' + e.changedTouches[i].identifier);
+            }
+        } else if (e.type === 'touchcancel' || e.type === 'touchend') {
+            type = 'up';
+            for (var i = 0; i < e.changedTouches.length; ++i) {
+                ids.push('touch' + e.changedTouches[i].identifier);
+            }
+        }
+        for (var i = 0; i < ids.length; ++i) {
+            var id = ids[i];
+            if (type === 'down') {
+                var touchId = undefined;
+                if (id !== 'mouse') {
+                    touchId = id.substring(5);
+                }
+                var pos = that.getCanvasPosition(e, touchId);
+                if (!coordinateIndices.hasOwnProperty(id) || coordinateIndices[id] === -1) {
+                    var reuseIndexKey = undefined;
+                    for (var key in coordinateIndices) {
+                        if (coordinateIndices.hasOwnProperty(key) &&
+                            alwaysTracked.indexOf(key) < 0 &&
+                            coordinateIndices[key] >= 0 &&
+                            !coordinates[coordinateIndices[key]].isDown) {
+                            reuseIndexKey = key;
+                        }
+                    }
+                    if (reuseIndexKey !== undefined) {
+                        coordinateIndices[id] = coordinateIndices[reuseIndexKey];
+                        coordinateIndices[reuseIndexKey] = -1;
+                    } else {
+                        var index = coordinates.length;
+                        coordinates.push({
+                            current: pos,
+                            lastDown: pos,
+                            isDown: false,
+                            index: index
+                        });
+                        coordinateIndices[id] = index;
+                    }
+                }
+                var index = coordinateIndices[id];
+                if (!coordinates[index].isDown) {
+                    coordinates[index].lastDown = pos;
+                    coordinates[index].current = pos;
+                    coordinates[index].isDown = true;
+                    coordinates[index].index = index;
+                    callbackObject.canvasPress(coordinates[index]);
+                }
+            } else if (type === 'up') {
+                if (coordinateIndices.hasOwnProperty(id) && coordinateIndices[id] !== -1) {
+                    var index = coordinateIndices[id];
+                    if (coordinates[index].isDown) {
+                        callbackObject.canvasRelease(coordinates[index]);
+                        coordinates[index].isDown = false;
+                    }
+                }
+            } else if (type === 'move') {
+                var touchId = undefined;
+                if (id !== 'mouse') {
+                    touchId = id.substring(5);
+                }
+                var pos = that.getCanvasPosition(e, touchId);
+                var index = coordinateIndices[id];
+                coordinates[index].current = pos;
+                callbackObject.canvasMove(coordinates[index]);
+            }
+        }
+        e.preventDefault();
+    };
+    if (listenOnCanvas) {
+        this.canvas.addEventListener('mousemove', eventListener);
+        this.canvas.addEventListener('mousedown', eventListener);
+        this.canvas.addEventListener('mouseup', eventListener);
+        this.canvas.addEventListener('mouseout', eventListener);
+        this.canvas.addEventListener('touchmove', eventListener);
+        this.canvas.addEventListener('touchstart', eventListener);
+        this.canvas.addEventListener('touchend', eventListener);
+        this.canvas.addEventListener('touchcancel', eventListener);
+    }
+    
+    return eventListener;
 };
 
 /**
@@ -522,7 +684,7 @@ CanvasResizer.prototype._isInMinMode = function() {
     return this.mode === CanvasResizer.Mode.MINIMUM_RESOLUTION ||
            this.mode === CanvasResizer.Mode.MINIMUM_HEIGHT ||
            this.mode === CanvasResizer.Mode.MINIMUM_WIDTH;
-}
+};
 
 /**
  * Resize the canvas in one of the fixed resolution modes.
@@ -534,8 +696,7 @@ CanvasResizer.prototype._resizeFixedResolution = function() {
         this.mode !== CanvasResizer.Mode.FIXED_RESOLUTION_INTERPOLATED) {
         return;
     }
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
+    this._setCanvasSize(this.width, this.height);
     var parentProperties = this._getParentProperties();
     var parentWidth = parentProperties.width;
     var parentHeight = parentProperties.height;
@@ -589,8 +750,7 @@ CanvasResizer.prototype._resizeFixedResolution = function() {
             }
             styleWidth = w * scale / window.devicePixelRatio;
             styleHeight = h * scale / window.devicePixelRatio;
-            this.canvas.width = w;
-            this.canvas.height = h;
+            this._setCanvasSize(w, h);
         }
         this._canvasPixelationRatio = scale;
     } else if (this.mode === CanvasResizer.Mode.FIXED_RESOLUTION_INTERPOLATED) {
