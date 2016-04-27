@@ -41,15 +41,15 @@ Floor.height = 8;
 
 Floor.fgSprites = {};
 Floor.bgSprites = {};
-Floor.alarmSprite = new Sprite('floor-alarm.png');
-Floor.renovationSprite = new Sprite('floor-renovation.png');
+Floor.alarmSprite = new GJS.Sprite('floor-alarm.png');
+Floor.renovationSprite = new GJS.Sprite('floor-renovation.png');
 Floor.renovatingSound = new GJS.Audio('renovating');
 
 Floor.loadSprites = function() {
     for (var i = 0; i < GameData.floors.length; ++i) {
         var floor = GameData.floors[i];
-        Floor.bgSprites[floor.id] = new Sprite('floor-' + floor.id + '-bg.png', undefined, 'floor_gfx.png');
-        Floor.fgSprites[floor.id] = new Sprite('floor-' + floor.id + '-fg.png', undefined, 'floor-fg.png');
+        Floor.bgSprites[floor.id] = new GJS.Sprite('floor-' + floor.id + '-bg.png', undefined, 'floor_gfx.png');
+        Floor.fgSprites[floor.id] = new GJS.Sprite('floor-' + floor.id + '-fg.png', undefined, 'floor-fg.png');
     }
 };
 

@@ -77,10 +77,10 @@ BaseCharacter.loadSprites = function() {
             if (GameData.characters[key].bodyIds) {
                 for (var i = 0; i < GameData.characters[key].bodyIds.length; ++i) {
                     var bodyId = GameData.characters[key].bodyIds[i];
-                    BaseCharacter.bodySprites[bodyId] = new Sprite('body-' + bodyId + '.png');
+                    BaseCharacter.bodySprites[bodyId] = new GJS.Sprite('body-' + bodyId + '.png');
                 }
             } else {
-                BaseCharacter.bodySprites[key] = new Sprite('body-' + key + '.png');
+                BaseCharacter.bodySprites[key] = new GJS.Sprite('body-' + key + '.png');
             }
         }
     }
@@ -524,8 +524,8 @@ var Runner = function(options) {
 Runner.prototype = new BaseCharacter();
 
 Runner.runningSprites = {
-    'runner': new Sprite('body-runner-running.png'),
-    'stretcher': new Sprite('body-stretcher.png')
+    'runner': new GJS.Sprite('body-runner-running.png'),
+    'stretcher': new GJS.Sprite('body-stretcher.png')
 };
 
 /**
@@ -612,7 +612,7 @@ var Ghost = function(options) {
 
 Ghost.prototype = new BaseCharacter();
 
-Ghost.scaringSprite = new Sprite('body-ghost-scaring.png');
+Ghost.scaringSprite = new GJS.Sprite('body-ghost-scaring.png');
 Ghost.disappearTime = 2;
 /**
  * ctx has its current transform set centered on the floor at the x center of the character.

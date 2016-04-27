@@ -17,9 +17,9 @@ var MonospaceBitmapFont = function(options) {
     };
     objectUtil.initWithDefaults(this, defaults, options);
     if (this.color !== undefined) {
-        this.sprite = new Sprite(this.spriteSrc, Sprite.turnSolidColored(this.color));
+        this.sprite = new GJS.Sprite(this.spriteSrc, GJS.Sprite.turnSolidColored(this.color));
     } else {
-        this.sprite = new Sprite(this.spriteSrc);
+        this.sprite = new GJS.Sprite(this.spriteSrc);
     }
 };
 

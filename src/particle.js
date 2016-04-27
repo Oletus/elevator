@@ -162,8 +162,8 @@ Particle.Appearance = {
 };
 
 /**
- * To use with the Sprite class from gameutils.js
- * @param {Sprite} sprite Sprite to draw.
+ * To use with the GJS.Sprite class from gameutils.js
+ * @param {GJS.Sprite} sprite GJS.Sprite to draw.
  * @param {number=} scaleMultiplier Scale multiplier for all the sprites. Useful for example if you run the particle
  * engine in a game world's coordinate system which has different scale compared to the canvas.
  */
@@ -178,7 +178,7 @@ Particle.spriteAppearance = function(sprite, scaleMultiplier) {
 };
 
 /**
- * Prerendered circle using the Sprite class from gameutils.js.
+ * Prerendered circle using the GJS.Sprite class from gameutils.js.
  * May be faster than drawing a circle as a path.
  * @param {string} color CSS color string for the circle.
  * @param {number} resolution Resolution of the sprite to create in pixels. Will not affect the size of the particle
@@ -198,7 +198,7 @@ Particle.prerenderedCircleAppearance = function(color, resolution, scaleMultipli
     helperCtx.beginPath();
     helperCtx.arc(resolution * 0.5, resolution * 0.5, resolution * 0.5, 0, Math.PI * 2);
     helperCtx.fill();
-    var sprite = new Sprite(helperCanvas);
+    var sprite = new GJS.Sprite(helperCanvas);
     return Particle.spriteAppearance(sprite, scaleMultiplier / resolution);
 };
 

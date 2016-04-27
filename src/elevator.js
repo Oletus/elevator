@@ -33,13 +33,13 @@ var Elevator = function(options) {
     this.reverseControls = false;
 };
 
-Elevator.sprite = new Sprite('lift.png');
-Elevator.shaftSprite = new Sprite('shaft.png');
-Elevator.counterweightSprite = new Sprite('counterweight.png');
-Elevator.wireSprite = new Sprite('wire.png');
-Elevator.doorSprite = new Sprite('door_closed.png');
-Elevator.doorOpenSprite = new Sprite('door_open1.png');
-Elevator.doorOpen2Sprite = new Sprite('door_open2.png');
+Elevator.sprite = new GJS.Sprite('lift.png');
+Elevator.shaftSprite = new GJS.Sprite('shaft.png');
+Elevator.counterweightSprite = new GJS.Sprite('counterweight.png');
+Elevator.wireSprite = new GJS.Sprite('wire.png');
+Elevator.doorSprite = new GJS.Sprite('door_closed.png');
+Elevator.doorOpenSprite = new GJS.Sprite('door_open1.png');
+Elevator.doorOpen2Sprite = new GJS.Sprite('door_open2.png');
 
 Elevator.whirrSound = new GJS.Audio('elevator-whirring');
 Elevator.dingSound = new GJS.Audio('elevator-ding');

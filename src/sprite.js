@@ -1,50 +1,84 @@
 'use strict';
 
+if (typeof GJS === "undefined") {
+    var GJS = {};
+}
+
 /**
  * A sprite that can be drawn on a 2D canvas.
  * @constructor
- * @param {string|HTMLImageElement|HTMLCanvasElement} filename File to load or a graphical element that's already
- * loaded.
- * @param {string=} filter Filter function to convert the sprite, for example Sprite.turnSolidColored('black')
+ * @param {string|HTMLImageElement|HTMLCanvasElement|GJS.Sprite} filename File to load, a graphical element that's already
+ * loaded, or another GJS.Sprite.
+ * @param {string=} filter Filter function to convert the sprite, for example GJS.Sprite.turnSolidColored('black')
  * @param {string|HTMLImageElement|HTMLCanvasElement=} fallback Fallback file to load or a graphical element that's
  * already loaded.
  */
-var Sprite = function(filename, /* Optional */ filter, fallback) {
+GJS.Sprite = function(filename, /* Optional */ filter, fallback) {
     this.filename = filename;
     this.missing = false;
     this.fallback = fallback;
     this.filter = filter;
-    Sprite.createdCount++;
+    GJS.Sprite.createdCount++;
+    this.loadedListeners = [];
+    this.implementsGameutilsSprite = true;
     this._reload();
 };
 
+GJS.Sprite.prototype.addLoadedListener = function(callback) {
+    if (this.loaded) {
+        callback();
+    }
+    else {
+        this.loadedListeners.push(callback);
+    }
+};
+
+GJS.Sprite.prototype._callLoadedListeners = function() {
+    for (var i = 0; i < this.loadedListeners.length; ++i) {
+        this.loadedListeners[i]();
+    }
+};
+
 /**
- * Reload the Sprite.
+ * Reload the GJS.Sprite.
  * @protected
  */
-Sprite.prototype._reload = function() {
+GJS.Sprite.prototype._reload = function() {
     if (typeof this.filename != typeof '') {
         this.img = this.filename;
+        if (this.img instanceof GJS.Sprite) {
+            var that = this;
+            this.img.addLoadedListener(function() {
+                that.filename = that.img.img;
+                that._reload();
+            });
+            return;
+        }
         this.loaded = true;
-        Sprite.loadedCount++;
-        this.width = this.filename.width;
-        this.height = this.filename.height;
+        GJS.Sprite.loadedCount++;
+        this.width = this.img.width;
+        this.height = this.img.height;
         if (this.filter !== undefined) {
             this.filter(this);
         }
     } else {
         this.img = document.createElement('img');
-        this.img.src = Sprite.gfxPath + this.filename;
+        if (this.filename.substring(0, 5) === 'data:' || this.filename.substring(0, 5) === 'http:') {
+            this.img.src = this.filename;
+        } else {
+            this.img.src = GJS.Sprite.gfxPath + this.filename;
+        }
         var that = this;
         this.loaded = false;
         this.img.onload = function() {
             that.loaded = true;
-            Sprite.loadedCount++;
+            GJS.Sprite.loadedCount++;
             that.width = that.img.width;
             that.height = that.img.height;
             if (that.filter !== undefined) {
                 that.filter(that);
             }
+            that._callLoadedListeners();
         };
         this.img.onerror = function() {
             if (that.fallback) {
@@ -55,7 +89,7 @@ Sprite.prototype._reload = function() {
             }
             that.loaded = true;
             that.missing = true;
-            Sprite.loadedCount++;
+            GJS.Sprite.loadedCount++;
             that.img = document.createElement('canvas');
             that.img.width = 150;
             that.img.height = 20;
@@ -67,19 +101,20 @@ Sprite.prototype._reload = function() {
             ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             ctx.fillStyle = '#000';
             ctx.fillText('Missing: ' + that.filename, 0, 0);
+            that._callLoadedListeners();
         };
     }
 };
 
 /**
- * Path for graphics files. Set this before creating any Sprite objects.
+ * Path for graphics files. Set this before creating any GJS.Sprite objects.
  */
-Sprite.gfxPath = 'assets/gfx/';
+GJS.Sprite.gfxPath = 'assets/gfx/';
 
 /**
  * Filter for turning the sprite solid colored.
  */
-Sprite.turnSolidColored = function(solidColor) {
+GJS.Sprite.turnSolidColored = function(solidColor) {
     return function(sprite) {
         var canvas = document.createElement('canvas');
         canvas.width = sprite.width;
@@ -96,7 +131,7 @@ Sprite.turnSolidColored = function(solidColor) {
 /**
  * Filter for generating a different hued variation of the sprite.
  */
-Sprite.varyHue = function(options) {
+GJS.Sprite.varyHue = function(options) {
     var defaults = {
         minHue: 0,
         maxHue: 1,
@@ -119,7 +154,17 @@ Sprite.varyHue = function(options) {
         canvas.height = sprite.height;
         var ctx = canvas.getContext('2d');
         sprite.draw(ctx, 0, 0);
-        var data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        try {
+            var data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        } catch (e) {
+            if (e.name == 'SecurityError') {
+                if (!GJS.Sprite.reportedSecurityError) {
+                    GJS.Sprite.reportedSecurityError = true;
+                    console.log(e.message);
+                }
+                return;
+            }
+        }
         for (var i = 0; i < data.data.length; i += 4) {
             var r = data.data[i];
             var g = data.data[i + 1];
@@ -142,20 +187,75 @@ Sprite.varyHue = function(options) {
 };
 
 /**
- * How many Sprite objects have been created.
+ * Filter for generating a variation of the GJS.Sprite with colors replaced with others.
+ * @param {Object} paletteMap A mapping from RGB source color values to target values. Source colors should be strings
+ * in "R, G, B" format. Target colors should be arrays [R, G, B]. In both cases the scale is 0-255.
+ * @param {number=} tolerance Tolerance for detecting source colors.
  */
-Sprite.createdCount = 0;
-/**
- * How many Sprite objects have been fully loaded.
- */
-Sprite.loadedCount = 0;
+GJS.Sprite.repalette = function(paletteMap, tolerance) {
+    if (tolerance === undefined) {
+        tolerance = 10;
+    }
+    var palette = [];
+    for (var key in paletteMap) {
+        if (paletteMap.hasOwnProperty(key)) {
+            var sourceRgb = key.split(', ');
+            palette.push({
+                r: sourceRgb[0],
+                g: sourceRgb[1],
+                b: sourceRgb[2],
+                target: paletteMap[key]
+            });
+        }
+    }
+    return function(sprite) {
+        var canvas = document.createElement('canvas');
+        canvas.width = sprite.width;
+        canvas.height = sprite.height;
+        var ctx = canvas.getContext('2d');
+        sprite.draw(ctx, 0, 0);
+        var data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        for (var i = 0; i < data.data.length; i += 4) {
+            var r = data.data[i];
+            var g = data.data[i + 1];
+            var b = data.data[i + 2];
+            for (var j = 0; j < palette.length; ++j) {
+                if (Math.abs(r - palette[j].r) < tolerance &&
+                    Math.abs(g - palette[j].g) < tolerance &&
+                    Math.abs(b - palette[j].b) < tolerance)
+                {
+                    var rgb = palette[j].target;
+                    data.data[i] = rgb[0];
+                    data.data[i + 1] = rgb[1];
+                    data.data[i + 2] = rgb[2];
+                }
+            }
+        }
+        ctx.putImageData(data, 0, 0);
+        sprite.img = canvas;
+    };
+};
+
+GJS.Sprite.reportedSecurityError = false;
 
 /**
- * @return {number} Amount of Sprite objects that have been fully loaded per amount that has been created.
+ * How many GJS.Sprite objects have been created.
+ */
+GJS.Sprite.createdCount = 0;
+/**
+ * How many GJS.Sprite objects have been fully loaded.
+ */
+GJS.Sprite.loadedCount = 0;
+
+/**
+ * @return {number} Amount of GJS.Sprite objects that have been fully loaded per amount that has been created.
  * Name specified as string to support Closure compiler together with loadingbar.js.
  */
-Sprite['loadedFraction'] = function() {
-    return Sprite.loadedCount / Sprite.createdCount;
+GJS.Sprite['loadedFraction'] = function() {
+    if (GJS.Sprite.createdCount === 0) {
+        return 1.0;
+    }
+    return GJS.Sprite.loadedCount / GJS.Sprite.createdCount;
 };
 
 /**
@@ -164,7 +264,7 @@ Sprite['loadedFraction'] = function() {
  * @param {number} leftX X coordinate of the left edge.
  * @param {number} topY Y coordinate of the top edge.
  */
-Sprite.prototype.draw = function(ctx, leftX, topY) {
+GJS.Sprite.prototype.draw = function(ctx, leftX, topY) {
     if (this.loaded) {
         ctx.drawImage(this.img, leftX, topY);
     }
@@ -178,7 +278,7 @@ Sprite.prototype.draw = function(ctx, leftX, topY) {
  * @param {number} angleRadians Angle to rotate the sprite with (relative to its center).
  * @param {number} scale Scale to scale the sprite with (relative to its center).
  */
-Sprite.prototype.drawRotated = function(ctx, centerX, centerY, angleRadians, /* optional */ scale) {
+GJS.Sprite.prototype.drawRotated = function(ctx, centerX, centerY, angleRadians, /* optional */ scale) {
     if (!this.loaded) {
         return;
     }
@@ -208,7 +308,7 @@ Sprite.prototype.drawRotated = function(ctx, centerX, centerY, angleRadians, /* 
  * @param {number} scaleX Scale to scale the sprite with along the x axis (relative to its center).
  * @param {number} scaleY Scale to scale the sprite with along the y axis (relative to its center).
  */
-Sprite.prototype.drawRotatedNonUniform = function(ctx, centerX, centerY, angleRadians, scaleX, scaleY) {
+GJS.Sprite.prototype.drawRotatedNonUniform = function(ctx, centerX, centerY, angleRadians, scaleX, scaleY) {
     if (!this.loaded) {
         return;
     }
@@ -236,7 +336,7 @@ Sprite.prototype.drawRotatedNonUniform = function(ctx, centerX, centerY, angleRa
  * Fill the canvas with the sprite, preserving the sprite's aspect ratio, with the sprite centered on the canvas.
  * @param {CanvasRenderingContext2D} ctx
  */
-Sprite.prototype.fillCanvas = function(ctx) {
+GJS.Sprite.prototype.fillCanvas = function(ctx) {
     if (!this.loaded) {
         return;
     }
@@ -249,7 +349,7 @@ Sprite.prototype.fillCanvas = function(ctx) {
  * of the canvas.
  * @param {CanvasRenderingContext2D} ctx
  */
-Sprite.prototype.fillCanvasFitBottom = function(ctx) {
+GJS.Sprite.prototype.fillCanvasFitBottom = function(ctx) {
     if (!this.loaded) {
         return;
     }
@@ -262,7 +362,7 @@ Sprite.prototype.fillCanvasFitBottom = function(ctx) {
  * of the canvas.
  * @param {CanvasRenderingContext2D} ctx
  */
-Sprite.prototype.fillCanvasHorizontallyFitBottom = function(ctx) {
+GJS.Sprite.prototype.fillCanvasHorizontallyFitBottom = function(ctx) {
     if (!this.loaded) {
         return;
     }
@@ -271,7 +371,7 @@ Sprite.prototype.fillCanvasHorizontallyFitBottom = function(ctx) {
 };
 
 /**
- * Just here to make Sprite and AnimatedSpriteInstance interchangeable.
+ * Just here to make GJS.Sprite and GJS.AnimatedSpriteInstance interchangeable.
  */
-Sprite.prototype.update = function() {
+GJS.Sprite.prototype.update = function() {
 };

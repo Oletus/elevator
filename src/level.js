@@ -71,10 +71,10 @@ Level.prototype.goToState = function(state) {
     this.stateTime = 0;
 }
 
-Level.failSprite = new Sprite('level-fail.png');
-Level.titleSprite = new Sprite('level-title.png');
-Level.topSprite = new Sprite('top.png');
-Level.bottomSprite = new Sprite('bottom.png');
+Level.failSprite = new GJS.Sprite('level-fail.png');
+Level.titleSprite = new GJS.Sprite('level-title.png');
+Level.topSprite = new GJS.Sprite('top.png');
+Level.bottomSprite = new GJS.Sprite('bottom.png');
 
 Level.prototype.spawnCharacter = function() {
     if (this.state !== Level.State.IN_PROGRESS) {

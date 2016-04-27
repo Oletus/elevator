@@ -61,8 +61,8 @@ var AnimatedSprite = function(animationData, options) {
  * Default constructor for single frames. Set this before loading any animations.
  */
 AnimatedSprite.frameConstructor = null;
-if (typeof Sprite !== 'undefined') {
-    AnimatedSprite.frameConstructor = Sprite;
+if (typeof GJS.Sprite !== 'undefined') {
+    AnimatedSprite.frameConstructor = GJS.Sprite;
 }
 
 AnimatedSprite._getFrame = (function() {
@@ -101,9 +101,9 @@ var AnimatedSpriteInstance = function(animatedSprite, finishedAnimationCallback)
     this.setAnimation(this.animatedSprite.defaultAnimation);
     var frame = this.animatedSprite.animations[this.animationKey][this.frame].frame;
 
-    // Add draw functions from Sprite if they are defined
+    // Add draw functions from GJS.Sprite if they are defined
     // A bit slow way to do this but needed to make the animation classes more generic.
-    if (frame instanceof Sprite && frame.draw !== undefined &&
+    if (frame instanceof GJS.Sprite && frame.draw !== undefined &&
         frame.drawRotated !== undefined && frame.drawRotatedNonUniform !== undefined)
     {
         var that = this;

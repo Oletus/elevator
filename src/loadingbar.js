@@ -13,8 +13,8 @@ if (window.GJS === undefined) {
 var LoadingBar = function(objectsToPoll) {
     if (objectsToPoll === undefined) {
         objectsToPoll = [];
-        if (typeof Sprite !== 'undefined') {
-            objectsToPoll.push(Sprite);
+        if (typeof GJS.Sprite !== 'undefined') {
+            objectsToPoll.push(GJS.Sprite);
         }
         if (typeof GJS.Audio !== 'undefined') {
             objectsToPoll.push(GJS.Audio);
