@@ -13,6 +13,7 @@
 <script src="src/animatedsprite.js"></script>
 <script src="src/lib/howler.core.js"></script>
 <script src="src/audio.js"></script>
+<script src="src/commonui.js"></script>
 <script>
 GJS.Audio.defaultExtensions = ['ogg', 'mp3'];
 GJS.Audio.audioPath = 'assets/audio/';
@@ -170,6 +171,15 @@ window['start'] = function() {
     if (DEV_MODE) {
         Game.parameters.initGUI();
     }
+    
+    GJS.commonUI.createUI({
+        parent: document.body,
+        fullscreenElement: document.body,
+        twitterAccount: 'Oletus',
+        fillStyle: '#ffffff',
+        opacity: 0.4,
+        scale: 0.8
+    });
     
     resizer = new CanvasResizer({mode: CanvasResizer.Mode.MINIMUM_HEIGHT, width: 192, height: 312});
     game = new Game(resizer);

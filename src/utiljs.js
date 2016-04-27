@@ -1,5 +1,9 @@
 'use strict';
 
+if (typeof GJS === "undefined") {
+    var GJS = {};
+}
+
 var arrayUtil = {}; // Utilities for working with JS arrays
 var stringUtil = {}; // Utilities for working with JS strings
 var objectUtil = {}; // Utilities for working with JS objects
@@ -178,11 +182,11 @@ objectUtil.wrap = function(toWrap, excludeFromForwarding) {
 };
 
 
-
 /**
  * Request fullscreen on a given element.
+ * @param {HTMLElement} elem Element to make fullscreen.
  */
-var requestFullscreen = function(elem) {
+GJS.requestFullscreen = function(elem) {
     if (elem.requestFullscreen) {
         elem.requestFullscreen();
     } else if (elem.msRequestFullscreen) {
@@ -192,6 +196,42 @@ var requestFullscreen = function(elem) {
     } else if (elem.webkitRequestFullscreen) {
         elem.webkitRequestFullscreen();
     }
+};
+
+/**
+ * Exit fullscreen.
+ */
+GJS.exitFullscreen = function() {
+    if(document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if(document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+    } else if(document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+    }
+};
+
+/**
+ * @param {function} listener Listener to call when fullscreen state changes.
+ */
+GJS.addFullscreenChangeListener = function(listener) {
+    document.addEventListener('fullscreenchange', listener);
+    document.addEventListener('mozfullscreenchange', listener);
+    document.addEventListener('webkitfullscreenchange', listener);
+};
+
+/**
+ * @return {boolean} True if document is currently fullscreen.
+ */
+GJS.isFullscreen = function() {
+    if (document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.webkitCurrentFullScreenElement)
+    {
+        return true;
+    }
+    return false;
 };
 
 
